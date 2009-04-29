@@ -7,7 +7,8 @@ LDFLAGS= -arch x86_64 -no-cpp-precomp -dynamic -fno-common \
 	-lidl -lXm -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2 -lfreetype \
 	-multiply_defined suppress
 
-
+.PHONY: clean
+	
 # Build the C language test program
 test : $(CALLABLE_TEST).o
 	cc $(CALLABLE_TEST).o -o $(CALLABLE_TEST) $(LDFLAGS) 

@@ -1,0 +1,13 @@
+Installation
+============
+
+Make sure to point LD_LIBRARY_PATH (DYLD_LIBRARY_PATH for Macs) to the appropriate bin directory of the IDL distribution i.e.::
+ 
+  /usr/local/itt/idl/bin/bin.bin.linux.x86_64 
+  
+for 64-bit Linux or::
+
+  /Applications/itt/idl/bin/bin.darwin.x86_64 
+  
+for 64-bit Mac
+  
