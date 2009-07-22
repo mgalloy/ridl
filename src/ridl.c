@@ -1,6 +1,7 @@
 #include <stdio.h>   
 #include <signal.h>
 #include "idl_export.h" 
+#include "readline/readline.h"
 #include "ridl.h"
 
 static int exit_value;
@@ -13,15 +14,15 @@ static IDL_MSG_BLOCK msg_block;
 
 
 void ridl_signal_handler(int signo) {
-  printf("Received signal %d\n", signo);
+  //printf("Received signal %d\n", signo);
   
-  exit_value = IDL_Cleanup(IDL_FALSE);
-  exit(exit_value);
+  exit_value = IDL_Cleanup(IDL_FALSE);  
 }
 
 
 void ridl_exit_handler(void) {  
   printf("Bye!\n");
+  //exit(exit_value);
 }
 
 
@@ -37,7 +38,7 @@ void ridl_print_prompt(void) {
 
 int main(int argc, char *argv[]) {  
   IDL_INIT_DATA init_data;  
-  char line[MAX_LINE_LENGTH];
+  char *line;
   int error;
   IDL_SignalSet_t *set;
   
@@ -64,18 +65,23 @@ int main(int argc, char *argv[]) {
     //IDL_SignalRegister(SIGSTOP, ridl_signal_handler, M_RIDL_SIGNAL_REG);
     
     while (1) {
-      ridl_print_prompt();
-      if (fgets(line, MAX_LINE_LENGTH, stdin) == NULL) { 
+      char *line = readline ("rIDL> ");
+      if (line == NULL) { 
         printf("\n");
         exit_value = IDL_Cleanup(IDL_FALSE); 
       };
+      
+      // TODO: check for "magic" line that begins with ":"
+      
+      add_history(line);
       error = IDL_ExecuteStr(line);
+      free(line);
       //printf("code = %d\n", error);
     }    
   } else {
     printf("Failed to initialize Callable IDL session.\n");
-    exit_value = 0;
+    exit_value = 1;
   }
    
-  return exit_value;
+  return(exit_value);
 } 
