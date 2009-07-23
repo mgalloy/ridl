@@ -13,7 +13,7 @@ static IDL_MSG_BLOCK msg_block;
 
 
 void ridl_exit_handler(void) {  
-  exit(0);
+  exit(EXIT_SUCCESS);
 }
 
 
@@ -115,8 +115,8 @@ int main(int argc, char *argv[]) {
     }    
   } else {
     printf("Failed to initialize Callable IDL session.\n");
-    return(1);
+    return(EXIT_FAILURE);
   }
   
-  return(1);
+  return(EXIT_FAILURE);
 } 
