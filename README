@@ -9,5 +9,7 @@ for 64-bit Linux or::
 
   /Applications/itt/idl/bin/bin.darwin.x86_64 
   
-for 64-bit Mac
+for 64-bit Mac.
+
+The GNU Readline library is required to be installed in the standard location i.e. /usr/local.
   
