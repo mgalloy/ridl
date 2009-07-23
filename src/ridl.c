@@ -47,7 +47,27 @@ char *ridl_getnextword(char *line, int start) {
 }
 
 
+void ridl_printversion(void) {
+  // TODO: put version info in here
+  printf("showing version\n");
+  exit(EXIT_SUCCESS);  
+}
+
+
+void ridl_printhelp(void) {
+  // TODO: put help in here
+  printf("show help...\n");
+  exit(EXIT_SUCCESS);
+}
+
+
 int main(int argc, char *argv[]) {  
+  int a;
+  for (a = 0; a < argc; a++) {
+    if (strcmp(argv[a], "-v") == 0) ridl_printversion();
+    if (strcmp(argv[a], "-h") == 0) ridl_printhelp();
+  }
+  
   // TODO: these command line args don't seem to be used; -32 should not be
   // expected to work, but not sure why the rest don't
   IDL_INIT_DATA init_data;    
