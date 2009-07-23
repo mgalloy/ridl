@@ -13,7 +13,7 @@ static IDL_MSG_BLOCK msg_block;
 
 
 void ridl_exit_handler(void) {  
-  //printf("Bye!\n");
+  exit(0);
 }
 
 
@@ -48,7 +48,8 @@ char *ridl_getnextword(char *line, int start) {
 
 
 int main(int argc, char *argv[]) {  
-  // TODO: these command line args don't seem to be used
+  // TODO: these command line args don't seem to be used; -32 should not be
+  // expected to work, but not sure why the rest don't
   IDL_INIT_DATA init_data;    
   init_data.options = IDL_INIT_CLARGS;  
   init_data.clargs.argc = argc;  
@@ -117,6 +118,5 @@ int main(int argc, char *argv[]) {
     return(1);
   }
   
-  // TODO: exit values don't seem to be passed to shell
   return(1);
 } 
