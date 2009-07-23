@@ -6,8 +6,9 @@
 #include "readline/readline.h"
 #include "ridl.h"
 
-static char *ridl_version = "0.1";
-static int show_welcome = 1;
+static int ridl_options = IDL_INIT_CLARGS;
+static int execute_cmd = 0;
+static char *cmd;
 
 static IDL_MSG_DEF msg_arr[] = {  
 #define M_RIDL_SIGNAL_REG       0
@@ -28,7 +29,7 @@ void ridl_exit_handler(void) {
    Print rIDL welcome message if not quiet.
 */
 void ridl_welcome(void) {
-  if (show_welcome) {
+  if (!(ridl_options & IDL_INIT_QUIET)) {
     printf("rIDL 0.1: Really Interactive Data Language\n");  
   }
 }
@@ -105,8 +106,8 @@ void ridl_printversion(void) {
   IDL_STRING *version = IDL_SysvVersionRelease();
   IDL_STRING *os = IDL_SysvVersionOS();
   IDL_STRING *arch = IDL_SysvVersionArch();
-  printf("rIDL %s: IDL %s %s %s\n", 
-         ridl_version, 
+  printf("rIDL %s: Really Interactive Data Language\n", ridl_version);
+  printf("IDL %s %s %s\n", 
          IDL_STRING_STR(version), 
          IDL_STRING_STR(os), 
          IDL_STRING_STR(arch));
@@ -122,6 +123,7 @@ void ridl_printhelp(void) {
   
   ridl_printversion();
   
+  printf("\n");
   printf("usage: ridl [options]\n");
   printf("\n");
   printf("options:\n");
@@ -136,7 +138,7 @@ void ridl_printhelp(void) {
   printf("%s%-*s %s\n", indent, switch_width, "-e command", 
          "executes command and exit");
   printf("%s%-*s %s\n", indent, switch_width, "-em=FILENAME", 
-    "execute the given .sav file containing an embedded license");
+         "execute the given .sav file containing an embedded license");
   printf("%s%-*s %s\n", indent, switch_width, "-h", 
          "display this help message");
   printf("%s%-*s %s\n", indent, switch_width, "-novm", 
@@ -163,27 +165,63 @@ void ridl_printhelp(void) {
 int main(int argc, char *argv[]) {  
   int a;
   for (a = 0; a < argc; a++) {
-    if (strcmp(argv[a], "-v") == 0) { 
-      ridl_printversion();
-      exit(EXIT_SUCCESS);
-    }
+    if (strcmp(argv[a], "-arg") == 0) {
+      // TODO: handle
+    }        
+    if (strcmp(argv[a], "-args") == 0) {
+      // TODO: handle
+    }        
+    if (strcmp(argv[a], "-demo") == 0) {
+      // TODO: handle
+    }    
+    if (strcmp(argv[a], "-e") == 0) {
+      if (a + 1 < argc) {
+        execute_cmd = 1;
+        cmd = argv[a + 1];
+        printf("picking up cmd %s\n", cmd);
+      }
+    }    
+    if (strcmp(argv[a], "-em") == 0) {
+      // TODO: handle
+    }        
     if (strcmp(argv[a], "-h") == 0) {
       ridl_printhelp();
       exit(EXIT_SUCCESS);
     }
+    if (strcmp(argv[a], "-novm") == 0) {
+      // TODO: handle
+    }        
+    if (strcmp(argv[a], "-pref") == 0) {
+      // TODO: handle
+    }        
     if (strcmp(argv[a], "-quiet") == 0) {
-      show_welcome = 0;
+      ridl_options |= IDL_INIT_QUIET;
+    } 
+    if (strcmp(argv[a], "-queue") == 0) {
+      ridl_options |= IDL_INIT_LMQUEUE;
     }    
+    if (strcmp(argv[a], "-rt") == 0) {
+      // TODO: handle
+    }        
+    if (strcmp(argv[a], "-student") == 0) {
+      // TODO: handle
+    }        
+    if (strcmp(argv[a], "-ulicense") == 0) {
+      // TODO: handle
+    }        
+    if (strcmp(argv[a], "-v") == 0) { 
+      ridl_printversion();
+      exit(EXIT_SUCCESS);
+    }
+    if (strcmp(argv[a], "-vm") == 0) {
+      // TODO: handle
+    }        
   }
   
-  // TODO: these command line args don't seem to be used; -32 should not be
-  // expected to work, but not sure why the rest don't
-  IDL_INIT_DATA init_data;    
-  init_data.options = IDL_INIT_CLARGS;  
-  init_data.clargs.argc = argc;  
-  init_data.clargs.argv = argv;  
-  
-  // TODO: handle -h and -v also
+  IDL_INIT_DATA init_data;
+  init_data.options = ridl_options;
+  init_data.clargs.argc = argc;
+  init_data.clargs.argv = argv;
   
   ridl_welcome();
                                                
@@ -196,6 +234,12 @@ int main(int argc, char *argv[]) {
     
     // TODO: add previous history to readline history
     // TODO: add completer for routines and variables
+    
+    // handle -e option if it was present
+    if (execute_cmd) {
+      int error = IDL_ExecuteStr(cmd);
+      return(IDL_Cleanup(IDL_FALSE));
+    }
     
     while (1) {
       char *line = readline ("rIDL> ");
