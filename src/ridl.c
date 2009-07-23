@@ -202,6 +202,7 @@ int main(int argc, char *argv[]) {
     }    
     if (strcmp(argv[a], "-rt") == 0) {
       // TODO: handle
+      // use: int IDL_RuntimeExec(char * file)
     }        
     if (strcmp(argv[a], "-student") == 0) {
       // TODO: handle
