@@ -16,11 +16,17 @@ static IDL_MSG_DEF msg_arr[] = {
 static IDL_MSG_BLOCK msg_block; 
 
 
+/*
+   Handle any rIDL cleanup before exiting.
+*/
 void ridl_exit_handler(void) {  
   exit(EXIT_SUCCESS);
 }
 
 
+/*
+   Print rIDL welcome message if not quiet.
+*/
 void ridl_welcome(void) {
   if (show_welcome) {
     printf("rIDL 0.1: Really Interactive Data Language\n");  
@@ -53,22 +59,48 @@ char *ridl_getnextword(char *line, int start) {
 }
 
 
+/*
+   Use IDL's FILE_WHICH to find filename in IDL path including the current
+   directory. If not found, then filename is copied and returned.
+   
+   This routine creates a _$RIDL_EDIT variable that will be left in the 
+   current IDL scope.
+*/
 char *ridl_findpath(char *filename) {
-  // TODO: find full path for filename referred to on .edit line
-  char *fullpath = (char *)malloc(strlen(filename) + 1);
-  strcpy(fullpath, filename);
+  char *cmdFormat = "_$ridl_edit = file_which('%s', /include_current_dir)";
+  char *cmd = (char *)malloc(strlen(cmdFormat) - 2 + strlen(filename) + 1);
+  sprintf(cmd, cmdFormat, filename);  
+  int result = IDL_ExecuteStr(cmd);
+  free(cmd);
+  
+  IDL_VPTR ridl_filename = IDL_FindNamedVariable("_$ridl_edit", IDL_FALSE);
+
+  char *ridl_filename_str = IDL_STRING_STR(&ridl_filename->value.str);
+  char *file;
+  if (strlen(ridl_filename_str) == 0) {
+    file = (char *)malloc(strlen(filename) + 1);
+    strcpy(file, filename);
+  } else {
+    file = (char *)malloc(strlen(ridl_filename_str) + 1);
+    strcpy(file, ridl_filename_str);
+  }
+
+  return(file);
 }
 
 
 void ridl_launcheditor(char *filename) {
-  char *editor = "mate -w";    // TODO: change editor to use $EDITOR
+  char *editor = "$EDITOR";
   char *cmd = (char *)malloc(strlen(filename) + strlen(editor) + 1 + 1);
   sprintf(cmd, "%s %s", editor, filename);
-  system(cmd);
+  system(cmd);   // TODO: should not block
   free(cmd);
 }
 
 
+/*
+   Prints version information about rIDL and IDL to stdout.
+*/
 void ridl_printversion(void) {
   IDL_STRING *version = IDL_SysvVersionRelease();
   IDL_STRING *os = IDL_SysvVersionOS();
@@ -81,9 +113,13 @@ void ridl_printversion(void) {
 }
 
 
+/*
+   Print usage and options for rIDL.
+*/
 void ridl_printhelp(void) {
-  char *indent = "  ";
-  int switch_width = 25;
+  char *indent = "  ";    // prefix for each line of switch help
+  int switch_width = 25;  // width of switch column in spaces
+  
   ridl_printversion();
   
   printf("usage: ridl [options]\n");
@@ -102,7 +138,7 @@ void ridl_printhelp(void) {
   printf("%s%-*s %s\n", indent, switch_width, "-em=FILENAME", 
     "execute the given .sav file containing an embedded license");
   printf("%s%-*s %s\n", indent, switch_width, "-h", 
-         "show this help message");
+         "display this help message");
   printf("%s%-*s %s\n", indent, switch_width, "-novm", 
          "use 7-minute demo mode instead of virtual machine with -rt");
   printf("%s%-*s %s\n", indent, switch_width, "-pref=FILENAME", 
@@ -118,7 +154,7 @@ void ridl_printhelp(void) {
   printf("%s%-*s %s\n", indent, switch_width, "-ulicense", 
          "start IDL with a unique license");
   printf("%s%-*s %s\n", indent, switch_width, "-v", 
-         "print version information");
+         "display version information");
   printf("%s%-*s %s\n", indent, switch_width, "-vm=FILENAME", 
          "start the virtual machine with the given .sav file");
 }
