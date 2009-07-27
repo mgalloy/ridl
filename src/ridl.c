@@ -85,8 +85,8 @@ char *ridl_findpath(char *filename) {
   char *ridl_filename_str = IDL_STRING_STR(&ridl_filename->value.str);
   char *file;
   if (strlen(ridl_filename_str) == 0) {
-    file = (char *)malloc(strlen(filename) + 1);
-    strcpy(file, filename);
+    file = (char *)malloc(strlen(filename) + 4 + 1);
+    sprintf(file, "%s.pro", filename);
   } else {
     file = (char *)malloc(strlen(ridl_filename_str) + 1);
     strcpy(file, ridl_filename_str);
