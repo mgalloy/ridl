@@ -25,4 +25,5 @@ install:
 clean:
 	rm -f $(RIDL).o
 	rm -f $(RIDL)
+	rm -rf bin.*
 	
