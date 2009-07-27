@@ -17,6 +17,11 @@ static IDL_MSG_DEF msg_arr[] = {
 static IDL_MSG_BLOCK msg_block; 
 
 
+void ridl_exit() {
+  int result = IDL_Cleanup(IDL_FALSE);
+}
+
+
 /*
    Handle any rIDL cleanup before exiting.
 */
@@ -228,7 +233,8 @@ int main(int argc, char *argv[]) {
                                                
   if (IDL_Initialize(&init_data)) {
     IDL_ExitRegister(ridl_exit_handler);
-
+    IDL_UicbRegExitDone(ridl_exit);
+    
     if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK", 
                                              IDL_CARRAY_ELTS(msg_arr),  
                                              msg_arr))) return(1);                                            
