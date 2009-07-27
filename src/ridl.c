@@ -261,15 +261,22 @@ int main(int argc, char *argv[]) {
       int firstcharIndex = ridl_firstchar(line);
       char firstchar = line[firstcharIndex];
       if (firstchar == ':') {
-        // TODO: handle magic lines
         char *cmd = ridl_getnextword(line, firstcharIndex);
-        printf("magic command '%s'\n", cmd);
+        if (strcmp(cmd, ":doc") == 0) {
+          char *routine = ridl_getnextword(line, firstcharIndex + 5);
+          char *man = (char *)malloc(8 + strlen(routine));
+          sprintf(man, "man, '%s'", routine);
+          int error = IDL_ExecuteStr(man);
+          free(man);
+          free(routine);
+        }
         free(cmd);
       } else {
         if (line && *line) { 
           add_history(line);
           
           // check for .edit
+          // TODO: see if this can be simplified by using IDL_TypeIDEUserEditFunc
           if (firstchar == '.') {
             char *cmd = ridl_getnextword(line, firstcharIndex);
             if (strcmp(cmd, ".edit") == 0) {
