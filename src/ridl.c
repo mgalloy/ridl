@@ -73,12 +73,13 @@ char *ridl_getnextword(char *line, int start) {
    current IDL scope.
 */
 char *ridl_findpath(char *filename) {
-  char *cmdFormat = "_$ridl_edit = file_which('%s', /include_current_dir)";
+  char *cmdFormat = "_$ridl_edit = file_which('%s.pro', /include_current_dir)";
   char *cmd = (char *)malloc(strlen(cmdFormat) - 2 + strlen(filename) + 1);
   sprintf(cmd, cmdFormat, filename);  
   int result = IDL_ExecuteStr(cmd);
   free(cmd);
   
+  // TODO: it would be nice to not leave this variable around
   IDL_VPTR ridl_filename = IDL_FindNamedVariable("_$ridl_edit", IDL_FALSE);
 
   char *ridl_filename_str = IDL_STRING_STR(&ridl_filename->value.str);
