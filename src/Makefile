@@ -10,7 +10,7 @@ LDFLAGS= -no-cpp-precomp -dynamic -fno-common \
 	-lidl -lXm -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2 -lreadline -lfreetype \
 	-multiply_defined suppress
 
-.PHONY: clean install
+.PHONY: clean install both
 
 $(RIDL) : $(RIDL).o
 	cc $(RIDL).o -o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
@@ -18,6 +18,14 @@ $(RIDL) : $(RIDL).o
 $(RIDL).o : $(RIDL).c
 	cc $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL).c -o $(RIDL).o
 
+both:
+	make clean
+	make
+	make install
+	make clean
+	make ARCH=i386
+	make ARCH=i386 install
+	
 install:
 	mkdir -p bin.darwin.$(ARCH)
 	mv $(RIDL) bin.darwin.$(ARCH)

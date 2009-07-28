@@ -4,6 +4,8 @@
 
 #include "idl_export.h" 
 #include "readline/readline.h"
+#include "readline/history.h"
+
 #include "ridl.h"
 
 static int ridl_options = IDL_INIT_CLARGS;
@@ -15,6 +17,34 @@ static IDL_MSG_DEF msg_arr[] = {
   {  "M_RIDL_SIGNAL_REG",   "%NSignal registration problem." }, 
 };
 static IDL_MSG_BLOCK msg_block; 
+
+// TODO: need to figure out what this should be
+static char *history_file_location = "/Users/mgalloy/.idl/itt/rbuf/history";
+
+void ridl_populatehistory(void) {
+  FILE *fp = fopen(history_file_location, "r");
+  int i;
+  char line[RIDL_MAX_LINE_LENGTH];
+  
+  // TODO: this reads the history backwards
+  while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
+    for (i = strlen(line); i > 0; i--) {
+      if (line[i] == '<') { 
+        line[i] = '\0';
+      }
+    }
+    add_history(line);
+  }
+  
+  fclose(fp);
+}
+
+
+int ridl_executestr(char *cmd) {
+  // TODO: save cmd in IDL history
+  add_history(cmd);
+  return IDL_ExecuteStr(cmd);
+}
 
 
 void ridl_show_compile_error(void) {
@@ -33,7 +63,7 @@ void ridl_exit(void) {
 /*
    Handle any rIDL cleanup before exiting.
 */
-void ridl_exit_handler(void) {  
+void ridl_exit_handler(void) { 
   exit(EXIT_SUCCESS);
 }
 
@@ -81,45 +111,13 @@ char *ridl_getnextword(char *line, int start) {
 
 
 /*
-   Use IDL's FILE_WHICH to find filename in IDL path including the current
-   directory. If not found, then filename is copied and returned.
-   
-   This routine creates a _$RIDL_EDIT variable that will be left in the 
-   current IDL scope.
-*/
-char *ridl_findpath(char *filename) {
-  char *cmdFormat = "_$ridl_edit = file_which('%s.pro', /include_current_dir)";
-  char *cmd = (char *)malloc(strlen(cmdFormat) - 2 + strlen(filename) + 1);
-  sprintf(cmd, cmdFormat, filename);  
-  int result = IDL_ExecuteStr(cmd);
-  free(cmd);
-  
-  // TODO: it would be nice to not leave this variable around
-  // IDL_CallRoutineByString("MG_FILE_WHICH", &result, 1, params, NULL)
-  IDL_VPTR ridl_filename = IDL_FindNamedVariable("_$ridl_edit", IDL_FALSE);
-
-  char *ridl_filename_str = IDL_STRING_STR(&ridl_filename->value.str);
-  char *file;
-  if (strlen(ridl_filename_str) == 0) {
-    file = (char *)malloc(strlen(filename) + 4 + 1);
-    sprintf(file, "%s.pro", filename);
-  } else {
-    file = (char *)malloc(strlen(ridl_filename_str) + 1);
-    strcpy(file, ridl_filename_str);
-  }
-
-  return(file);
-}
-
-
-/*
    Launch editor in $EDITOR environment variable.
 */
 void ridl_launcheditor(char *filename) {
-  char *editor = "$EDITOR";
-  char *cmd = (char *)malloc(strlen(filename) + strlen(editor) + 1 + 1);
-  sprintf(cmd, "%s %s", editor, filename);
-  system(cmd);
+  char *cmdFormat = "ridl_launcheditor, '%s'";
+  char *cmd = (char *)malloc(strlen(filename) + strlen(cmdFormat) + 1);
+  sprintf(cmd, cmdFormat, filename);
+  int result = IDL_ExecuteStr(cmd);
   free(cmd);
 }
 
@@ -265,11 +263,10 @@ int main(int argc, char *argv[]) {
                                              IDL_CARRAY_ELTS(msg_arr),  
                                              msg_arr))) return(1);                                            
     
-    // TODO: add previous history to readline history
-    //       figure out IDL_RbufRecall, parse .idl/itt/rbuf/history file, or
-    //       use RECALL_COMMANDS()
+    using_history();
+    ridl_populatehistory();
     
-    // TODO: add completer for routines and variables
+    // TODO: add completers for routines and variables completion
     
     // handle -e option if it was present
     if (execute_cmd) {
@@ -278,7 +275,7 @@ int main(int argc, char *argv[]) {
     }
     
     while (1) {
-      char *line = readline ("rIDL> ");
+      char *line = readline (ridl_prompt);
       
       // normal exit by hitting ^D
       if (line == NULL) { 
@@ -301,25 +298,38 @@ int main(int argc, char *argv[]) {
         }
         free(cmd);
       } else {
-        if (line && *line) { 
-          add_history(line);
-          
+        if (line && *line) {           
           // check for .edit
-          // TODO: see if this can be simplified by using IDL_TypeIDEUserEditFunc
           if (firstchar == '.') {
             char *cmd = ridl_getnextword(line, firstcharIndex);
             if (strcmp(cmd, ".edit") == 0) {
               char *file = ridl_getnextword(line, firstcharIndex + strlen(cmd) + 1);
-              char *fullpath = ridl_findpath(file);
-              ridl_launcheditor(fullpath);
+              ridl_launcheditor(file);
               free(file);
-              free(fullpath);
             } else {
-              int error = IDL_ExecuteStr(line);
+              int error = ridl_executestr(line);
             }
             free(cmd);
+          } else if (firstchar == '!') {
+            char *expansion;
+            int expansion_result;
+            expansion_result = history_expand(line, &expansion);
+            switch (expansion_result) {
+              case -1: 
+                printf("Error in expansion\n");
+                break;
+              case 2: 
+                printf("%s%s\n", ridl_prompt, expansion);
+                break;
+              case 0: 
+              case 1: 
+                printf("%s%s\n", ridl_prompt, expansion);
+                int error = ridl_executestr(expansion);
+                break;
+            }
+            free(expansion);
           } else {
-            int error = IDL_ExecuteStr(line);
+            int error = ridl_executestr(line);
           }
         }
       }
