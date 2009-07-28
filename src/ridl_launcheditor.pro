@@ -1,7 +1,11 @@
 ; docformat = 'rst'
 
 ;+
-; 
+; Finds .pro files in the !path or current directory.
+;
+; :Params:
+;    basename : in, required, type=string
+;       basename of .pro file to find in !path or current directory
 ;-
 pro ridl_launcheditor, basename
   compile_opt strictarr
@@ -12,7 +16,7 @@ pro ridl_launcheditor, basename
   editor = getenv('RIDL_EDITOR')
   if (editor eq '') then editor = getenv('EDITOR')
   if (editor eq '') then begin
-    print, 'No editor set: specify $EDITOR or $RIDL_EDITOR'
+    print, 'No editor set: specify $RIDL_EDITOR or $EDITOR'
     return
   endif
   

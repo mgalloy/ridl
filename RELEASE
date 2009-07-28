@@ -1,0 +1,33 @@
+rIDL 1.0
+--------
+
+  * .edit executive command uses RIDL_EDITOR and EDITOR environment variables
+    to launch an editor.
+    
+  * :doc magic command displays header information about a routine.
+  
+  * :log/:unlog magic command. To get a log of the session, both commands and
+    output, use::
+    
+       rIDL> :log filename
+
+  * Readline history commands are available with :!. For example, to replace a 
+    string::
+    
+       rIDL> a = '/path/to/datafile'
+       rIDL> :!!:s/a/b/
+       rIDL> b = '/path/to/datafile'
+  
+    Here, the first two lines are typed and the third line is created by the 
+    second line. Search for help on using Readline history for more   
+    information about commands available (just put them after a :).    
+  
+  
+IDL functionality not in rIDL
+-----------------------------
+
+  * widget support
+  
+  * not all command line options
+  
+  * command history file

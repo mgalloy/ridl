@@ -11,6 +11,9 @@
 static int ridl_options = IDL_INIT_CLARGS;
 static int execute_cmd = 0;
 static char *cmd;
+static int logging = 0;
+static char *log_file;
+static FILE *log_fp;
 
 static IDL_MSG_DEF msg_arr[] = {  
 #define M_RIDL_SIGNAL_REG       0
@@ -21,34 +24,71 @@ static IDL_MSG_BLOCK msg_block;
 // TODO: need to figure out what this should be
 static char *history_file_location = "/Users/mgalloy/.idl/itt/rbuf/history";
 
+
+
+void ridl_logoutput(int flags, char *buf, int n) {
+  printf("%s", buf);
+  if (flags & IDL_TOUT_F_NLPOST) printf("\n");
+
+  fprintf(log_fp, "%s", buf);
+  if (flags & IDL_TOUT_F_NLPOST) fprintf(log_fp, "\n");
+}
+
+
+/*
+   Registered to be called when the !prompt changes.
+*/
+void ridl_changeprompt(IDL_STRING *prompt) {
+  ridl_prompt = IDL_STRING_STR(prompt);
+}
+
+
+/*
+   Reads IDL history file and populates the Readline history.
+*/
 void ridl_populatehistory(void) {
   FILE *fp = fopen(history_file_location, "r");
-  int i;
+  int i, line_number = 0, rline_number;
+  char history[RIDL_RBUF_SIZE][RIDL_MAX_LINE_LENGTH];
   char line[RIDL_MAX_LINE_LENGTH];
   
-  // TODO: this reads the history backwards
   while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
     for (i = strlen(line); i > 0; i--) {
       if (line[i] == '<') { 
         line[i] = '\0';
       }
     }
-    add_history(line);
+    strcpy(history[line_number++], line);
+  }
+  
+  for (rline_number = line_number - 1; rline_number >= 0; rline_number--) {
+    add_history(history[rline_number]);
   }
   
   fclose(fp);
 }
 
-
+/*
+   Execute an IDL command typed at the command line by the user.
+*/
 int ridl_executestr(char *cmd) {
-  // TODO: save cmd in IDL history
+  if (logging) fprintf(log_fp, "%s%s\n", ridl_prompt, cmd);
+
+  int result = IDL_ExecuteStr(cmd);
+
   add_history(cmd);
-  return IDL_ExecuteStr(cmd);
+  // TODO: also add to IDL history
+
+  fprintf(stderr, "\e[0m");   // reset colors if there was a compile error
+  return(result);
 }
 
 
+/*
+   Registered to be called before a compiler error is shown.
+*/
 void ridl_show_compile_error(void) {
-  //printf("Showing a compiler error...\n");
+  fprintf(stderr, "\e[31m");
 }
 
 
@@ -63,7 +103,9 @@ void ridl_exit(void) {
 /*
    Handle any rIDL cleanup before exiting.
 */
-void ridl_exit_handler(void) { 
+void ridl_exit_handler(void) {
+  if (logging) fclose(log_fp);
+
   exit(EXIT_SUCCESS);
 }
 
@@ -258,6 +300,7 @@ int main(int argc, char *argv[]) {
     IDL_ExitRegister(ridl_exit_handler);
     IDL_UicbRegExitDone(ridl_exit);
     IDL_UicbRegShowCompileErr(ridl_show_compile_error);
+    IDL_UicbRegPromptChange(ridl_changeprompt);
     
     if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK", 
                                              IDL_CARRAY_ELTS(msg_arr),  
@@ -274,7 +317,7 @@ int main(int argc, char *argv[]) {
       return(IDL_Cleanup(IDL_FALSE));
     }
     
-    while (1) {
+    while (1) {      
       char *line = readline (ridl_prompt);
       
       // normal exit by hitting ^D
@@ -287,16 +330,53 @@ int main(int argc, char *argv[]) {
       int firstcharIndex = ridl_firstchar(line);
       char firstchar = line[firstcharIndex];
       if (firstchar == ':') {
-        char *cmd = ridl_getnextword(line, firstcharIndex);
-        if (strcmp(cmd, ":doc") == 0) {
-          char *routine = ridl_getnextword(line, firstcharIndex + 5);
-          char *man = (char *)malloc(8 + strlen(routine));
-          sprintf(man, "man, '%s'", routine);
-          int error = IDL_ExecuteStr(man);
-          free(man);
-          free(routine);
+        if ((firstcharIndex + 1 < strlen(line)) && (line[firstcharIndex + 1] == '!')) {
+          char *expansion;
+          int expansion_result;
+          char *expansion_line = (char *) malloc(strlen(line) + 1);
+          strcpy(expansion_line, line + firstcharIndex + 1);
+          expansion_result = history_expand(expansion_line, &expansion);
+          switch (expansion_result) {
+            case -1: 
+              printf("Error in expansion\n");
+              break;
+            case 2: 
+              printf("%s%s\n", ridl_prompt, expansion);
+              break;
+            case 0: 
+            case 1: 
+              printf("%s%s\n", ridl_prompt, expansion);
+              int error = ridl_executestr(expansion);
+              break;
+          }
+          free(expansion_line);
+          free(expansion);
+        } else {                          
+          char *cmd = ridl_getnextword(line, firstcharIndex);
+          if (strcmp(cmd, ":doc") == 0) {
+            char *routine = ridl_getnextword(line, firstcharIndex + 5);
+            char *man = (char *)malloc(8 + strlen(routine));
+            sprintf(man, "man, '%s'", routine);
+            int error = IDL_ExecuteStr(man);
+            free(man);
+            free(routine);
+          } else if (strcmp(cmd, ":log") == 0) {
+            if (logging) fclose(log_fp);
+
+            logging = 1;
+            char *filename = ridl_getnextword(line, firstcharIndex + 5);
+            log_fp = fopen(filename, "w");
+            IDL_ToutPush(ridl_logoutput);
+            free(filename);
+          } else if (strcmp(cmd, ":unlog") == 0) {
+            if (logging) {
+              fclose(log_fp);
+              IDL_ToutPop();
+            }
+            logging = 0;
+          }
+          free(cmd);
         }
-        free(cmd);
       } else {
         if (line && *line) {           
           // check for .edit
@@ -304,30 +384,14 @@ int main(int argc, char *argv[]) {
             char *cmd = ridl_getnextword(line, firstcharIndex);
             if (strcmp(cmd, ".edit") == 0) {
               char *file = ridl_getnextword(line, firstcharIndex + strlen(cmd) + 1);
-              ridl_launcheditor(file);
+              ridl_launcheditor(file);              
               free(file);
+              
+              add_history(line);
             } else {
               int error = ridl_executestr(line);
             }
             free(cmd);
-          } else if (firstchar == '!') {
-            char *expansion;
-            int expansion_result;
-            expansion_result = history_expand(line, &expansion);
-            switch (expansion_result) {
-              case -1: 
-                printf("Error in expansion\n");
-                break;
-              case 2: 
-                printf("%s%s\n", ridl_prompt, expansion);
-                break;
-              case 0: 
-              case 1: 
-                printf("%s%s\n", ridl_prompt, expansion);
-                int error = ridl_executestr(expansion);
-                break;
-            }
-            free(expansion);
           } else {
             int error = ridl_executestr(line);
           }
