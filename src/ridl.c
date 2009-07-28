@@ -9,8 +9,12 @@
 #include "ridl.h"
 
 static int ridl_options = IDL_INIT_CLARGS;
+
 static int execute_cmd = 0;
 static char *cmd;
+
+static int execute_batch_file = 0;
+static char *batch_file;
 
 static int logging = 0;
 static char *log_file;
@@ -255,60 +259,47 @@ void ridl_printhelp(void) {
 */
 int main(int argc, char *argv[]) {  
   int a;
-  for (a = 0; a < argc; a++) {
+  for (a = 1; a < argc; a++) {
     if (strcmp(argv[a], "-arg") == 0) {
       // TODO: handle
-    }        
-    if (strcmp(argv[a], "-args") == 0) {
+    } else if (strcmp(argv[a], "-args") == 0) {
       // TODO: handle
-    }        
-    if (strcmp(argv[a], "-demo") == 0) {
+    } else if (strcmp(argv[a], "-demo") == 0) {
       // TODO: handle
-    }    
-    if (strcmp(argv[a], "-e") == 0) {
+    } else if (strcmp(argv[a], "-e") == 0) {
       if ((a + 1) < argc) {
         execute_cmd = 1;
-        cmd = argv[a + 1];
+        cmd = argv[++a];
       }
-    }    
-    if (strcmp(argv[a], "-em") == 0) {
+    } else if (strcmp(argv[a], "-em") == 0) {
       // TODO: handle
-    }        
-    if (strcmp(argv[a], "-h") == 0) {
+    } else if (strcmp(argv[a], "-h") == 0) {
       ridl_printhelp();
       exit(EXIT_SUCCESS);
-    }
-    if (strcmp(argv[a], "-novm") == 0) {
+    } else if (strcmp(argv[a], "-novm") == 0) {
       // TODO: handle
-    }        
-    if (strcmp(argv[a], "-pref") == 0) {
+    } else if (strcmp(argv[a], "-pref") == 0) {
       // TODO: handle
-    }        
-    if (strcmp(argv[a], "-quiet") == 0) {
+    } else if (strcmp(argv[a], "-quiet") == 0) {
       ridl_options |= IDL_INIT_QUIET;
-    } 
-    if (strcmp(argv[a], "-queue") == 0) {
+    } else if (strcmp(argv[a], "-queue") == 0) {
       ridl_options |= IDL_INIT_LMQUEUE;
-    }    
-    if (strcmp(argv[a], "-rt") == 0) {
+    } else if (strcmp(argv[a], "-rt") == 0) {
       // TODO: handle
       // use: int IDL_RuntimeExec(char * file)
-    }        
-    if (strcmp(argv[a], "-student") == 0) {
+    } else if (strcmp(argv[a], "-student") == 0) {
       // TODO: handle
-    }        
-    if (strcmp(argv[a], "-ulicense") == 0) {
+    } else if (strcmp(argv[a], "-ulicense") == 0) {
       // TODO: handle
-    }        
-    if (strcmp(argv[a], "-v") == 0) { 
+    } else if (strcmp(argv[a], "-v") == 0) { 
       ridl_printversion();
       exit(EXIT_SUCCESS);
-    }
-    if (strcmp(argv[a], "-vm") == 0) {
+    } else if (strcmp(argv[a], "-vm") == 0) {
       // TODO: handle
-    }   
-    
-    // TODO: handle positional parameter i.e. batch file to execute     
+    } else {
+      execute_batch_file = 1;
+      batch_file = argv[a];
+    }
   }
   
   IDL_INIT_DATA init_data;
@@ -338,6 +329,13 @@ int main(int argc, char *argv[]) {
     if (execute_cmd) {
       int error = IDL_ExecuteStr(cmd);
       return(IDL_Cleanup(IDL_FALSE));
+    }
+    
+    if (execute_batch_file) {
+      char *batch_cmd = (char *)malloc(strlen(batch_file) + 2);
+      sprintf(batch_cmd, "@%s", batch_file);
+      int error = IDL_ExecuteStr(batch_cmd);
+      free(batch_cmd);
     }
     
     while (1) {      

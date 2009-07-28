@@ -4,6 +4,8 @@ rIDL 1.0
   * .edit executive command uses RIDL_EDITOR and EDITOR environment variables
     to launch an editor.
     
+  * filename completion
+  
   * :doc magic command displays header information about a routine.
   
   * :log/:unlog magic command. To get a log of the session, both commands and

@@ -1,0 +1,7 @@
+demo filename completion
+  navigate to data/vpr.../em/vac.../vac..3../vac...YeeEl..
+
+demo .edit
+demo :log
+demo :doc
+demo history
