@@ -11,6 +11,7 @@
 static int ridl_options = IDL_INIT_CLARGS;
 static int execute_cmd = 0;
 static char *cmd;
+
 static int logging = 0;
 static char *log_file;
 static FILE *log_fp;
@@ -24,6 +25,28 @@ static IDL_MSG_BLOCK msg_block;
 // TODO: need to figure out what this should be
 static char *history_file_location = "/Users/mgalloy/.idl/itt/rbuf/history";
 
+
+char *ridl_command_generator(const char *text, int state) {
+  if (!state) {
+    char *result = (char *)malloc(6);
+    strcpy(result, "print");
+    return(result);
+  } else { 
+    return((char *)NULL);
+  }
+}
+
+
+char **ridl_completion(const char *text, int start, int end) {
+  char **matches = (char **) NULL;
+  // determines state and calls the correct generator
+    
+  //matches = rl_completion_matches(text, ridl_command_generator);
+  //return(matches);
+  
+  //printf("\ntext = '%s', start = %d, end = %d\n", text, start, end);
+  return((char **) NULL);
+}
 
 
 void ridl_logoutput(int flags, char *buf, int n) {
@@ -308,6 +331,7 @@ int main(int argc, char *argv[]) {
     
     using_history();
     ridl_populatehistory();
+    rl_attempted_completion_function = ridl_completion;
     
     // TODO: add completers for routines and variables completion
     
@@ -318,7 +342,7 @@ int main(int argc, char *argv[]) {
     }
     
     while (1) {      
-      char *line = readline (ridl_prompt);
+      char *line = readline(ridl_prompt);
       
       // normal exit by hitting ^D
       if (line == NULL) { 
@@ -331,6 +355,8 @@ int main(int argc, char *argv[]) {
       char firstchar = line[firstcharIndex];
       if (firstchar == ':') {
         if ((firstcharIndex + 1 < strlen(line)) && (line[firstcharIndex + 1] == '!')) {
+          // TODO: eventually this shouldn't be a magic command, but should be
+          //       activated when a space is entered
           char *expansion;
           int expansion_result;
           char *expansion_line = (char *) malloc(strlen(line) + 1);
@@ -374,6 +400,8 @@ int main(int argc, char *argv[]) {
               IDL_ToutPop();
             }
             logging = 0;
+          } else {
+            printf("Unknown magic command %s\n", cmd);
           }
           free(cmd);
         }
@@ -406,4 +434,4 @@ int main(int argc, char *argv[]) {
   }
   
   return(EXIT_FAILURE);
-} 
+}
