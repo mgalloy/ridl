@@ -1,9 +1,8 @@
 RIDL=ridl
 IDLDIR=/Applications/itt/idl
 ARCH=x86_64
-ARCHFLAGS= -arch $(ARCH)
 #ARCH=i386
-#ARCHFLAGS= 
+ARCHFLAGS= -arch $(ARCH)
 BINDIR=$(IDLDIR)/bin/bin.darwin.$(ARCH)
 LDFLAGS= -no-cpp-precomp -dynamic -fno-common \
 	-L$(BINDIR) -L/usr/X11/lib \
@@ -19,11 +18,10 @@ $(RIDL).o : $(RIDL).c
 	cc $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL).c -o $(RIDL).o
 
 install:
-	mkdir bin.darwin.$(ARCH)
+	mkdir -p bin.darwin.$(ARCH)
 	mv $(RIDL) bin.darwin.$(ARCH)
 		
 clean:
 	rm -f $(RIDL).o
 	rm -f $(RIDL)
-	rm -rf bin.*
 	
