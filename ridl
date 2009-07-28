@@ -8,8 +8,8 @@ done
 
 if [ $PREFER_32 = 1 ]; then 
   DYLD_LIBRARY_PATH=/Applications/itt/idl/bin/bin.darwin.i386
-  $RIDL_DIR/src/bin.darwin.i386/ridl
+  $RIDL_DIR/src/bin.darwin.i386/ridl $@
 else
   DYLD_LIBRARY_PATH=/Applications/itt/idl/bin/bin.darwin.x86_64
-  $RIDL_DIR/src/bin.darwin.x86_64/ridl
+  $RIDL_DIR/src/bin.darwin.x86_64/ridl $@
 fi

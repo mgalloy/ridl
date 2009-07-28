@@ -266,10 +266,9 @@ int main(int argc, char *argv[]) {
       // TODO: handle
     }    
     if (strcmp(argv[a], "-e") == 0) {
-      if (a + 1 < argc) {
+      if ((a + 1) < argc) {
         execute_cmd = 1;
         cmd = argv[a + 1];
-        printf("picking up cmd %s\n", cmd);
       }
     }    
     if (strcmp(argv[a], "-em") == 0) {
