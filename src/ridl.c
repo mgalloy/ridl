@@ -17,7 +17,15 @@ static IDL_MSG_DEF msg_arr[] = {
 static IDL_MSG_BLOCK msg_block; 
 
 
-void ridl_exit() {
+void ridl_show_compile_error(void) {
+  //printf("Showing a compiler error...\n");
+}
+
+
+/*
+   Called when EXIT routine is encountered.
+*/
+void ridl_exit(void) {
   int result = IDL_Cleanup(IDL_FALSE);
 }
 
@@ -40,6 +48,9 @@ void ridl_welcome(void) {
 }
 
 
+/*
+   Return the index of the first non-space character on the line.
+*/
 int ridl_firstchar(char *line) {
   int i;
   for (i = 0; i < strlen(line); i++) {
@@ -48,6 +59,10 @@ int ridl_firstchar(char *line) {
 }
 
 
+/*
+   Return the word starting from index start on line. The result is 
+   dynamically allocated, so should be freed by the calling routine.
+*/
 char *ridl_getnextword(char *line, int start) {
   int i;
   for (i = start; i < strlen(line); i++) {
@@ -80,6 +95,7 @@ char *ridl_findpath(char *filename) {
   free(cmd);
   
   // TODO: it would be nice to not leave this variable around
+  // IDL_CallRoutineByString("MG_FILE_WHICH", &result, 1, params, NULL)
   IDL_VPTR ridl_filename = IDL_FindNamedVariable("_$ridl_edit", IDL_FALSE);
 
   char *ridl_filename_str = IDL_STRING_STR(&ridl_filename->value.str);
@@ -96,11 +112,14 @@ char *ridl_findpath(char *filename) {
 }
 
 
+/*
+   Launch editor in $EDITOR environment variable.
+*/
 void ridl_launcheditor(char *filename) {
   char *editor = "$EDITOR";
   char *cmd = (char *)malloc(strlen(filename) + strlen(editor) + 1 + 1);
   sprintf(cmd, "%s %s", editor, filename);
-  system(cmd);   // TODO: should not block
+  system(cmd);
   free(cmd);
 }
 
@@ -168,6 +187,9 @@ void ridl_printhelp(void) {
 }
 
 
+/*
+   rIDL main loop.
+*/
 int main(int argc, char *argv[]) {  
   int a;
   for (a = 0; a < argc; a++) {
@@ -222,7 +244,9 @@ int main(int argc, char *argv[]) {
     }
     if (strcmp(argv[a], "-vm") == 0) {
       // TODO: handle
-    }        
+    }   
+    
+    // TODO: handle positional parameter i.e. batch file to execute     
   }
   
   IDL_INIT_DATA init_data;
@@ -235,12 +259,16 @@ int main(int argc, char *argv[]) {
   if (IDL_Initialize(&init_data)) {
     IDL_ExitRegister(ridl_exit_handler);
     IDL_UicbRegExitDone(ridl_exit);
+    IDL_UicbRegShowCompileErr(ridl_show_compile_error);
     
     if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK", 
                                              IDL_CARRAY_ELTS(msg_arr),  
                                              msg_arr))) return(1);                                            
     
     // TODO: add previous history to readline history
+    //       figure out IDL_RbufRecall, parse .idl/itt/rbuf/history file, or
+    //       use RECALL_COMMANDS()
+    
     // TODO: add completer for routines and variables
     
     // handle -e option if it was present
