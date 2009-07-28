@@ -1,7 +1,21 @@
-demo filename completion
-  navigate to data/vpr.../em/vac.../vac..3../vac...YeeEl..
+demo filename completion, navigate::
+  
+  f = 'data/vpr.../em/vac.../vac..3../vac...YeeEl..'
 
-demo .edit
-demo :log
-demo :doc
+demo :doc, show header::
+  
+  :doc mg_h5_dump
+     
+demo .edit, examine a .pro file::
+  
+  .edit mg_h5_dump
+  
+demo :log, start logging::
+  
+  :log yee.log
+      
+do the dump::
+
+  mg_h5_dump, f
+     
 demo history

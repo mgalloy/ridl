@@ -54,11 +54,17 @@ char **ridl_completion(const char *text, int start, int end) {
 
 
 void ridl_logoutput(int flags, char *buf, int n) {
-  printf("%s", buf);
+  char *output = (char *)malloc(strlen(buf) + 1);
+  strncpy(output, buf, n);
+  output[n] = '\0';
+  
+  printf("%s", output);
   if (flags & IDL_TOUT_F_NLPOST) printf("\n");
 
-  fprintf(log_fp, "%s", buf);
+  fprintf(log_fp, "%s", output);
   if (flags & IDL_TOUT_F_NLPOST) fprintf(log_fp, "\n");
+  
+  free(output);
 }
 
 

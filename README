@@ -1,15 +1,6 @@
 Installation
 ============
 
-Make sure to point LD_LIBRARY_PATH (DYLD_LIBRARY_PATH for Macs) to the appropriate bin directory of the IDL distribution i.e.::
- 
-  /usr/local/itt/idl/bin/bin.bin.linux.x86_64 
-  
-for 64-bit Linux or::
-
-  /Applications/itt/idl/bin/bin.darwin.x86_64 
-  
-for 64-bit Mac.
-
 The GNU Readline library is required to be installed in the standard location i.e. /usr/local.
-  
+
+Currently, the system only works on Mac OS X, but should easily work on other UNIX systems with a few changes to the Makefiles.
