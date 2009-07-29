@@ -1,21 +1,43 @@
-demo filename completion, navigate::
-  
-  f = 'data/vpr.../em/vac.../vac..3../vac...YeeEl..'
+::
 
-demo :doc, show header::
+  $ clear
   
-  :doc mg_h5_dump
+Hello, my name is Michael Galloy and I would like to show you a project I have been working on to improve command line interactivity with IDL::
+
+  $ ridl
+
+It's called rIDL and is a drop-in replacement for command line IDL. It *will* have all the features of the current IDL command line (although my prototype does not yet), but adds some new features to improve using IDL interactively.
+
+First, rIDL has filename completion to save me typing long filenames::
+  
+  rIDL> f = 'data/vor.../vac.../vac...YeeEl..'
+
+Just hit tab to complete a filename or provide the possible choices. I intend to add the ability to complete on other items as well like routine names, variables in the current scope, or keyword names.
+
+There are also a new class of commands called magic commands. These are special commands beginning with a colon which are pre-processed by rIDL. For example, suppose I have a routine to examine the HDF5 file I just specified, but I can't remember the calling syntax. The `doc` magic command shows the calling syntax and comment header::
+  
+  rIDL> :doc mg_h5_dump
      
-demo .edit, examine a .pro file::
+If I need a closer look or to edit the file, I can use the .edit executive command::
   
-  .edit mg_h5_dump
+  rIDL> .edit mg_h5_dump
   
-demo :log, start logging::
+.edit works in the IDL Workbench or in the old IDLDE, but does not work in the current IDL command line. Simply set the RIDL_EDITOR or the EDITOR environment variable to choose the editor that should be launched when .edit is used. Here, I have set emacs as my editor. After I'm finished editing, quitting emacs brings me back to rIDL.
+
+I would like a complete transcript of my analysis of the HDF5 file. Currently, IDL's JOURNAL routine records commands I enter, but only some of the output. The log magic command specifies a file that will contain an exact record of my session from that point on::
   
-  :log yee.log
+  rIDL> :log yee.log
       
-do the dump::
+Now, the output from my command will appear in yee.log::
 
-  mg_h5_dump, f
+  rIDL> mg_h5_dump, f
      
-demo history
+If I exit rIDL and look at the file, the output is correct::
+
+  rIDL> exit
+  $ more yee.log
+
+Currently, I've been using rIDL on Mac OS X for my daily work with IDL and have been adding features as I need them. It should also work on UNIX systems with minor changes to the Makefile. Hopefully, it will be ready to start distributing soon. 
+
+Thanks for listening!
+
