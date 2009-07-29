@@ -13,6 +13,9 @@ rIDL 1.0
     
        rIDL> :log filename
 
+  * Use the :help magic command to get information about all the currently
+    available magic commands.
+
   * Readline history commands are available with :!. For example, to replace a 
     string::
     
@@ -23,13 +26,18 @@ rIDL 1.0
     Here, the first two lines are typed and the third line is created by the 
     second line. Search for help on using Readline history for more   
     information about commands available (just put them after a :).    
-  
+      
+  * Command line switches -v to print the rIDL/IDL versions and -h to print
+    help on the available command line options.
+    
   
 IDL functionality not in rIDL
 -----------------------------
 
   * widget support
   
-  * not all command line options
+  * not all command line switches
   
-  * command history file
+  * does not change IDL's command history file (not sure how this should work, 
+    should there be two separate history files? just use IDL's? just use
+    rIDL's?)

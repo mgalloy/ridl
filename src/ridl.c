@@ -212,6 +212,25 @@ void ridl_printversion(void) {
 }
 
 
+void ridl_printmagichelp(void) {
+  char *indent = "  ";
+  int magic_width = 16;
+  
+  ridl_printversion();
+  
+  printf("\nmagic commands:\n");
+  
+  printf("%s%-*s %s\n", indent, magic_width, ":doc routine", 
+         "show calling syntax and comment header for the routine");
+  printf("%s%-*s %s\n", indent, magic_width, ":help", 
+         "show this help message");
+  printf("%s%-*s %s\n", indent, magic_width, ":log filename", 
+         "start logging all commands and output to filename");
+  printf("%s%-*s %s\n", indent, magic_width, ":unlog", 
+         "stop logging");
+}
+
+
 /*
    Print usage and options for rIDL.
 */
@@ -221,9 +240,8 @@ void ridl_printhelp(void) {
   
   ridl_printversion();
   
-  printf("\n");
-  printf("usage: ridl [options]\n");
-  printf("\n");
+  printf("\nusage: ridl [options]\n\n");
+
   printf("options:\n");
   printf("%s%-*s %s\n", indent, switch_width, "-32", 
          "start in 32-bit mode");
@@ -405,6 +423,8 @@ int main(int argc, char *argv[]) {
               IDL_ToutPop();
             }
             logging = 0;
+          } else if (strcmp(cmd, ":help") == 0) {
+            ridl_printmagichelp();
           } else {
             printf("Unknown magic command %s\n", cmd);
           }
