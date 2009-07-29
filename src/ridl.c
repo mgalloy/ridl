@@ -302,6 +302,8 @@ int main(int argc, char *argv[]) {
       exit(EXIT_SUCCESS);
     } else if (strcmp(argv[a], "-vm") == 0) {
       // TODO: handle
+    } else if (strcmp(argv[a], "-32") == 0) {
+      // need to accept -32, but don't need to do anything
     } else {
       execute_batch_file = 1;
       batch_file = argv[a];
