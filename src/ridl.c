@@ -68,11 +68,26 @@ void ridl_logoutput(int flags, char *buf, int n) {
 }
 
 
+void ridl_updateprompt(void) {
+  sprintf(ridl_expandedprompt, ridl_prompt, ridl_cmdnumber);
+}
+
+
 /*
    Registered to be called when the !prompt changes.
 */
 void ridl_changeprompt(IDL_STRING *prompt) {
   ridl_prompt = IDL_STRING_STR(prompt);
+  ridl_updateprompt();
+}
+
+
+/* 
+   Registered to be called when the current working directory changes.
+*/
+void ridl_changewdir(char *dir) {
+  // TODO: modify prompt
+  //printf("Changing dirs to %s\n", dir);
 }
 
 
@@ -96,6 +111,7 @@ void ridl_populatehistory(void) {
   
   for (rline_number = line_number - 1; rline_number >= 0; rline_number--) {
     add_history(history[rline_number]);
+    ridl_cmdnumber++;
   }
   
   fclose(fp);
@@ -110,6 +126,7 @@ int ridl_executestr(char *cmd) {
   int result = IDL_ExecuteStr(cmd);
 
   add_history(cmd);
+  ridl_updateprompt();
   // TODO: also add to IDL history
 
   fprintf(stderr, "\e[0m");   // reset colors if there was a compile error
@@ -340,6 +357,7 @@ int main(int argc, char *argv[]) {
     IDL_UicbRegExitDone(ridl_exit);
     IDL_UicbRegShowCompileErr(ridl_show_compile_error);
     IDL_UicbRegPromptChange(ridl_changeprompt);
+    IDL_UicbRegWorkingDirChange(ridl_changewdir);
     
     if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK", 
                                              IDL_CARRAY_ELTS(msg_arr),  
@@ -364,8 +382,10 @@ int main(int argc, char *argv[]) {
       free(batch_cmd);
     }
     
+    ridl_updateprompt();
+    
     while (1) {      
-      char *line = readline(ridl_prompt);
+      char *line = readline(ridl_expandedprompt);
       
       // normal exit by hitting ^D
       if (line == NULL) { 
@@ -390,14 +410,17 @@ int main(int argc, char *argv[]) {
               printf("Error in expansion\n");
               break;
             case 2: 
-              printf("%s%s\n", ridl_prompt, expansion);
+              printf("%s\n", expansion);
               break;
             case 0: 
             case 1: 
-              printf("%s%s\n", ridl_prompt, expansion);
-              int error = ridl_executestr(expansion);
+              //printf("%s%s\n", ridl_prompt, expansion);
+              ridl_executestr(expansion);
               break;
           }
+          ridl_cmdnumber++;
+          ridl_updateprompt();
+          
           free(expansion_line);
           free(expansion);
         } else {                          
@@ -441,12 +464,18 @@ int main(int argc, char *argv[]) {
               free(file);
               
               add_history(line);
+              ridl_cmdnumber++;
+              ridl_updateprompt();
             } else {
               int error = ridl_executestr(line);
+              ridl_cmdnumber++;              
+              ridl_updateprompt();
             }
             free(cmd);
           } else {
             int error = ridl_executestr(line);
+            ridl_cmdnumber++;
+            ridl_updateprompt();
           }
         }
       }
