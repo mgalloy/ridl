@@ -397,7 +397,8 @@ int main(int argc, char *argv[]) {
       int firstcharIndex = ridl_firstchar(line);
       char firstchar = line[firstcharIndex];
       if (firstchar == ':') {
-        if ((firstcharIndex + 1 < strlen(line)) && (line[firstcharIndex + 1] == '!')) {
+        if ((firstcharIndex + 1 < strlen(line)) 
+              && (line[firstcharIndex + 1] == '!' || line[firstcharIndex + 1] == '^')) {
           // TODO: eventually this shouldn't be a magic command, but should be
           //       activated when a space is entered
           char *expansion;

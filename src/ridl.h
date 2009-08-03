@@ -1,5 +1,5 @@
 static char *ridl_version = "0.1";
-static char *ridl_prompt = "rIDL[%d]> ";
+static char *ridl_prompt = "[%d]rIDL> ";
 static char ridl_expandedprompt[1024];
 static int ridl_cmdnumber = 0;
 
