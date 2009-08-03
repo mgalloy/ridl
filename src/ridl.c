@@ -29,6 +29,16 @@ static IDL_MSG_BLOCK msg_block;
 // TODO: need to figure out what this should be
 static char *history_file_location = "/Users/mgalloy/.idl/itt/rbuf/history";
 
+int ridl_really_exit = 1;
+
+
+/*
+   Called when the initial IDL startup text has finished printing.
+*/
+void ridl_inittextdone(void) {
+  
+}
+
 
 char *ridl_command_generator(const char *text, int state) {
   if (!state) {
@@ -139,6 +149,13 @@ int ridl_executestr(char *cmd) {
 */
 void ridl_show_compile_error(void) {
   fprintf(stderr, "\e[31m");
+}
+
+
+/*
+   Registered to be called after IDL_Cleanup is called. 
+*/
+void ridl_deathhint(void) {
 }
 
 
@@ -351,6 +368,8 @@ int main(int argc, char *argv[]) {
   init_data.clargs.argv = argv;
   
   ridl_welcome();
+  
+  IDL_UicbRegInitTextDone(ridl_inittextdone);
                                                
   if (IDL_Initialize(&init_data)) {
     IDL_ExitRegister(ridl_exit_handler);
@@ -358,6 +377,7 @@ int main(int argc, char *argv[]) {
     IDL_UicbRegShowCompileErr(ridl_show_compile_error);
     IDL_UicbRegPromptChange(ridl_changeprompt);
     IDL_UicbRegWorkingDirChange(ridl_changewdir);
+    IDL_UicbRegDeathHint(ridl_deathhint);
     
     if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK", 
                                              IDL_CARRAY_ELTS(msg_arr),  
