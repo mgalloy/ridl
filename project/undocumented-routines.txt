@@ -1,0 +1,121 @@
+::
+
+  IDL_UicbRegInitTextDone(IDL_INIT_TEXT_HANDLER_FUNC proc);
+  typedef void (* IDL_INIT_TEXT_HANDLER_FUNC)(void);
+
+called when the initial launch text is finished printing
+
+
+::
+
+  IDL_UicbRegExitDone(IDL_EXITDONE_HANDLER_FUNC proc);
+  typedef void (* IDL_EXITDONE_HANDLER_FUNC proc);
+
+called when EXIT is encountered in a routine
+
+
+::
+
+  IDL_UicbRegShowCompileErr(IDL_SHOWCOMPILEERROR_HANDLER_FUNC proc);
+  typedef void (* IDL_SHOWCOMPILEERROR_HANDLER_FUNC proc)(void);
+
+called when a compiler error is discovered, but before the error is printed
+
+
+::
+
+  IDL_UicbRegPromptChange(IDL_PROMPTCHANGE_HANDLER_FUNC proc);
+  typedef void (* IDL_PROMPTCHANGE_HANDLER_FUNC proc)(IDL_STRING *);
+
+called when !prompt is modified
+
+
+::
+
+  IDL_UicbRegWorkingDirChange(IDL_WORKINGDIRCHANGE_HANDLER_FUNC proc);
+  typedef void (* IDL_WORKINGDIRCHANGE_HANDLER_FUNC proc)(char *);
+
+called when the current working directory is changed
+
+
+::
+
+  IDL_UicbRegDeathHint(IDL_DEATHHINT_HANDLER_FUNC proc);
+  typedef void (* IDL_DEATHHINT_HANDLER_FUNC proc)(void);
+
+
+::
+
+  IDL_ObjCallMethodByString;
+  
+
+::
+
+  IDL_EzCall;
+  
+  
+::
+
+  IDL_EzCallCleanup;
+
+
+::
+
+  IDL_CallRoutineByString;
+
+
+::
+
+  IDL_CmdLineProcess;
+
+
+::
+
+  IDL_CmdLineCheckUnknown;
+
+
+::
+
+  IDL_ExecuteCommandFromCmdLine;
+
+seems to exit application immediately
+
+
+::
+
+  IDL_Rbuf_Hide_Timestamp;
+  
+
+::
+
+  IDL_Rbuf_Unhide_Timestamp;
+  
+
+::
+
+  IDL_RbufGetState;
+  
+  
+::
+
+  IDL_RlineGetState;
+  
+
+::
+
+  IDL_RbufClear;
+  
+
+::
+
+  IDL_RbufGetCurrentTimestamp;
+  
+
+::
+
+  IDL_RbufRecall;
+  
+
+::
+
+  IDL_RbufReset;
