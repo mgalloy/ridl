@@ -1,12 +1,15 @@
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <signal.h>
+#include <pthread.h>
 
 #include "idl_export.h" 
 #include "readline/readline.h"
 #include "readline/history.h"
 
 #include "ridl.h"
+
+static pthread_t execute_thread;
 
 static int ridl_options = IDL_INIT_CLARGS;
 
@@ -127,20 +130,29 @@ void ridl_populatehistory(void) {
   fclose(fp);
 }
 
+//void *ridl_pexecutestr(void *cmd) {
+//  printf("cmd in pthread = '%s'\n", (char *)cmd);
+//  int result = IDL_ExecuteStr((char *)cmd);
+//}
+
+
 /*
    Execute an IDL command typed at the command line by the user.
 */
 int ridl_executestr(char *cmd) {
   if (logging) fprintf(log_fp, "%s%s\n", ridl_prompt, cmd);
 
+  //int rc = pthread_create(&execute_thread, NULL, ridl_pexecutestr, (void *)cmd);
   int result = IDL_ExecuteStr(cmd);
+  
+  //pthread_cancel(execute_thread);
 
   add_history(cmd);
   ridl_updateprompt();
   // TODO: also add to IDL history
 
   fprintf(stderr, "\e[0m");   // reset colors if there was a compile error
-  return(result);
+  return(0);
 }
 
 
@@ -361,7 +373,7 @@ int main(int argc, char *argv[]) {
       batch_file = argv[a];
     }
   }
-  
+    
   IDL_INIT_DATA init_data;
   init_data.options = ridl_options;
   init_data.clargs.argc = argc;
