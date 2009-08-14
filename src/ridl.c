@@ -303,6 +303,8 @@ void ridl_printhelp(void) {
          "execute the given .sav file containing an embedded license");
   printf("%s%-*s %s\n", indent, switch_width, "-h", 
          "display this help message");
+  printf("%s%-*s %s\n", indent, switch_width, "-IDL_PREF value", 
+         "set the IDL_PREF preference for this session");         
   printf("%s%-*s %s\n", indent, switch_width, "-novm", 
          "use 7-minute demo mode instead of virtual machine with -rt");
   printf("%s%-*s %s\n", indent, switch_width, "-pref=FILENAME", 
