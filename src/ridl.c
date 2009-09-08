@@ -11,6 +11,8 @@
 
 static pthread_t execute_thread;
 
+static IDL_USER_INFO user_info;
+
 static int ridl_options = IDL_INIT_CLARGS;
 
 static int execute_cmd = 0;
@@ -29,11 +31,12 @@ static IDL_MSG_DEF msg_arr[] = {
 };
 static IDL_MSG_BLOCK msg_block; 
 
-// TODO: need to figure out what this should be
-static char *history_file_location = "/Users/mgalloy/.idl/itt/rbuf/history";
+static char history_file_location[1024];
 
 int ridl_really_exit = 1;
 
+
+int prompt_type = RIDL_USE_RIDL_PROMPT;
 
 /*
    Called when the initial IDL startup text has finished printing.
@@ -82,7 +85,17 @@ void ridl_logoutput(int flags, char *buf, int n) {
 
 
 void ridl_updateprompt(void) {
-  sprintf(ridl_expandedprompt, ridl_prompt, ridl_cmdnumber);
+  switch (prompt_type) {
+    case RIDL_USE_RIDL_PROMPT: 
+      sprintf(ridl_expandedprompt, ridl_prompt, "rIDL");
+      break;
+    case RIDL_USE_IDL_PROMPT:
+      strcpy(ridl_expandedprompt, ridl_idl_prompt);
+      break;
+    case RIDL_USE_NUMBERED_PROMPT: 
+      sprintf(ridl_expandedprompt, ridl_numbered_prompt, ridl_cmdnumber);
+      break;
+  }
 }
 
 
@@ -90,7 +103,7 @@ void ridl_updateprompt(void) {
    Registered to be called when the !prompt changes.
 */
 void ridl_changeprompt(IDL_STRING *prompt) {
-  ridl_prompt = IDL_STRING_STR(prompt);
+  ridl_idl_prompt = IDL_STRING_STR(prompt);
   ridl_updateprompt();
 }
 
@@ -393,9 +406,16 @@ int main(int argc, char *argv[]) {
     IDL_UicbRegWorkingDirChange(ridl_changewdir);
     IDL_UicbRegDeathHint(ridl_deathhint);
     
+    IDL_GetUserInfo(&user_info);
+    sprintf(history_file_location, "%s/.idl/itt/rbuf/history", user_info.homedir);
+    
     if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK", 
                                              IDL_CARRAY_ELTS(msg_arr),  
                                              msg_arr))) return(1);                                            
+    
+    if (prompt_type == RIDL_USE_IDL_PROMPT) {
+      IDL_ExecuteStr("!prompt = !prompt");
+    }
     
     using_history();
     ridl_populatehistory();
