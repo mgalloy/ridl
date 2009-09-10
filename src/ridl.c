@@ -22,6 +22,7 @@ static int execute_batch_file = 0;
 static char *batch_file;
 
 static int logging = 0;
+static int teeing = 0;
 static char *log_file;
 static FILE *log_fp;
 
@@ -153,7 +154,7 @@ void ridl_populatehistory(void) {
    Execute an IDL command typed at the command line by the user.
 */
 int ridl_executestr(char *cmd) {
-  if (logging) fprintf(log_fp, "%s%s\n", ridl_prompt, cmd);
+  if (logging) fprintf(log_fp, "%s%s\n", ridl_expandedprompt, cmd);
 
   //int rc = pthread_create(&execute_thread, NULL, ridl_pexecutestr, (void *)cmd);
   int result = IDL_ExecuteStr(cmd);
@@ -196,7 +197,8 @@ void ridl_exit(void) {
    Handle any rIDL cleanup before exiting.
 */
 void ridl_exit_handler(void) {
-  if (logging) fclose(log_fp);
+  if (logging) fclose(log_fp); 
+  if (teeing) fclose(log_fp);
 
   exit(EXIT_SUCCESS);
 }
@@ -286,7 +288,11 @@ void ridl_printmagichelp(void) {
   printf("%s%-*s %s\n", indent, magic_width, ":log filename", 
          "start logging all commands and output to filename");
   printf("%s%-*s %s\n", indent, magic_width, ":unlog", 
-         "stop logging");
+         "stop logging commands and output");
+  printf("%s%-*s %s\n", indent, magic_width, ":tee filename", 
+         "log output to filename");
+  printf("%s%-*s %s\n", indent, magic_width, ":untee", 
+         "stop logging output");
 }
 
 
@@ -501,6 +507,20 @@ int main(int argc, char *argv[]) {
               IDL_ToutPop();
             }
             logging = 0;
+          } else if (strcmp(cmd, ":tee") == 0) {
+            if (teeing) fclose(log_fp);
+
+            teeing = 1;
+            char *filename = ridl_getnextword(line, firstcharIndex + 5);
+            log_fp = fopen(filename, "w");
+            IDL_ToutPush(ridl_logoutput);
+            free(filename);
+          } else if (strcmp(cmd, ":untee") == 0) {
+            if (teeing) {
+              fclose(log_fp);
+              IDL_ToutPop();
+            }
+            teeing = 0;          
           } else if (strcmp(cmd, ":help") == 0) {
             ridl_printmagichelp();
           } else {
