@@ -1,0 +1,21 @@
+These are the features that I believe rIDL should have before it reaches version 1.0:
+
+#. everything in regular IDL command line should work in rIDL
+
+#. tab completion of: structure/object fields fields, variable names, routine/method names, routine params/keywords, filenames in executive command or strings
+
+#. .edit should work
+
+#. copy and paste multiple lines
+
+#. history magic command
+
+#. enhanced journal magic command
+
+#. magic command to send commands from current session to file
+
+#. multiple IDL_IDLBridge like Abraham's command line
+
+#. should except all IDL command line options plus --help and --version
+
+#. handle long command lines with some kinds of grace, i.e., able to combine a several commands ending with $'s into one long command
