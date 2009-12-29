@@ -257,6 +257,10 @@ void ridl_launcheditor(char *filename) {
   free(cmd);
 }
 
+void ridl_getevents() {
+  char *cmd = "ridl_getevents";
+  int result = IDL_ExecuteStr(cmd);
+}
 
 /*
    Prints version information about rIDL and IDL to stdout.
@@ -446,6 +450,7 @@ int main(int argc, char *argv[]) {
     
     while (1) {      
       char *line = readline(ridl_expandedprompt);
+      ridl_getevents();
       
       // normal exit by hitting ^D
       if (line == NULL) { 
