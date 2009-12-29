@@ -5,7 +5,7 @@
 ; waiting for a new command.
 ;-
 pro ridl_getevents
-  compile_opt strictarr
+  compile_opt strictarr, hidden
   
   common managed, ids, names, outermodal
   

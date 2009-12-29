@@ -8,7 +8,7 @@
 ;       basename of .pro file to find in !path or current directory
 ;-
 pro ridl_launcheditor, basename
-  compile_opt strictarr
+  compile_opt strictarr, hidden
 
   fullpath = file_which(basename + '.pro', /include_current_dir)
   if (fullpath eq '') then fullpath = basename + '.pro'
