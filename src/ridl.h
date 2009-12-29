@@ -13,3 +13,5 @@ static int ridl_cmdnumber = 0;
 
 const int RIDL_MAX_LINE_LENGTH = 1024;
 const int RIDL_RBUF_SIZE = 500;
+
+static float ridl_event_delay = 0.1;

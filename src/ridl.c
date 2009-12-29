@@ -36,7 +36,6 @@ static char history_file_location[1024];
 
 int ridl_really_exit = 1;
 
-
 int prompt_type = RIDL_USE_RIDL_PROMPT;
 
 /*
@@ -266,7 +265,7 @@ void ridl_getevents() {
 
 static int ridl_event_hook () {
   ridl_getevents();
-  sleep (0.2);
+  sleep(ridl_event_delay);
   return 0;
 }
 
