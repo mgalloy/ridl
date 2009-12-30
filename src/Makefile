@@ -4,6 +4,7 @@ ARCH=x86_64
 #ARCH=i386
 ARCHFLAGS= -arch $(ARCH)
 OS=darwin
+CC=cc
 BINDIR=$(IDLDIR)/bin/bin.$(OS).$(ARCH)
 LDFLAGS= -no-cpp-precomp -dynamic -fno-common \
 	-L$(BINDIR) -L/usr/X11/lib \
@@ -13,10 +14,10 @@ LDFLAGS= -no-cpp-precomp -dynamic -fno-common \
 .PHONY: clean install both
 
 $(RIDL) : $(RIDL).o
-	cc $(RIDL).o -o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
+	$(CC) $(RIDL).o -o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
 
 $(RIDL).o : $(RIDL).c
-	cc $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL).c -o $(RIDL).o
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL).c -o $(RIDL).o
 
 both:
 	make clean
