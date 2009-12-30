@@ -149,6 +149,30 @@ void ridl_populatehistory(void) {
 //}
 
 
+int ridl_stepinto(void) {
+  char *cmd = ".step";
+  printf(".step\n");  
+  int status = ridl_executestr(cmd);
+  printf("%s", ridl_expandedprompt);
+}
+
+
+int ridl_stepover(void) {
+  char *cmd = ".stepover";
+  printf(".stepover\n");
+  int status = ridl_executestr(cmd);
+  printf("%s", ridl_expandedprompt);
+}
+
+
+int ridl_stepreturn(void) {
+  char *cmd = ".return";
+  printf(".return\n");  
+  int status = ridl_executestr(cmd);
+  printf("%s", ridl_expandedprompt);
+}
+
+
 /*
    Execute an IDL command typed at the command line by the user.
 */
@@ -458,6 +482,20 @@ int main(int argc, char *argv[]) {
     
     rl_event_hook = ridl_event_hook;
     
+    // TODO: eventually these should be read in from a configuration file:
+    //
+    //    F5: stepinto
+    //    F6: stepover
+    //    F7: stepreturn
+    
+    //rl_bind_keyseq("\e[15~", (rl_command_func_t *)ridl_stepinto);
+    //rl_bind_keyseq("\e[17~", (rl_command_func_t *)ridl_stepover);
+    //rl_bind_keyseq("\e[18~", (rl_command_func_t *)ridl_stepreturn);
+    
+    rl_add_defun("stepinto", (rl_command_func_t *)ridl_stepinto, CTRL('q'));
+    rl_add_defun("stepover", (rl_command_func_t *)ridl_stepover, CTRL('w'));
+    rl_add_defun("stepreturn", (rl_command_func_t *)ridl_stepreturn, CTRL('e'));
+
     while (1) {      
       char *line = readline(ridl_expandedprompt);
       ridl_getevents();
