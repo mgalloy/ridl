@@ -6,8 +6,9 @@ ARCHFLAGS= -arch $(ARCH)
 OS=darwin
 CC=cc
 BINDIR=$(IDLDIR)/bin/bin.$(OS).$(ARCH)
+READLINE_LIB=/usr/local/lib
 LDFLAGS= -no-cpp-precomp -dynamic -fno-common \
-	-L$(BINDIR) -L/usr/X11/lib \
+	-L$(BINDIR) -L/usr/X11/lib -L$(READLINE_LIB) \
 	-lidl -lXm -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2 -lreadline -lfreetype \
 	-multiply_defined suppress
 
@@ -24,7 +25,7 @@ both:
 	make
 	make install
 	make clean
-	make ARCH=i386
+	make ARCH=i386 READLINE_LIB=/Users/mgalloy/lib/readline-6.0-32/lib
 	make ARCH=i386 install
 	
 install:

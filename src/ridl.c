@@ -488,9 +488,9 @@ int main(int argc, char *argv[]) {
     //    F6: stepover
     //    F7: stepreturn
     
-    //rl_bind_keyseq("\e[15~", (rl_command_func_t *)ridl_stepinto);
-    //rl_bind_keyseq("\e[17~", (rl_command_func_t *)ridl_stepover);
-    //rl_bind_keyseq("\e[18~", (rl_command_func_t *)ridl_stepreturn);
+    rl_bind_keyseq("\e[15~", (rl_command_func_t *)ridl_stepinto);
+    rl_bind_keyseq("\e[17~", (rl_command_func_t *)ridl_stepover);
+    rl_bind_keyseq("\e[18~", (rl_command_func_t *)ridl_stepreturn);
     
     rl_add_defun("stepinto", (rl_command_func_t *)ridl_stepinto, CTRL('q'));
     rl_add_defun("stepover", (rl_command_func_t *)ridl_stepover, CTRL('w'));
