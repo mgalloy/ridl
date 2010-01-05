@@ -112,8 +112,47 @@ void ridl_changeprompt(IDL_STRING *prompt) {
    Registered to be called when the current working directory changes.
 */
 void ridl_changewdir(char *dir) {
-  // TODO: modify prompt
+  // TODO: possibly modify prompt
   //printf("Changing dirs to %s\n", dir);
+}
+
+
+void ridl_addhistoryline(char *line) {
+  // TODO: this needs to be done in C because line might contains quotes
+  
+  //char *cmdFormat = "ridl_addhistoryline, '%s'";
+  //char *cmd = (char *)malloc(strlen(line) + strlen(cmdFormat) + 1);
+  //sprintf(cmd, cmdFormat, line);
+  //int result = IDL_ExecuteStr(cmd);
+  //free(cmd);
+  
+  //pro ridl_addhistoryline, line
+  //  compile_opt strictarr, hidden
+  //
+  //  historyfile = filepath('history', subdir=['.idl', 'itt', 'rbuf'], root=mg_homedir())
+  //  
+  //  nlines = file_lines(historyfile)
+  //  lines = strarr(nlines)
+  //  
+  //  openr, lun, historyfile, /get_lun
+  //  readf, lun, lines
+  //  free_lun, lun
+  //  
+  //  format = '(A, " ", C("<!-- ", CDI2, "-", CMoA, "-", CYI4, " ", CHI02, ":", CMI, ":", CSF05.2, " -->"))'
+  //  
+  //  openw, lun, historyfile, /get_lun
+  //  printf, lun, line, systime(/julian), format=format
+  //  printf, lun, lines[0:n_elements(lines) - 2L]
+  //  free_lun, lun
+  //end
+}
+
+
+void ridl_printsource(void) {
+  if (IDL_DebugGetStackDepth() > 1) {
+    char *sourceFileCmd = "ridl_printsource";
+    int result = IDL_ExecuteStr(sourceFileCmd);
+  }
 }
 
 
@@ -182,14 +221,11 @@ int ridl_stepreturn(void) {
 int ridl_executestr(char *cmd) {
   if (logging) fprintf(log_fp, "%s%s\n", ridl_expandedprompt, cmd);
 
-  //int rc = pthread_create(&execute_thread, NULL, ridl_pexecutestr, (void *)cmd);
   int result = IDL_ExecuteStr(cmd);
   
-  //pthread_cancel(execute_thread);
-
   add_history(cmd);
   ridl_updateprompt();
-  // TODO: also add to IDL history
+  ridl_addhistoryline(cmd);
 
   fprintf(stderr, "\e[0m");   // reset colors if there was a compile error
   return(0);
@@ -297,6 +333,14 @@ static int ridl_event_hook () {
 }
 
 
+char *ridl_readline(void) {
+  // print source code line if we are not at the main level
+  ridl_printsource();
+  
+  char *line = readline(ridl_expandedprompt);  
+}
+
+
 /*
    Prints version information about rIDL and IDL to stdout.
 */
@@ -304,6 +348,7 @@ void ridl_printversion(void) {
   IDL_STRING *version = IDL_SysvVersionRelease();
   IDL_STRING *os = IDL_SysvVersionOS();
   IDL_STRING *arch = IDL_SysvVersionArch();
+  
   printf("rIDL %s: Really Interactive Data Language\n", ridl_version);
   printf("IDL %s %s %s\n", 
          IDL_STRING_STR(version), 
@@ -381,20 +426,6 @@ void ridl_printhelp(void) {
          "display version information");
   printf("%s%-*s %s\n", indent, switch_width, "-vm=FILENAME", 
          "start the virtual machine with the given .sav file");
-}
-
-
-void ridl_printsource(void) {
-  int level = IDL_DebugGetStackDepth();
-  if (level > 1) {
-    char *sourceFileCmd = "ridl_printsource";
-    int result = IDL_ExecuteStr(sourceFileCmd);
-  }
-}
-
-char *ridl_readline(void) {
-  ridl_printsource();
-  char *line = readline(ridl_expandedprompt);  
 }
 
 
