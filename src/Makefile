@@ -24,9 +24,9 @@ both:
 	make clean
 	make
 	make install
-	make clean
-	make ARCH=i386 READLINE_LIB=/Users/mgalloy/lib/readline-6.0-32/lib
-	make ARCH=i386 install
+	#make clean
+	#make ARCH=i386 READLINE_LIB=/Users/mgalloy/lib/readline-6.0-32/lib
+	#make ARCH=i386 install
 	
 install:
 	mkdir -p bin.darwin.$(ARCH)

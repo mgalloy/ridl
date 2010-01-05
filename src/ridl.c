@@ -153,6 +153,7 @@ int ridl_stepinto(void) {
   char *cmd = ".step";
   printf(".step\n");  
   int status = ridl_executestr(cmd);
+  ridl_printsource();  
   printf("%s", ridl_expandedprompt);
 }
 
@@ -161,6 +162,7 @@ int ridl_stepover(void) {
   char *cmd = ".stepover";
   printf(".stepover\n");
   int status = ridl_executestr(cmd);
+  ridl_printsource();  
   printf("%s", ridl_expandedprompt);
 }
 
@@ -169,6 +171,7 @@ int ridl_stepreturn(void) {
   char *cmd = ".return";
   printf(".return\n");  
   int status = ridl_executestr(cmd);
+  ridl_printsource();  
   printf("%s", ridl_expandedprompt);
 }
 
@@ -381,6 +384,20 @@ void ridl_printhelp(void) {
 }
 
 
+void ridl_printsource(void) {
+  int level = IDL_DebugGetStackDepth();
+  if (level > 1) {
+    char *sourceFileCmd = "ridl_printsource";
+    int result = IDL_ExecuteStr(sourceFileCmd);
+  }
+}
+
+char *ridl_readline(void) {
+  ridl_printsource();
+  char *line = readline(ridl_expandedprompt);  
+}
+
+
 /*
    rIDL main loop.
 */
@@ -492,12 +509,12 @@ int main(int argc, char *argv[]) {
     rl_bind_keyseq("\e[17~", (rl_command_func_t *)ridl_stepover);
     rl_bind_keyseq("\e[18~", (rl_command_func_t *)ridl_stepreturn);
     
-    rl_add_defun("stepinto", (rl_command_func_t *)ridl_stepinto, CTRL('q'));
-    rl_add_defun("stepover", (rl_command_func_t *)ridl_stepover, CTRL('w'));
-    rl_add_defun("stepreturn", (rl_command_func_t *)ridl_stepreturn, CTRL('e'));
+    //rl_add_defun("stepinto", (rl_command_func_t *)ridl_stepinto, CTRL('q'));
+    //rl_add_defun("stepover", (rl_command_func_t *)ridl_stepover, CTRL('w'));
+    //rl_add_defun("stepreturn", (rl_command_func_t *)ridl_stepreturn, CTRL('e'));
 
-    while (1) {      
-      char *line = readline(ridl_expandedprompt);
+    while (1) {
+      char *line = ridl_readline();
       ridl_getevents();
       
       // normal exit by hitting ^D
