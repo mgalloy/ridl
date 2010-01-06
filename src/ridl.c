@@ -139,63 +139,39 @@ char *ridl_currenttimestamp(void) {
   return(timestamp);
 }
 
-char *ridl_homedir(void) {
-  IDL_USER_INFO user_info;
-  IDL_GetUserInfo(&user_info);
-  
-  return(user_info.homedir);
-}
 
-
-char *ridl_historyfilename(void) {
-  char *homedir = ridl_homedir();
-  char *historyfilename = (char *)malloc(1024);
-  sprintf(historyfilename, "%s/.idl/itt/rbuf/history", homedir);
-  return(historyfilename);
-}
-
+/*
+   Prepends a new command line with time stamp to the history file.
+*/
 void ridl_addhistoryline(char *line) {
+  char history[RIDL_RBUF_SIZE][RIDL_MAX_LINE_LENGTH];
+  char tmpline[RIDL_MAX_LINE_LENGTH];
+  FILE *fp; 
+  int i, line_number = 0;
+  
   // create history line with time stamp
   char *timestamp = ridl_currenttimestamp();
-  char *historyline = (char *)malloc(1024);
-  char *historyfilename = ridl_historyfilename();
+  char historyline[RIDL_MAX_LINE_LENGTH];
   
   sprintf(historyline, "%s <!-- %s -->", line, timestamp);
   free(timestamp);
 
-  // TODO: add history line to the history file
-  //printf("Add %s to %s\n", historyline, historyfilename);
+  // add history line to the history file
   
-  free(historyfilename);
-  free(historyline);
+  // read history file into a buffer
+  fp = fopen(history_file_location, "r");
+  while (fgets(tmpline, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
+    strcpy(history[line_number++], tmpline);
+  }
+  fclose(fp);
   
-  // TODO: this needs to be done in C because line might contains quotes
-  
-  //char *cmdFormat = "ridl_addhistoryline, '%s'";
-  //char *cmd = (char *)malloc(strlen(line) + strlen(cmdFormat) + 1);
-  //sprintf(cmd, cmdFormat, line);
-  //int result = IDL_ExecuteStr(cmd);
-  //free(cmd);
-  
-  //pro ridl_addhistoryline, line
-  //  compile_opt strictarr, hidden
-  //
-  //  historyfile = filepath('history', subdir=['.idl', 'itt', 'rbuf'], root=mg_homedir())
-  //  
-  //  nlines = file_lines(historyfile)
-  //  lines = strarr(nlines)
-  //  
-  //  openr, lun, historyfile, /get_lun
-  //  readf, lun, lines
-  //  free_lun, lun
-  //  
-  //  format = '(A, " ", C("<!-- ", CDI2, "-", CMoA, "-", CYI4, " ", CHI02, ":", CMI, ":", CSF05.2, " -->"))'
-  //  
-  //  openw, lun, historyfile, /get_lun
-  //  printf, lun, line, systime(/julian), format=format
-  //  printf, lun, lines[0:n_elements(lines) - 2L]
-  //  free_lun, lun
-  //end
+  // write new command line plus buffer
+  fp = fopen(history_file_location, "w");
+  fprintf(fp, "%s\n", historyline);
+  for (i = 0; i < line_number; i++) {
+    fprintf(fp, "%s", history[i]); 
+  }
+  fclose(fp);
 }
 
 
