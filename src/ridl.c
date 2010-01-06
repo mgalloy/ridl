@@ -2,6 +2,7 @@
 #include <stdlib.h> 
 #include <signal.h>
 #include <pthread.h>
+#include <time.h>
 
 #include "idl_export.h" 
 #include "readline/readline.h"
@@ -117,7 +118,57 @@ void ridl_changewdir(char *dir) {
 }
 
 
+char *ridl_currenttimestamp(void) {
+  char *timestamp = (char *)malloc(22);
+  char *monthname[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+  struct tm *stime;
+  char *date; 
+  time_t timer;
+  timer = time(NULL);
+  stime = localtime(&timer);
+  date = asctime(stime);
+  
+  sprintf(timestamp, "%2d-%s-%4d %2d:%02d:%05.2f", 
+          stime->tm_mday,
+          monthname[stime->tm_mon],
+          1900 + stime->tm_year,
+          stime->tm_hour,
+          stime->tm_min,
+          (float) stime->tm_sec);
+  return(timestamp);
+}
+
+char *ridl_homedir(void) {
+  IDL_USER_INFO user_info;
+  IDL_GetUserInfo(&user_info);
+  
+  return(user_info.homedir);
+}
+
+
+char *ridl_historyfilename(void) {
+  char *homedir = ridl_homedir();
+  char *historyfilename = (char *)malloc(1024);
+  sprintf(historyfilename, "%s/.idl/itt/rbuf/history", homedir);
+  return(historyfilename);
+}
+
 void ridl_addhistoryline(char *line) {
+  // create history line with time stamp
+  char *timestamp = ridl_currenttimestamp();
+  char *historyline = (char *)malloc(1024);
+  char *historyfilename = ridl_historyfilename();
+  
+  sprintf(historyline, "%s <!-- %s -->", line, timestamp);
+  free(timestamp);
+
+  // TODO: add history line to the history file
+  //printf("Add %s to %s\n", historyline, historyfilename);
+  
+  free(historyfilename);
+  free(historyline);
+  
   // TODO: this needs to be done in C because line might contains quotes
   
   //char *cmdFormat = "ridl_addhistoryline, '%s'";
