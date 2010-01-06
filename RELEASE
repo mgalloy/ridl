@@ -1,4 +1,4 @@
-rIDL 1.0
+rIDL 0.1
 --------
 
   * .edit executive command uses RIDL_EDITOR and EDITOR environment variables
@@ -16,6 +16,9 @@ rIDL 1.0
   * Use the :help magic command to get information about all the currently
     available magic commands.
 
+  * Keybindings are supported. Currently F5, F6, and F7 are step into, step 
+    over, and step return.
+  
   * Readline history commands are available with :!. For example, to replace a 
     string::
     
@@ -30,14 +33,12 @@ rIDL 1.0
   * Command line switches -v to print the rIDL/IDL versions and -h to print
     help on the available command line options.
     
+  * Commands are saved in the history file as they are entered so that an IDL 
+    crash does not lose all the history from that session.
+  
   
 IDL functionality not in rIDL
 -----------------------------
-
-  * widget support
   
-  * not all command line switches
-  
-  * does not change IDL's command history file (not sure how this should work, 
-    should there be two separate history files? just use IDL's? just use
-    rIDL's?)
+  * setting preferences via a command line switch when starting is not 
+    supported
