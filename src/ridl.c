@@ -119,7 +119,7 @@ void ridl_changewdir(char *dir) {
 
 
 char *ridl_currenttimestamp(void) {
-  char *timestamp = (char *)malloc(22);
+  char *timestamp = (char *)malloc(25);
   char *monthname[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
   struct tm *stime;
