@@ -1,7 +1,6 @@
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <signal.h>
-#include <pthread.h>
 #include <time.h>
 
 #include "idl_export.h" 
@@ -9,8 +8,6 @@
 #include "readline/history.h"
 
 #include "ridl.h"
-
-static pthread_t execute_thread;
 
 static IDL_USER_INFO user_info;
 
@@ -34,6 +31,7 @@ static IDL_MSG_DEF msg_arr[] = {
 static IDL_MSG_BLOCK msg_block; 
 
 static char history_file_location[1024];
+static char history_file_backup_location[1024];
 
 int ridl_really_exit = 1;
 
@@ -165,6 +163,14 @@ void ridl_addhistoryline(char *line) {
   }
   fclose(fp);
   
+  // write new command line plus buffer to the backup location
+  fp = fopen(history_file_backup_location, "w");
+  fprintf(fp, "%s\n", historyline);
+  for (i = 0; i < line_number; i++) {
+    fprintf(fp, "%s", history[i]); 
+  }
+  fclose(fp);
+  
   // write new command line plus buffer
   fp = fopen(history_file_location, "w");
   fprintf(fp, "%s\n", historyline);
@@ -208,11 +214,6 @@ void ridl_populatehistory(void) {
   
   fclose(fp);
 }
-
-//void *ridl_pexecutestr(void *cmd) {
-//  printf("cmd in pthread = '%s'\n", (char *)cmd);
-//  int result = IDL_ExecuteStr((char *)cmd);
-//}
 
 
 int ridl_stepinto(void) {
@@ -525,6 +526,7 @@ int main(int argc, char *argv[]) {
     
     IDL_GetUserInfo(&user_info);
     sprintf(history_file_location, "%s/.idl/itt/rbuf/history", user_info.homedir);
+    sprintf(history_file_backup_location, "%s/.idl/itt/rbuf/#history", user_info.homedir);
     
     if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK", 
                                              IDL_CARRAY_ELTS(msg_arr),  
