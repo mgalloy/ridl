@@ -195,7 +195,7 @@ void ridl_populatehistory(void) {
   while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
     for (i = strlen(line); i > 0; i--) {
       if (line[i] == '<') { 
-        line[i] = '\0';
+        line[i - 1] = '\0'; // i - 1 one because of the space between cmd and <!--
       }
     }
     strcpy(history[line_number++], line);
