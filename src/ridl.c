@@ -338,8 +338,6 @@ char *ridl_getnextword(char *line, int start) {
 
 /*
    Launch editor in $EDITOR environment variable.
-   
-   TODO: should check $RIDL_EDITOR first and then fall back to $EDITOR.
 */
 void ridl_launcheditor(char *filename) {
   char *cmdFormat = "ridl_launcheditor, '%s'";
