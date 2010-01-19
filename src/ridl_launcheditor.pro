@@ -14,10 +14,10 @@ pro ridl_launcheditor, basename
   old_quiet = !quiet
   !quiet = 1
   fullpath = file_which(basename + '.pro', /include_current_dir)
+  if (fullpath eq '') then fullpath = file_which(basename, /include_current_dir)
+  if (fullpath eq '') then fullpath = basename
   !quiet = old_quiet
-  
-  if (fullpath eq '') then fullpath = basename + '.pro'
-    
+
   editor = getenv('RIDL_EDITOR')
   if (editor eq '') then editor = getenv('EDITOR')
   if (editor eq '') then begin
