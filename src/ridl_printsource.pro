@@ -1,3 +1,9 @@
+; docformat = 'rst'
+
+;+
+; Prints the current line of source code (used if execution is stopped at a 
+; breakpoint).
+;-
 pro ridl_printsource
   compile_opt strictarr
   
