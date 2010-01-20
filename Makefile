@@ -8,3 +8,6 @@ both:
 	
 clean:
 	cd src; make clean
+	
+install:
+	cd src; make install

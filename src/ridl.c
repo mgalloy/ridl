@@ -417,7 +417,7 @@ void ridl_printhelp(void) {
   
   ridl_printversion();
   
-  printf("\nusage: ridl [options]\n\n");
+  printf("\nusage: ridl [options] [batch_filename]\n\n");
 
   printf("options:\n");
   printf("%s%-*s %s\n", indent, switch_width, "-32", 
