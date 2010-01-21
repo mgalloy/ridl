@@ -468,7 +468,7 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[a], "-args") == 0) {
       // TODO: handle
     } else if (strcmp(argv[a], "-demo") == 0) {
-      // TODO: handle
+      ridl_options |= IDL_INIT_DEMO;
     } else if (strcmp(argv[a], "-e") == 0) {
       if ((a + 1) < argc) {
         execute_cmd = 1;
@@ -491,7 +491,7 @@ int main(int argc, char *argv[]) {
       // TODO: handle
       // use: int IDL_RuntimeExec(char * file)
     } else if (strcmp(argv[a], "-student") == 0) {
-      // TODO: handle
+      ridl_options |= IDL_INIT_STUDENT;
     } else if (strcmp(argv[a], "-ulicense") == 0) {
       // TODO: handle
     } else if (strcmp(argv[a], "-v") == 0) { 
@@ -500,7 +500,13 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(argv[a], "-vm") == 0) {
       // TODO: handle
     } else if (strcmp(argv[a], "-32") == 0) {
-      // need to accept -32, but don't need to do anything
+      // need to accept -32, but don't need to do anything since this must be
+      // handled by the launch script (if we have gotten here it is too late)
+    } else if (argv[a][0] == '-') {
+      // assuming that this is setting a preference
+      // TODO: actually set the preference
+      printf("setting %s preference to %s\n", argv[a] + 1, argv[a + 1]);
+      a++;
     } else {
       execute_batch_file = 1;
       batch_file = argv[a];
