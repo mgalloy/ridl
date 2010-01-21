@@ -11,6 +11,7 @@ LDFLAGS= -no-cpp-precomp -dynamic -fno-common \
 	-L$(BINDIR) -L/usr/X11/lib -L$(READLINE_LIB) \
 	-lidl -lXm -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2 -lreadline -lfreetype \
 	-multiply_defined suppress
+CFLAGS=
 
 .PHONY: clean install both
 
@@ -18,7 +19,7 @@ $(RIDL) : $(RIDL).o
 	$(CC) $(RIDL).o -o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
 
 $(RIDL).o : $(RIDL).c
-	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL).c -o $(RIDL).o
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL).c -o $(RIDL).o $(CFLAGS)
 
 both:
 	make clean
