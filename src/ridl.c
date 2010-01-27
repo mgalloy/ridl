@@ -565,19 +565,11 @@ int main(int argc, char *argv[]) {
     
     rl_event_hook = ridl_event_hook;
     
-    // TODO: eventually these should be read in from a configuration file:
-    //
-    //    F5: stepinto
-    //    F6: stepover
-    //    F7: stepreturn
-    
-    rl_bind_keyseq("\e[15~", (rl_command_func_t *)ridl_stepinto);
-    rl_bind_keyseq("\e[17~", (rl_command_func_t *)ridl_stepover);
-    rl_bind_keyseq("\e[18~", (rl_command_func_t *)ridl_stepreturn);
-    
-    //rl_add_defun("stepinto", (rl_command_func_t *)ridl_stepinto, CTRL('q'));
-    //rl_add_defun("stepover", (rl_command_func_t *)ridl_stepover, CTRL('w'));
-    //rl_add_defun("stepreturn", (rl_command_func_t *)ridl_stepreturn, CTRL('e'));
+    // bind these functions to keys in an Readline configuration file, i.e., 
+    // like ~/.inputrc
+    rl_add_funmap_entry("ridl-stepinto", (rl_command_func_t *)ridl_stepinto);
+    rl_add_funmap_entry("ridl-stepover", (rl_command_func_t *)ridl_stepover);
+    rl_add_funmap_entry("ridl-stepreturn", (rl_command_func_t *)ridl_stepreturn);
 
     while (1) {
       char *line = ridl_readline();

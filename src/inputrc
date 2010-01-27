@@ -1,0 +1,7 @@
+# add the contents of this file to or include this file from ~/.inputrc:
+# 
+#    $include /Users/mgalloy/projects/ridl/trunk/src/inputrc
+
+"\e[15~": ridl-stepinto
+"\e[17~": ridl-stepover
+"\e[18~": ridl-stepreturn
