@@ -31,7 +31,8 @@ rIDL 0.1
     information about commands available (just put them after a :).    
       
   * Command line switches -v to print the rIDL/IDL versions and -h to print
-    help on the available command line options.
+    help on the available command line options are added to the standard IDL
+    command line switches.
     
   * Commands are saved in the history file as they are entered so that an IDL 
     crash does not lose all the history from that session.
