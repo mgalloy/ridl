@@ -5,7 +5,7 @@
 ; breakpoint).
 ;-
 pro ridl_printsource
-  compile_opt strictarr
+  compile_opt strictarr, hidden
   
   s = scope_traceback(/structure)
   level = n_elements(s) - 2L
