@@ -1,23 +1,23 @@
 rIDL 0.1
 --------
 
-  * .edit executive command uses RIDL_EDITOR and EDITOR environment variables
-    to launch an editor.
+  * The .edit executive command uses RIDL_EDITOR and EDITOR environment 
+    variables to launch an editor.
     
-  * filename completion
+  * Hitting tab will do filename completion.
   
-  * :doc magic command displays header information about a routine.
+  * The :doc magic command displays header information about a routine.
   
-  * :log/:unlog magic command. To get a log of the session, both commands and
-    output, use::
+  * :log/:unlog magic command. To get a log of the session, containing both 
+    commands and output, use::
     
        rIDL> :log filename
 
   * Use the :help magic command to get information about all the currently
     available magic commands.
 
-  * Keybindings are supported. Currently F5, F6, and F7 are step into, step 
-    over, and step return.
+  * Keybindings are supported. Currently step into, step over, and step return
+    can be mapped via a Readline configuration file.
   
   * Readline history commands are available with :!. For example, to replace a 
     string::
