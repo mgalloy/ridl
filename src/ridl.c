@@ -22,6 +22,9 @@ static char *batch_file;
 static int runtime_exec = 0;
 static char *runtime_filename;
 
+static int preferences_file_set = 0;
+static char *preferences_filename;
+
 static int logging = 0;
 static int teeing = 0;
 static char *log_file;
@@ -494,8 +497,9 @@ int main(int argc, char *argv[]) {
       exit(EXIT_SUCCESS);
     } else if (strcmp(argv[a], "-novm") == 0) {
       ridl_options |= IDL_INIT_NOVM;
-    } else if (strcmp(argv[a], "-pref") == 0) {
-      // TODO: handle
+    } else if (strncmp(argv[a], "-pref", 5) == 0) {
+      preferences_file_set = 1;
+      preferences_filename = argv[a] + 6;
     } else if (strcmp(argv[a], "-quiet") == 0) {
       ridl_options |= IDL_INIT_QUIET;
     } else if (strcmp(argv[a], "-queue") == 0) {
@@ -567,6 +571,20 @@ int main(int argc, char *argv[]) {
   rl_attempted_completion_function = ridl_completion;
   
   // TODO: add completers for routines and variables completion
+  
+  // load -pref filename if present on the command line
+  if (preferences_file_set) {
+    // TODO: make this work (doing a PREF_SET will not change the preferences
+    // values unless COMMIT is set, but doing so will change the user's 
+    // preferences file permanently); how to change preferences just for this
+    // session of IDL?
+    
+    //char *pref_set_format = "pref_set, filename='%s'";
+    //char *pref_set_cmd = (char *)malloc(strlen(pref_set_format) - 2 + strlen(preferences_filename) + 1);
+    ///sprintf(pref_set_cmd, pref_set_format, preferences_filename);
+    //int error = IDL_ExecuteStr(pref_set_cmd);
+    //free(pref_set_cmd);
+  }
   
   // handle -rt ir -em options if one of them was present on the command line
   if (runtime_exec) {
