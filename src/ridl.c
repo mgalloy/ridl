@@ -363,7 +363,7 @@ void ridl_getevents() {
 
 
 static int ridl_event_hook () {
-  if (IDL_DebugGetStackDepth() == 1) ridl_getevents();
+  ridl_getevents();
   sleep(ridl_event_delay);
   return 0;
 }
@@ -625,7 +625,7 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     char *line = ridl_readline();
-    if (IDL_DebugGetStackDepth() == 1) ridl_getevents();
+    ridl_getevents();
     
     // normal exit by hitting ^D
     if (line == NULL) { 
