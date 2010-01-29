@@ -30,6 +30,8 @@ static int teeing = 0;
 static char *log_file;
 static FILE *log_fp;
 
+static int use_colors = 1;
+
 static IDL_MSG_DEF msg_arr[] = {  
 #define M_RIDL_SIGNAL_REG       0
   {  "M_RIDL_SIGNAL_REG",   "%NSignal registration problem." }, 
@@ -261,7 +263,7 @@ int ridl_executestr(char *cmd) {
   ridl_updateprompt();
   ridl_addhistoryline(cmd);
 
-  fprintf(stderr, "\e[0m");   // reset colors if there was a compile error
+  if (use_colors) fprintf(stderr, "\e[0m");   // reset colors if there was a compile error
   return(0);
 }
 
@@ -270,7 +272,7 @@ int ridl_executestr(char *cmd) {
 // Registered to be called before a compiler error is shown.
 //
 void ridl_show_compile_error(void) {
-  fprintf(stderr, "\e[31m");  // will show compiler errors in red
+  if (use_colors) fprintf(stderr, "\e[31m");  // will show compiler errors in red
 }
 
 
@@ -361,7 +363,7 @@ void ridl_getevents() {
 
 
 static int ridl_event_hook () {
-  ridl_getevents();
+  if (IDL_DebugGetStackDepth() == 1) ridl_getevents();
   sleep(ridl_event_delay);
   return 0;
 }
@@ -402,11 +404,15 @@ void ridl_printmagichelp(void) {
   ridl_printversion();
   
   printf("\nmagic commands:\n");
-  
+
+  printf(magic_format, indent, magic_width, ":colors", 
+         "toggle whether color is used");  
   printf(magic_format, indent, magic_width, ":doc routine", 
          "show calling syntax and comment header for the routine");
   printf(magic_format, indent, magic_width, ":help", 
          "show this help message");
+  printf(magic_format, indent, magic_width, ":history n", 
+         "show the last n commands");
   printf(magic_format, indent, magic_width, ":log filename", 
          "start logging all commands and output to filename");
   printf(magic_format, indent, magic_width, ":unlog", 
@@ -619,7 +625,7 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     char *line = ridl_readline();
-    ridl_getevents();
+    if (IDL_DebugGetStackDepth() == 1) ridl_getevents();
     
     // normal exit by hitting ^D
     if (line == NULL) { 
@@ -649,7 +655,6 @@ int main(int argc, char *argv[]) {
             break;
           case 0: 
           case 1: 
-            //printf("%s%s\n", ridl_prompt, expansion);
             ridl_executestr(expansion);
             break;
         }
@@ -660,7 +665,14 @@ int main(int argc, char *argv[]) {
         free(expansion);
       } else {                          
         char *cmd = ridl_getnextword(line, firstcharIndex);
-        if (strcmp(cmd, ":doc") == 0) {
+        if (strcmp(cmd, ":colors") == 0) {
+          use_colors = use_colors ? 0 : 1;
+          if (use_colors) {
+            printf("colors on\n");
+          } else {
+            printf("colors off\n");
+          }
+        } else if (strcmp(cmd, ":doc") == 0) {
           char *routine = ridl_getnextword(line, firstcharIndex + 5);
           char *man = (char *)malloc(8 + strlen(routine));
           sprintf(man, "man, '%s'", routine);
@@ -697,8 +709,21 @@ int main(int argc, char *argv[]) {
           teeing = 0;          
         } else if (strcmp(cmd, ":help") == 0) {
           ridl_printmagichelp();
+        } else if (strcmp(cmd, ":history") == 0) {
+          char *nstr = ridl_getnextword(line, firstcharIndex + 9);
+          int i, n = 10; 
+          
+          HIST_ENTRY *h;
+          HISTORY_STATE *hs;
+          if (strlen(nstr) > 0) n = atoi(nstr);
+          hs = history_get_history_state();
+          for (i = n - 1; i >= 0; i--) {
+            h = history_get(hs->offset - i);            
+            printf("[%d]: %s\n", hs->offset - i, h == 0 ? "" : h->line);
+          }
+          free(nstr);
         } else {
-          printf("Unknown magic command %s\n", cmd);
+          printf("Unknown magic command '%s'\n", cmd);
         }
         free(cmd);
       }
