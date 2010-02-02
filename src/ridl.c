@@ -45,6 +45,56 @@ int ridl_really_exit = 1;
 
 int prompt_type = RIDL_USE_RIDL_PROMPT;
 
+
+/*
+  char *s = (char *)malloc(1024);
+  char *t = (char *)malloc(1024);
+  strcpy(t, "Hello my name is %name and I live in %city!\n");
+  ridl_replacestr(s, t, "name", "Mike");
+  printf("%s", s);
+ 
+  strcpy(t, s);
+  ridl_replacestr(s, t, "city", "Boulder");
+  printf("%s", s);
+*/
+char *ridl_replacestr(char *result, char *text, char *name, char *value) {
+  char *pos, *original_name, *original_value;
+  int i, matches;
+  
+  original_name = name;
+  original_value = value;
+  
+  while (*text) {
+    if (*text == '%') {
+      pos = text;
+      text++;
+      
+      matches = 1;
+      for (name = original_name; *name; name++, text++) {
+        if (*name != *text) {
+          matches = 0;
+          break;
+        }
+      }
+
+      if (matches) {
+        while (*result++ = *value++) 
+          ;
+        *result--;   // remove the null
+        value = original_value;
+      } else {
+        *result++ = *pos;
+      }
+    } else {
+      *result = *text;
+      text++;
+      result++;
+    }
+  }
+  *result = '\0';
+}
+
+
 /*
    Called when the initial IDL startup text has finished printing.
 */
@@ -477,9 +527,9 @@ void ridl_printhelp(void) {
 //
 //   rIDL main loop.
 //
-int main(int argc, char *argv[]) {  
+int main(int argc, char *argv[]) { 
   int a;
-  
+     
   // first run through command line switches (some of them are needed when
   // initializing IDL)
   for (a = 1; a < argc; a++) {
