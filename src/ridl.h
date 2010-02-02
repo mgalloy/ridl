@@ -1,13 +1,10 @@
 static char *ridl_version = "0.1";
 
-#define RIDL_USE_RIDL_PROMPT 0
-#define RIDL_USE_IDL_PROMPT 1
-#define RIDL_USE_NUMBERED_PROMPT 2
+#define RIDL_PROMPT_LENGTH 1024
 
-static char *ridl_prompt = "%s> ";
-static char *ridl_idl_prompt = "IDL> ";
-static char *ridl_numbered_prompt = "[%d]: ";
-static char ridl_expandedprompt[1024];
+static char *ridl_prompt = "rIDL> ";
+static char ridl_current_wdir[RIDL_PROMPT_LENGTH];
+static char ridl_expandedprompt[RIDL_PROMPT_LENGTH];
 
 static int ridl_cmdnumber = 0;
 

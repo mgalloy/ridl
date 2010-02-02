@@ -43,8 +43,6 @@ static char history_file_backup_location[1024];
 
 int ridl_really_exit = 1;
 
-int prompt_type = RIDL_USE_RIDL_PROMPT;
-
 
 /*
   char *s = (char *)malloc(1024);
@@ -142,17 +140,7 @@ void ridl_logoutput(int flags, char *buf, int n) {
 
 
 void ridl_updateprompt(void) {
-  switch (prompt_type) {
-    case RIDL_USE_RIDL_PROMPT: 
-      sprintf(ridl_expandedprompt, ridl_prompt, "rIDL");
-      break;
-    case RIDL_USE_IDL_PROMPT:
-      strcpy(ridl_expandedprompt, ridl_idl_prompt);
-      break;
-    case RIDL_USE_NUMBERED_PROMPT: 
-      sprintf(ridl_expandedprompt, ridl_numbered_prompt, ridl_cmdnumber);
-      break;
-  }
+  ridl_replacestr(ridl_expandedprompt, ridl_prompt, "path", ridl_current_wdir);
 }
 
 
@@ -160,7 +148,7 @@ void ridl_updateprompt(void) {
    Registered to be called when the !prompt changes.
 */
 void ridl_changeprompt(IDL_STRING *prompt) {
-  ridl_idl_prompt = IDL_STRING_STR(prompt);
+  ridl_prompt = IDL_STRING_STR(prompt);
   ridl_updateprompt();
 }
 
@@ -169,8 +157,8 @@ void ridl_changeprompt(IDL_STRING *prompt) {
    Registered to be called when the current working directory changes.
 */
 void ridl_changewdir(char *dir) {
-  // TODO: possibly modify prompt
-  //printf("Changing dirs to %s\n", dir);
+  strcpy(ridl_current_wdir, dir);
+  ridl_updateprompt();
 }
 
 
@@ -581,14 +569,14 @@ int main(int argc, char *argv[]) {
     } else if (argv[a][0] == '-') {
       // assuming that this is setting a preference
       // TODO: actually set the preference
-      printf("setting %s preference to %s\n", argv[a] + 1, argv[a + 1]);
+      printf("setting '%s' preference to '%s'\n", argv[a] + 1, argv[a + 1]);
       a++;
     } else {
       execute_batch_file = 1;
       batch_file = argv[a];
     }
   }
-    
+  
   IDL_INIT_DATA init_data;
   init_data.options = ridl_options;
   init_data.clargs.argc = argc;
@@ -616,12 +604,11 @@ int main(int argc, char *argv[]) {
   
   if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK", 
                                            IDL_CARRAY_ELTS(msg_arr),  
-                                           msg_arr))) return(1);                                            
+                                           msg_arr))) return(1);
   
-  if (prompt_type == RIDL_USE_IDL_PROMPT) {
-    IDL_ExecuteStr("!prompt = !prompt");
-  }
-  
+  strcpy(ridl_current_wdir, user_info.wd);
+  IDL_ExecuteStr("!prompt = !prompt");  // triggers prompt to be set
+    
   using_history();
   ridl_populatehistory();
   rl_attempted_completion_function = ridl_completion;
