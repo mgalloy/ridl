@@ -140,7 +140,14 @@ void ridl_logoutput(int flags, char *buf, int n) {
 
 
 void ridl_updateprompt(void) {
-  ridl_replacestr(ridl_expandedprompt, ridl_prompt, "path", ridl_current_wdir);
+  char *tmp = (char *)malloc(RIDL_PROMPT_LENGTH);
+  char cmdnum[10];
+  sprintf(cmdnum, "%d", ridl_cmdnumber);
+  
+  ridl_replacestr(tmp, ridl_prompt, "wdir", ridl_current_wdir);
+  ridl_replacestr(ridl_expandedprompt, tmp, "cmdnum", cmdnum);
+  
+  free(tmp);
 }
 
 
