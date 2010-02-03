@@ -37,6 +37,9 @@ rIDL 0.1
   * Commands are saved in the history file as they are entered so that an IDL 
     crash does not lose all the history from that session.
   
+  * The prompt can contain variables such as %wdir or %cmdnum which will be
+    expanded for display.
+  
   
 IDL functionality not in rIDL
 -----------------------------
