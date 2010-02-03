@@ -274,8 +274,10 @@ void ridl_populatehistory(void) {
 
 int ridl_stepinto(void) {
   char *cmd = ".step";
-  printf(".step\n");  
+  printf("%s\n", cmd);  
   int status = ridl_executestr(cmd);
+  ridl_cmdnumber++;
+  ridl_updateprompt();
   ridl_printsource();  
   printf("%s", ridl_expandedprompt);
 }
@@ -283,8 +285,10 @@ int ridl_stepinto(void) {
 
 int ridl_stepover(void) {
   char *cmd = ".stepover";
-  printf(".stepover\n");
+  printf("%s\n", cmd);  
   int status = ridl_executestr(cmd);
+  ridl_cmdnumber++;
+  ridl_updateprompt();
   ridl_printsource();  
   printf("%s", ridl_expandedprompt);
 }
@@ -292,8 +296,10 @@ int ridl_stepover(void) {
 
 int ridl_stepreturn(void) {
   char *cmd = ".return";
-  printf(".return\n");  
+  printf("%s\n", cmd);   
   int status = ridl_executestr(cmd);
+  ridl_cmdnumber++;
+  ridl_updateprompt();
   ridl_printsource();  
   printf("%s", ridl_expandedprompt);
 }
