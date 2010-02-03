@@ -55,9 +55,9 @@ int ridl_really_exit = 1;
   ridl_replacestr(s, t, "city", "Boulder");
   printf("%s", s);
 */
-char *ridl_replacestr(char *result, char *text, char *name, char *value) {
+int ridl_replacestr(char *result, char *text, char *name, char *value) {
   char *pos, *original_name, *original_value;
-  int i, matches;
+  int i, matches, matched = 0;
   
   original_name = name;
   original_value = value;
@@ -76,6 +76,7 @@ char *ridl_replacestr(char *result, char *text, char *name, char *value) {
       }
 
       if (matches) {
+        matched = 1;
         while (*result++ = *value++) 
           ;
         *result--;   // remove the null
@@ -90,6 +91,8 @@ char *ridl_replacestr(char *result, char *text, char *name, char *value) {
     }
   }
   *result = '\0';
+  
+  return(matched);
 }
 
 
@@ -101,6 +104,7 @@ void ridl_inittextdone(void) {
 }
 
 
+// mallocs return value, caller should free
 char *ridl_command_generator(const char *text, int state) {
   if (!state) {
     char *result = (char *)malloc(6);
@@ -211,7 +215,7 @@ void ridl_addhistoryline(char *line) {
   
   // read history file into a buffer
   fp = fopen(history_file_location, "r");
-  while (fgets(tmpline, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
+  while (fgets(tmpline, RIDL_MAX_LINE_LENGTH, fp) != NULL && line_number < RIDL_RBUF_SIZE) {
     strcpy(history[line_number++], tmpline);
   }
   fclose(fp);
@@ -236,8 +240,7 @@ void ridl_addhistoryline(char *line) {
 
 void ridl_printsource(void) {
   if (IDL_DebugGetStackDepth() > 1) {
-    char *sourceFileCmd = "ridl_printsource";
-    int result = IDL_ExecuteStr(sourceFileCmd);
+    int result = IDL_ExecuteStr("ridl_printsource");
   }
 }
 
@@ -251,7 +254,7 @@ void ridl_populatehistory(void) {
   char history[RIDL_RBUF_SIZE][RIDL_MAX_LINE_LENGTH];
   char line[RIDL_MAX_LINE_LENGTH];
   
-  while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
+  while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL && line_number < RIDL_RBUF_SIZE) {
     for (i = strlen(line); i > 0; i--) {
       if (line[i] == '<') { 
         line[i - 1] = '\0'; // i - 1 one because of the space between cmd and <!--
@@ -300,16 +303,23 @@ int ridl_stepreturn(void) {
    Execute an IDL command typed at the command line by the user.
 */
 int ridl_executestr(char *cmd) {
+  int result;
+  
   if (logging) fprintf(log_fp, "%s%s\n", ridl_expandedprompt, cmd);
 
-  int result = IDL_ExecuteStr(cmd);
+  result = IDL_ExecuteStr(cmd);
   
+  // add line to both Readline's history and IDL's history file
   add_history(cmd);
-  ridl_updateprompt();
   ridl_addhistoryline(cmd);
 
-  if (use_colors) fprintf(stderr, "\e[0m");   // reset colors if there was a compile error
-  return(0);
+  // update prompt
+  ridl_updateprompt();
+
+  // reset colors if there was a compile error
+  if (use_colors) fprintf(stderr, "\e[0m");
+  
+  return(result);
 }
 
 
@@ -615,7 +625,7 @@ int main(int argc, char *argv[]) {
   
   strcpy(ridl_current_wdir, user_info.wd);
   IDL_ExecuteStr("!prompt = !prompt");  // triggers prompt to be set
-    
+
   using_history();
   ridl_populatehistory();
   rl_attempted_completion_function = ridl_completion;
@@ -636,7 +646,7 @@ int main(int argc, char *argv[]) {
     //free(pref_set_cmd);
   }
   
-  // handle -rt ir -em options if one of them was present on the command line
+  // handle -rt or -em options if one of them was present on the command line
   if (runtime_exec) {
     int error = IDL_RuntimeExec(runtime_filename);
     return(IDL_Cleanup(IDL_FALSE));
@@ -687,7 +697,7 @@ int main(int argc, char *argv[]) {
         //       activated when a space is entered
         char *expansion;
         int expansion_result;
-        char *expansion_line = (char *) malloc(strlen(line) + 1);
+        char *expansion_line = (char *)malloc(strlen(line) + 1);
         strcpy(expansion_line, line + firstcharIndex + 1);
         expansion_result = history_expand(expansion_line, &expansion);
         switch (expansion_result) {
@@ -785,12 +795,16 @@ int main(int argc, char *argv[]) {
             ridl_cmdnumber++;
             ridl_updateprompt();
           } else {
+            // execute standard executive commands
             int error = ridl_executestr(line);
-            ridl_cmdnumber++;              
-            ridl_updateprompt();
+            ridl_cmdnumber++;
+            ridl_updateprompt();            
           }
           free(cmd);
         } else {
+          // TODO: need to aggregate multi-line commands
+          
+          // execute normal IDL commands
           int error = ridl_executestr(line);
           ridl_cmdnumber++;
           ridl_updateprompt();

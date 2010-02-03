@@ -6,7 +6,7 @@ static char *ridl_prompt = "rIDL> ";
 static char ridl_current_wdir[RIDL_PROMPT_LENGTH];
 static char ridl_expandedprompt[RIDL_PROMPT_LENGTH];
 
-static int ridl_cmdnumber = 0;
+static int ridl_cmdnumber = 1;
 
 const int RIDL_MAX_LINE_LENGTH = 1024;
 const int RIDL_RBUF_SIZE = 500;
