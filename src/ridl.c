@@ -145,13 +145,31 @@ void ridl_logoutput(int flags, char *buf, int n) {
 
 void ridl_updateprompt(void) {
   char *tmp = (char *)malloc(RIDL_PROMPT_LENGTH);
+  char *tmp2 = (char *)malloc(RIDL_PROMPT_LENGTH);
+  char *tmp3 = (char *)malloc(RIDL_PROMPT_LENGTH);
   char cmdnum[10];
+  char *dots;
+  int i;
+  
   sprintf(cmdnum, "%d", ridl_cmdnumber);
   
   ridl_replacestr(tmp, ridl_prompt, "wdir", ridl_current_wdir);
   ridl_replacestr(ridl_expandedprompt, tmp, "cmdnum", cmdnum);
+
+  dots = (char *)malloc(strlen(ridl_expandedprompt));
+  for (i = 0; i < strlen(ridl_expandedprompt) - 1; i++) {
+    dots[i] = '.';
+  }
+  dots[i] = '\0';
+  
+  ridl_replacestr(tmp2, ridl_prompt2, "wdir", ridl_current_wdir);
+  ridl_replacestr(tmp3, tmp2, "cmdnum", cmdnum);
+  ridl_replacestr(ridl_expandedprompt2, tmp3, "p1dots", dots);
   
   free(tmp);
+  free(tmp2);
+  free(tmp3);
+  free(dots);
 }
 
 
@@ -426,15 +444,29 @@ void ridl_getevents() {
 static int ridl_event_hook () {
   ridl_getevents();
   sleep(ridl_event_delay);
-  return 0;
+  return(0);
 }
 
+
+char *ridl_linecontinued(char *line) {
+  // TODO: need a better check for the continuation $
+  if (line[strlen(line) - 1] == '$') {
+    line[strlen(line) - 1] = '\0';
+  } else {
+    return(NULL);
+  }
+}
 
 char *ridl_readline(void) {
   // print source code line if we are not at the main level
   ridl_printsource();
   
-  char *line = readline(ridl_expandedprompt);  
+  // prompt changes depending on if this is a continuation line
+  if (continued) {
+    char *line = readline(ridl_expandedprompt2); 
+  } else {
+    char *line = readline(ridl_expandedprompt);  
+  }
 }
 
 
@@ -808,12 +840,36 @@ int main(int argc, char *argv[]) {
           }
           free(cmd);
         } else {
-          // TODO: need to aggregate multi-line commands
+          // determine if line is continued
+          char *line_continued = ridl_linecontinued(line);
           
-          // execute normal IDL commands
-          int error = ridl_executestr(line);
-          ridl_cmdnumber++;
-          ridl_updateprompt();
+          // tack on
+          if (continued) {
+            if (line_continued) {
+              strcat(ridl_continuedline, line);
+            } else {
+              int error;
+              continued = 0;
+              strcat(ridl_continuedline, line);
+              error = ridl_executestr(ridl_continuedline);
+              ridl_cmdnumber++;
+              ridl_updateprompt();
+            }
+          } else {
+            if (line_continued) {
+              continued = 1;
+              strcpy(ridl_continuedline, line);
+            } else {
+              // execute normal IDL commands
+              int error = ridl_executestr(line);
+              ridl_cmdnumber++;
+              ridl_updateprompt();
+            }  
+          }
+          
+          
+          
+
         }
       }
     }
