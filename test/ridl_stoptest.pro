@@ -1,3 +1,20 @@
+function ridl_stoptest_class::init
+  compile_opt strictarr
+
+  a = 1
+  b = 2
+  
+  return, 1
+end
+
+
+pro ridl_stoptest_class__define
+  compile_opt strictarr
+
+  define = { ridl_stoptest_class, a: 0L }
+end
+
+
 pro ridl_stoptest_helper
   compile_opt strictarr
   
@@ -12,5 +29,6 @@ pro ridl_stoptest
   
   stop
   a = 5
-  ridl_stoptest_helper
+  o = obj_new('ridl_stoptest_class')  ; .step on this line
+  obj_destroy, o
 end
