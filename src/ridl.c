@@ -447,11 +447,75 @@ static int ridl_event_hook () {
   return(0);
 }
 
+// Find the position of the continuation $, if present; -1 if not found
+int ridl_findcontinuationpos(char *line) {
+  int i;
+  int only_space = 1;
+  int after_char = 0;
+  int inside_single_quotes = 0, inside_double_quotes = 0, inside_comment = 0;
+  
+  for (i = 0; i < strlen(line); i++) {
+    switch (line[i]) {
+      case '\t':
+      case ' ':
+        break;
+        
+      case ';':
+        only_space = 0;
+        after_char = 0;
+        if (!inside_single_quotes && !inside_double_quotes) return(-1);
+        break;
+
+      case '\'':
+        only_space = 0;
+        after_char = 0;
+        if (inside_single_quotes) {
+          inside_single_quotes = 0;
+        } else if (!inside_double_quotes) {
+          inside_single_quotes = 1;
+        }
+        break;
+        
+      case '"':
+        only_space = 0;
+        after_char = 0;
+        if (inside_double_quotes) {
+          inside_double_quotes = 0;
+        } else if (!inside_single_quotes) {
+          inside_double_quotes = 1;
+        }
+        break;
+        
+      case '$':
+        // quoted
+        if (inside_single_quotes || inside_double_quotes) break;
+        
+        // spawn to OS
+        if (only_space && !continued) break;
+        
+        // in a variable name
+        if (after_char) break;
+        
+        return(i);
+
+      default:
+        only_space = 0;
+
+        if ((line[i] == '_') 
+              || (line[i] >= '0' && line[i] <= '9') 
+              || (line[i] >= 'a' && line[i] <= 'z') 
+              || (line[i] >= 'A' && line[i] <= 'Z')) after_char = 1;
+    }
+  }
+  
+  return(-1);
+}
 
 char *ridl_linecontinued(char *line) {
-  // TODO: need a better check for the continuation $
-  if (line[strlen(line) - 1] == '$') {
-    line[strlen(line) - 1] = '\0';
+  int continuationPos = ridl_findcontinuationpos(line);
+
+  if (continuationPos > 0) {
+    line[continuationPos] = '\0';
   } else {
     return(NULL);
   }
