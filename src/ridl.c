@@ -907,11 +907,11 @@ int main(int argc, char *argv[]) {
           // determine if line is continued
           char *line_continued = ridl_linecontinued(line);
           
-          // tack on
           if (continued) {
             if (line_continued) {
               strcat(ridl_continuedline, line);
             } else {
+              // execute IDL commands that were continued on several lines
               int error;
               continued = 0;
               strcat(ridl_continuedline, line);
@@ -930,10 +930,6 @@ int main(int argc, char *argv[]) {
               ridl_updateprompt();
             }  
           }
-          
-          
-          
-
         }
       }
     }
