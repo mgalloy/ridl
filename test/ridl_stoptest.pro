@@ -1,3 +1,20 @@
+pro ridl_stoptest_class::helper
+  compile_opt strictarr
+  
+  a = 5
+  b = 7
+  help, a
+end
+
+
+pro ridl_stoptest_class::cleanup
+  compile_opt strictarr
+
+  a = 1
+  b = 2
+end
+
+
 function ridl_stoptest_class::init
   compile_opt strictarr
 
@@ -28,7 +45,13 @@ pro ridl_stoptest
   compile_opt strictarr
   
   stop
+  
   a = 5
-  o = obj_new('ridl_stoptest_class')  ; .step on this line
-  obj_destroy, o
+  
+  ridl_stoptest_helper
+  call_procedure, 'ridl_stoptest_helper'
+  
+  o = obj_new('ridl_stoptest_class')  ; problem if you .step on this line
+  o->helper
+  obj_destroy, o                      ; also a problem on this line
 end
