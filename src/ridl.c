@@ -533,7 +533,7 @@ char *ridl_readline(void) {
   }
 }
 
-
+        
 /*
    Prints version information about rIDL and IDL to stdout.
 */
@@ -716,6 +716,11 @@ int main(int argc, char *argv[]) {
   IDL_UicbRegPromptChange(ridl_changeprompt);
   IDL_UicbRegWorkingDirChange(ridl_changewdir);
   IDL_UicbRegDeathHint(ridl_deathhint);
+
+  // TODO: will need to use something like this to fix ticket #1, but this
+  //       will crash now; this specifies a routine that will be called when
+  //       IDL needs to do a readline (as in RIDL_STOPTEST)
+  //IDL_UicbRegRlineFromKbrd(ridl_readline);
 
   IDL_GetUserInfo(&user_info);
   sprintf(history_file_location, "%s/.idl/itt/rbuf/history", user_info.homedir);
