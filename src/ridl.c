@@ -458,6 +458,7 @@ int ridl_findcontinuationpos(char *line) {
     switch (line[i]) {
       case '\t':
       case ' ':
+        after_char = 0;
         break;
         
       case ';':
@@ -486,8 +487,8 @@ int ridl_findcontinuationpos(char *line) {
         }
         break;
         
-      case '$':
-        // quoted
+      case '$':      
+        // quoted        
         if (inside_single_quotes || inside_double_quotes) break;
         
         // spawn to OS
@@ -500,9 +501,10 @@ int ridl_findcontinuationpos(char *line) {
 
       default:
         only_space = 0;
-
+        after_char = 0;
+        
+        if (after_char && (line[i] >= '0' && line[i] <= '9')) after_char = 1;
         if ((line[i] == '_') 
-              || (line[i] >= '0' && line[i] <= '9') 
               || (line[i] >= 'a' && line[i] <= 'z') 
               || (line[i] >= 'A' && line[i] <= 'Z')) after_char = 1;
     }
@@ -514,8 +516,9 @@ int ridl_findcontinuationpos(char *line) {
 char *ridl_linecontinued(char *line) {
   int continuationPos = ridl_findcontinuationpos(line);
 
-  if (continuationPos > 0) {
+  if (continuationPos >= 0) {
     line[continuationPos] = '\0';
+    return(line);
   } else {
     return(NULL);
   }
@@ -929,7 +932,7 @@ int main(int argc, char *argv[]) {
         } else {
           // determine if line is continued
           char *line_continued = ridl_linecontinued(line);
-          
+
           if (continued) {
             if (line_continued) {
               strcat(ridl_continuedline, line);
