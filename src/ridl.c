@@ -631,12 +631,10 @@ void ridl_printhelp(void) {
 }
 
 
-//
-//   rIDL main loop.
-//
-int main(int argc, char *argv[]) { 
+void ridl_handleswitches(int argc, char *argv[], int before) {
   int a;
-     
+  char tmpcmd[RIDL_MAX_LINE_LENGTH];
+  
   // first run through command line switches (some of them are needed when
   // initializing IDL)
   for (a = 1; a < argc; a++) {
@@ -687,14 +685,32 @@ int main(int argc, char *argv[]) {
       // handled by the launch script (if we have gotten here it is too late)
     } else if (argv[a][0] == '-') {
       // assuming that this is setting a preference
-      // TODO: actually set the preference
-      printf("setting '%s' preference to '%s'\n", argv[a] + 1, argv[a + 1]);
+      if (before == 0) {
+        // TODO: convert each preference name to a system variable name
+        if (strcmp(argv[a] + 1, "IDL_PROMPT") == 0) {
+          char space[2];
+          space[0] = argv[a + 1][strlen(argv[a + 1]) - 1] == ' ' ? '\0' : ' ';
+          space[1] = '\0';
+          sprintf(tmpcmd, "!prompt = '%s%s'", argv[a + 1], space);
+          IDL_ExecuteStr(tmpcmd);
+        }
+      }
       a++;
     } else {
       execute_batch_file = 1;
       batch_file = argv[a];
     }
   }
+  
+}
+
+
+//
+//   rIDL main loop.
+//
+int main(int argc, char *argv[]) { 
+
+  ridl_handleswitches(argc, argv, 1);
   
   IDL_INIT_DATA init_data;
   init_data.options = ridl_options;
@@ -721,6 +737,8 @@ int main(int argc, char *argv[]) {
   //       will crash now; this specifies a routine that will be called when
   //       IDL needs to do a readline (as in RIDL_STOPTEST)
   //IDL_UicbRegRlineFromKbrd(ridl_readline);
+
+  ridl_handleswitches(argc, argv, 0);
 
   IDL_GetUserInfo(&user_info);
   sprintf(history_file_location, "%s/.idl/itt/rbuf/history", user_info.homedir);
