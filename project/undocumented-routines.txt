@@ -1,3 +1,9 @@
+---------------------
+Registration routines
+---------------------
+
+IDL_UicbRegInitTextDone
+-----------------------
 ::
 
   void IDL_UicbRegInitTextDone(IDL_INIT_TEXT_HANDLER_FUNC proc);
@@ -6,6 +12,8 @@
 called when the initial launch text is finished printing
 
 
+IDL_UicbRegExitDone
+-------------------
 ::
 
   void IDL_UicbRegExitDone(IDL_EXITDONE_HANDLER_FUNC proc);
@@ -14,6 +22,8 @@ called when the initial launch text is finished printing
 called when EXIT is encountered in a routine
 
 
+IDL_UicbRegShowCompileErr
+-------------------------
 ::
 
   void IDL_UicbRegShowCompileErr(IDL_SHOWCOMPILEERROR_HANDLER_FUNC proc);
@@ -22,6 +32,8 @@ called when EXIT is encountered in a routine
 called when a compiler error is discovered, but before the error is printed
 
 
+IDL_UicbRegPromptChange
+-----------------------
 ::
 
   void IDL_UicbRegPromptChange(IDL_PROMPTCHANGE_HANDLER_FUNC proc);
@@ -30,6 +42,8 @@ called when a compiler error is discovered, but before the error is printed
 called when !prompt is modified
 
 
+IDL_UicbRegWorkingDirChange
+---------------------------
 ::
 
   void IDL_UicbRegWorkingDirChange(IDL_WORKINGDIRCHANGE_HANDLER_FUNC proc);
@@ -38,42 +52,58 @@ called when !prompt is modified
 called when the current working directory is changed
 
 
+IDL_UicbRegDeathHint
+--------------------
 ::
 
   void IDL_UicbRegDeathHint(IDL_DEATHHINT_HANDLER_FUNC proc);
   typedef void (* IDL_DEATHHINT_HANDLER_FUNC proc)(void);
 
 
+IDL_ObjCallMethodByString
+-------------------------
 ::
 
   IDL_ObjCallMethodByString;
   
 
+IDL_EzCall
+----------
 ::
 
   IDL_EzCall;
   
   
+IDL_EzCallCleanup
+-----------------
 ::
 
   IDL_EzCallCleanup;
 
 
+IDL_CallRoutineByString
+-----------------------
 ::
 
   IDL_CallRoutineByString;
 
 
+IDL_CmdLineProcess
+------------------
 ::
 
   IDL_CmdLineProcess;
 
 
+IDL_CmdLineCheckUnknown
+-----------------------
 ::
 
   IDL_CmdLineCheckUnknown;
 
 
+IDL_ExecuteCommandFromCmdLine
+-----------------------------
 ::
 
   IDL_ExecuteCommandFromCmdLine;
@@ -81,41 +111,91 @@ called when the current working directory is changed
 seems to exit application immediately
 
 
+IDL_Rbuf_Hide_Timestamp
+-----------------------
 ::
 
   IDL_Rbuf_Hide_Timestamp;
   
 
+IDL_Rbuf_Unhide_Timestamp
+-------------------------
 ::
 
   IDL_Rbuf_Unhide_Timestamp;
   
 
+IDL_RbufGetState
+----------------
 ::
 
   IDL_RbufGetState;
   
-  
+
+IDL_RlineGetState
+----------------- 
 ::
 
   IDL_RlineGetState;
   
 
+IDL_RbufClear
+-------------
 ::
 
   IDL_RbufClear;
   
 
+IDL_RbufGetCurrentTimestamp
+---------------------------
 ::
 
   int IDL_RbufGetCurrentTimestamp();
   
 
+IDL_RbufRecall
+--------------
 ::
 
   IDL_RbufRecall;
   
 
+IDL_RbufReset
+-------------
 ::
 
   IDL_RbufReset;
+
+
+--------------------------
+IDL Rline defines/routines
+--------------------------
+
+IDL_UicbRegRlineFromKbrd
+------------------------
+::
+
+  IDL_UicbRegRlineFromKbrd;
+  
+called when a line is needed by the compiler (i.e., when a previous line is continued on the next line with $ or when an OBJ_NEW or OBJ_DESTROY is `.step`'ed into)
+
+This is the rline stuff in `idl_export.h`::
+
+  /**** Flags to OR together for options parameter to IDL_RlineRead() ****/
+  #define IDL_RLINE_OPT_NOSAVE        1   /* Don't save in recall buffer */
+  #define IDL_RLINE_OPT_NOJOURNAL     2   /* Don't journal */
+  #define IDL_RLINE_OPT_JOURCMT       4   /* Put a '; ' at start in journal */
+  #define IDL_RLINE_OPT_NOEDIT        8   /* Like (!EDIT_INPUT = 0) for one call*/
+
+  extern char *IDL_CDECL IDL_Rline(char *s, IDL_MEMINT n, int unit, FILE
+                                   *stream, int is_tty, char *prompt, int opt);
+  extern void IDL_CDECL IDL_RlineSetStdinOptions(int opt);
+
+These are in `idl.export`, but not `idl_export.h`::
+
+    IDL_UicbRegRlineDisplayFkeys;
+    IDL_UicbRegRlineFromKbrd;
+    IDL_UicbRegRlineInterruptWarn;
+    IDL_UicbRegRlineRedraw;
+    IDL_UicbRegRlineSetFkey;
+    
