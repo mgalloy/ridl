@@ -40,9 +40,22 @@ rIDL 0.1
   * The prompt can contain variables such as %wdir or %cmdnum which will be
     expanded for display.
   
+  * Certain commands can be bound to keystrokes. Currently .step, .stepover, 
+    and .return are available.
+    
+  * Multi-line commands, when entered at the interactive command line, are 
+    combined into a single line in the command history.
+    
   
 IDL functionality not in rIDL
 -----------------------------
   
   * setting preferences via a command line switch when starting is not 
     supported
+
+  * command line args specified via a command line switch when starting and
+    retrieved with the COMMAND_LINE_ARGS routine are not supported
+    
+  * .step'ing into an OBJ_NEW or OBJ_DESTROY call will leave rIDL's command 
+    line reading and into IDL's default mechanism until scope returns to the
+    level of the original OBJ_NEW or OBJ_DESTROY.
