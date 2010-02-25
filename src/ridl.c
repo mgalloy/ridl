@@ -538,9 +538,12 @@ char *ridl_readline(void) {
 
 
 int ridl_readline_callback(int cont, int  widevint_allowed) {
-  char *line = ridl_readline();
-  printf("%d, %d, %s", cont, widevint_allowed, line);
-  return(0);
+  char *line;
+  printf("Before: %d, %d\n", cont, widevint_allowed);
+  line = ridl_readline();
+  printf("After: %d, %d, %s\n", cont, widevint_allowed, line);
+
+  return(line == 0 ? 0 : 1);
 }
 
         

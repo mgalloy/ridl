@@ -180,6 +180,25 @@ IDL_UicbRegRlineFromKbrd
   
 called when a line is needed by the compiler (i.e., when a previous line is continued on the next line with $ or when an OBJ_NEW or OBJ_DESTROY is `.step`'ed into)  
 
+Read strings into s from keyboard using information from the rblk
+global variable exported from rline().
+
+entry
+     This routine should only be called by rline via
+   IDL_UicbRlineFromKbrd(). rblk must be initialized properly.
+
+exit:
+     A line of input has been input from the terminal and is stored
+     in rblk. It reads characters until the input buffer fills,
+     a newline character is read, or an end-of-file condition is
+     encountered. The string is terminated with a null character.
+   If widevint_allowed is TRUE, it might exit before a complete
+   line is input to allow widget events to be processed.
+
+diagnostics:
+   Returns one of the IDL_RLINEFROMKBRD_* values as described in
+   the description of IDL_UicbRlineFromKbrd().
+ 
         Routine to be called from rline() for reading from an interactive
         input source. Reads a line of input from the user.
           cont - TRUE if this is a call to continue a previous input
