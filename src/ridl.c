@@ -536,6 +536,13 @@ char *ridl_readline(void) {
   }
 }
 
+
+int ridl_readline_callback(int cont, int  widevint_allowed) {
+  char *line = ridl_readline();
+  printf("%d, %d, %s", cont, widevint_allowed, line);
+  return(0);
+}
+
         
 /*
    Prints version information about rIDL and IDL to stdout.
@@ -739,7 +746,7 @@ int main(int argc, char *argv[]) {
   // TODO: will need to use something like this to fix ticket #1, but this
   //       will crash now; this specifies a routine that will be called when
   //       IDL needs to do a readline (as in RIDL_STOPTEST)
-  //IDL_UicbRegRlineFromKbrd(ridl_readline);
+  IDL_UicbRegRlineFromKbrd(ridl_readline_callback);
 
   ridl_handleswitches(argc, argv, 0);
 

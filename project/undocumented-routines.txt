@@ -175,10 +175,32 @@ IDL_UicbRegRlineFromKbrd
 ------------------------
 ::
 
-  IDL_UicbRegRlineFromKbrd;
+  IDL_UicbRegRlineFromKbrd(IDL_UicbRlineFromKbrd_t proc);
+  typedef int (* IDL_UicbRlineFromKbrd_t)(int cont, int  widevint);
   
-called when a line is needed by the compiler (i.e., when a previous line is continued on the next line with $ or when an OBJ_NEW or OBJ_DESTROY is `.step`'ed into)
+called when a line is needed by the compiler (i.e., when a previous line is continued on the next line with $ or when an OBJ_NEW or OBJ_DESTROY is `.step`'ed into)  
 
+        Routine to be called from rline() for reading from an interactive
+        input source. Reads a line of input from the user.
+          cont - TRUE if this is a call to continue a previous input
+                line, and FALSE if this is the first call for the line.
+          widevint_allowed - TRUE if the routine can return without a
+                complete line if there is the possibility that widget
+                events have arrived, and FALSE if it should block
+                until the complete line is in.
+        Allowed return values are:
+          IDL_RLINEFROMKBRD_EOF (0) - End of file was seen.
+          IDL_RLINEFROMKBRD_OK (1) - A line was sucessfully input and
+                stored into rblk.
+          IDL_RLINEFROMKBRD_WIDEVINT (2) - An incomplete line has been
+                input (and possibly stored in rblk although this
+                is not required) but window system events have arrived
+                and might be processed. This return is only allowed
+                if the widevint_allowed argument is TRUE. On the
+                next call, the FromKbrd function will be given the
+                same rblk, and is expected to pick up the input
+                operation where it left off.
+ 
 This is the rline stuff in `idl_export.h`::
 
   /**** Flags to OR together for options parameter to IDL_RlineRead() ****/
