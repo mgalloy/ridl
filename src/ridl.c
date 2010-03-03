@@ -546,7 +546,27 @@ int ridl_readline_callback(int cont, int  widevint_allowed) {
   return(line == 0 ? 0 : 1);
 }
 
-        
+
+void ridl_magic_history(char *line, int firstcharIndex, int length, int printLineNum) {
+  char *nstr = ridl_getnextword(line, firstcharIndex + length);
+  int i, n = length + 1; 
+  
+  HIST_ENTRY *h;
+  HISTORY_STATE *hs;
+  if (strlen(nstr) > 0) n = atoi(nstr);
+  hs = history_get_history_state();
+  for (i = n - 1; i >= 0; i--) {
+    h = history_get(hs->offset - i); 
+    if (printLineNum) {
+      printf("[%d]: %s\n", hs->offset - i, h == 0 ? "" : h->line);
+    } else {
+      printf("%s\n", h == 0 ? "" : h->line);
+    }
+  }
+  free(nstr);
+}  
+
+               
 /*
    Prints version information about rIDL and IDL to stdout.
 */
@@ -582,7 +602,9 @@ void ridl_printmagichelp(void) {
   printf(magic_format, indent, magic_width, ":help", 
          "show this help message");
   printf(magic_format, indent, magic_width, ":history n", 
-         "show the last n commands");
+         "show the last n commands prefixed with the command number");
+  printf(magic_format, indent, magic_width, ":qhistory n", 
+         "show the last n commands with no prefix");
   printf(magic_format, indent, magic_width, ":log filename", 
          "start logging all commands and output to filename");
   printf(magic_format, indent, magic_width, ":unlog", 
@@ -902,22 +924,10 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(cmd, ":help") == 0) {
           ridl_printmagichelp();
         } else if (strcmp(cmd, ":history") == 0) {
-          char *nstr = ridl_getnextword(line, firstcharIndex + 9);
-          int i, n = 10; 
-          
-          HIST_ENTRY *h;
-          HISTORY_STATE *hs;
-          if (strlen(nstr) > 0) n = atoi(nstr);
-          hs = history_get_history_state();
-          for (i = n - 1; i >= 0; i--) {
-            h = history_get(hs->offset - i);            
-            printf("[%d]: %s\n", hs->offset - i, h == 0 ? "" : h->line);
-          }
-          free(nstr);
-        } else {
-          printf("Unknown magic command '%s'\n", cmd);
+          ridl_magic_history(line, firstcharIndex, 9, 1);
+        } else if (strcmp(cmd, ":qhistory") == 0) {
+          ridl_magic_history(line, firstcharIndex, 10, 0);
         }
-        free(cmd);
       }
     } else {
       if (line && *line) {           
