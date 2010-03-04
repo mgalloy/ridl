@@ -213,6 +213,17 @@ char *ridl_currenttimestamp(void) {
 }
 
 
+int ridl_file_exists(const char *filename) {
+  FILE *file;
+  if (file = fopen(filename, "r")) {
+    fclose(file);
+    return(1);
+  }
+  return(0);
+}
+
+
+
 /*
    Prepends a new command line with time stamp to the history file.
 */
@@ -549,7 +560,7 @@ int ridl_readline_callback(int cont, int  widevint_allowed) {
 
 void ridl_magic_history(char *line, int firstcharIndex, int length, int printLineNum) {
   char *nstr = ridl_getnextword(line, firstcharIndex + length);
-  int i, n = length + 1; 
+  int i, n = 10; 
   
   HIST_ENTRY *h;
   HISTORY_STATE *hs;
@@ -566,7 +577,34 @@ void ridl_magic_history(char *line, int firstcharIndex, int length, int printLin
   free(nstr);
 }  
 
-               
+
+void ridl_magic_histedit(char *line, int firstcharIndex) {
+  HIST_ENTRY *h;
+  HISTORY_STATE *hs;
+  char *snlines = ridl_getnextword(line, firstcharIndex + 10);
+  char *filename = ridl_getnextword(line, firstcharIndex + 10 + strlen(snlines) + 1);
+  int i, nlines = atoi(snlines);
+  
+  if (ridl_file_exists(filename)) {
+    printf("File %s already exists\n", filename);
+    return;
+  }
+  
+  FILE *fp = fopen(filename, "w");
+  
+  hs = history_get_history_state();
+  for (i = nlines - 1; i >= 0; i--) {
+    h = history_get(hs->offset - i); 
+    fprintf(fp, "%s\n", h == 0 ? "" : h->line);
+  }
+  free(snlines);
+  free(filename);
+  fclose(fp);
+  
+  ridl_launcheditor(filename); 
+}   
+
+            
 /*
    Prints version information about rIDL and IDL to stdout.
 */
@@ -601,10 +639,12 @@ void ridl_printmagichelp(void) {
          "show calling syntax and comment header for the routine");
   printf(magic_format, indent, magic_width, ":help", 
          "show this help message");
-  printf(magic_format, indent, magic_width, ":history n", 
+  printf(magic_format, indent, magic_width, ":history [n]", 
          "show the last n commands prefixed with the command number");
-  printf(magic_format, indent, magic_width, ":qhistory n", 
+  printf(magic_format, indent, magic_width, ":qhistory [n]", 
          "show the last n commands with no prefix");
+  printf(magic_format, indent, magic_width, ":histedit n filename", 
+         "send the last n commands to filename and launch editor");
   printf(magic_format, indent, magic_width, ":log filename", 
          "start logging all commands and output to filename");
   printf(magic_format, indent, magic_width, ":unlog", 
@@ -927,6 +967,8 @@ int main(int argc, char *argv[]) {
           ridl_magic_history(line, firstcharIndex, 9, 1);
         } else if (strcmp(cmd, ":qhistory") == 0) {
           ridl_magic_history(line, firstcharIndex, 10, 0);
+        } else if (strcmp(cmd, ":histedit") == 0) {
+          ridl_magic_histedit(line, firstcharIndex);
         }
       }
     } else {
