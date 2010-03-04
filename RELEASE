@@ -8,6 +8,9 @@ rIDL 0.1
   
   * The :doc magic command displays header information about a routine.
   
+  * Use the :history magic command to retrieve the command line history or 
+    :histedit to send the commands to a file and launch your editor.
+    
   * :log/:unlog magic command. To get a log of the session, containing both 
     commands and output, use::
     
@@ -45,7 +48,7 @@ rIDL 0.1
     
   * Multi-line commands, when entered at the interactive command line, are 
     combined into a single line in the command history.
-    
+  
   
 IDL functionality not in rIDL
 -----------------------------
