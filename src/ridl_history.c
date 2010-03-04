@@ -2,18 +2,81 @@
 #include <stdlib.h> 
 #include <string.h>
 
+#include "idl_export.h" 
+#include "readline/history.h"
+
 #include "ridl.h"
 
 
-/*
-   Prepends a new command line with time stamp to the history file.
+static char history_filename[1024];
+static char historybackup_filename[1024];
+
+/**
+   rIDL history system implementation.
 */
-void ridl_addhistoryline(char *line, char *history_file_location, char *history_file_backup_location) {
+
+
+/**
+   Reads IDL history file and populates the Readline history.
+*/
+int ridl_populatehistory(void) {
+  FILE *fp = fopen(history_file_location, "r");
+  int i, cmdnum = 0, line_number = 0, rline_number;
+  char history[RIDL_RBUF_SIZE][RIDL_MAX_LINE_LENGTH];
+  char line[RIDL_MAX_LINE_LENGTH];
+  
+  while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL && line_number < RIDL_RBUF_SIZE) {
+    for (i = strlen(line); i > 0; i--) {
+      if (line[i] == '<') { 
+        line[i - 1] = '\0'; // i - 1 one because of the space between cmd and <!--
+      }
+    }
+    strcpy(history[line_number++], line);
+  }
+  
+  for (rline_number = line_number - 1; rline_number >= 0; rline_number--) {
+    add_history(history[rline_number]);
+    cmdnum++;
+  }
+  
+  fclose(fp);
+  
+  return(cmdnum);
+}
+
+
+/**
+   Initialize the rIDL history system.
+   
+   @return integer representing number of lines in the command history loaded
+*/
+int ridl_initialize_history(void) {
+  IDL_USER_INFO user_info;
+  IDL_GetUserInfo(&user_info);
+
+  sprintf(history_filename, "%s/.idl/itt/rbuf/history", user_info.homedir);
+  sprintf(historybackup_filename, "%s/.idl/itt/rbuf/#history", user_info.homedir);
+  
+  using_history();
+  return(ridl_populatehistory());
+}
+
+
+/**
+   Adds a line to the history system. Prepends a new command line with time 
+   stamp to the history file and adds it to readline's history.
+   
+   @param[in] line line to add to the history
+*/
+void ridl_addhistoryline(char *line) {
   char history[RIDL_RBUF_SIZE][RIDL_MAX_LINE_LENGTH];
   char tmpline[RIDL_MAX_LINE_LENGTH];
   FILE *fp; 
   int i, line_number = 0;
   
+  // add line to readline's history
+  add_history(line);
+    
   // create history line with time stamp
   char *timestamp = ridl_currenttimestamp();
   char historyline[RIDL_MAX_LINE_LENGTH];
@@ -24,14 +87,14 @@ void ridl_addhistoryline(char *line, char *history_file_location, char *history_
   // add history line to the history file
   
   // read history file into a buffer
-  fp = fopen(history_file_location, "r");
+  fp = fopen(history_filename, "r");
   while (fgets(tmpline, RIDL_MAX_LINE_LENGTH, fp) != NULL && line_number < RIDL_RBUF_SIZE) {
     strcpy(history[line_number++], tmpline);
   }
   fclose(fp);
     
   // write new command line plus buffer to the backup location
-  fp = fopen(history_file_backup_location, "w");
+  fp = fopen(historybackup_filename, "w");
   fprintf(fp, "%s\n", historyline);
   for (i = 0; i < line_number; i++) {
     fprintf(fp, "%s", history[i]); 
@@ -39,7 +102,7 @@ void ridl_addhistoryline(char *line, char *history_file_location, char *history_
   fclose(fp);
   
   // write new command line plus buffer
-  fp = fopen(history_file_location, "w");
+  fp = fopen(history_filename, "w");
   fprintf(fp, "%s\n", historyline);
   for (i = 0; i < line_number; i++) {
     fprintf(fp, "%s", history[i]); 

@@ -1,1 +1,6 @@
-void ridl_addhistoryline(char *line, char *history_file_location, char *history_file_backup_location);
+/**
+   rIDL history system interface.
+*/
+
+int ridl_initialize_history(void);
+void ridl_addhistoryline(char *line);

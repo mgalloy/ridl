@@ -8,6 +8,10 @@ both:
 	
 clean:
 	cd src; make clean
+	rm -rf capi-docs
 	
 install:
 	cd src; make install
+	
+doc:
+	doxygen doxygen.config

@@ -231,33 +231,6 @@ void ridl_printsource(void) {
 }
 
 
-/*
-   Reads IDL history file and populates the Readline history.
-*/
-void ridl_populatehistory(void) {
-  FILE *fp = fopen(history_file_location, "r");
-  int i, line_number = 0, rline_number;
-  char history[RIDL_RBUF_SIZE][RIDL_MAX_LINE_LENGTH];
-  char line[RIDL_MAX_LINE_LENGTH];
-  
-  while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL && line_number < RIDL_RBUF_SIZE) {
-    for (i = strlen(line); i > 0; i--) {
-      if (line[i] == '<') { 
-        line[i - 1] = '\0'; // i - 1 one because of the space between cmd and <!--
-      }
-    }
-    strcpy(history[line_number++], line);
-  }
-  
-  for (rline_number = line_number - 1; rline_number >= 0; rline_number--) {
-    add_history(history[rline_number]);
-    ridl_cmdnumber++;
-  }
-  
-  fclose(fp);
-}
-
-
 int ridl_stepinto(void) {
   char *cmd = ".step";
   printf("%s\n", cmd);  
@@ -302,8 +275,7 @@ int ridl_executestr(char *cmd) {
   result = IDL_ExecuteStr(cmd);
   
   // add line to both Readline's history and IDL's history file
-  add_history(cmd);
-  ridl_addhistoryline(cmd, history_file_location, history_file_backup_location);
+  ridl_addhistoryline(cmd);
 
   // update prompt
   ridl_updateprompt();
@@ -737,19 +709,17 @@ int main(int argc, char *argv[]) {
 
   ridl_handleswitches(argc, argv, 0);
 
-  IDL_GetUserInfo(&user_info);
-  sprintf(history_file_location, "%s/.idl/itt/rbuf/history", user_info.homedir);
-  sprintf(history_file_backup_location, "%s/.idl/itt/rbuf/#history", user_info.homedir);
+  ridl_cmdnumber = ridl_initialize_history() + 1;
   
   if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK", 
                                            IDL_CARRAY_ELTS(msg_arr),  
                                            msg_arr))) return(1);
   
+  IDL_GetUserInfo(&user_info);
+
   strcpy(ridl_current_wdir, user_info.wd);
   IDL_ExecuteStr("!prompt = !prompt");  // triggers prompt to be set
 
-  using_history();
-  ridl_populatehistory();
   rl_attempted_completion_function = ridl_completion;
   
   // TODO: add completers for routines and variables completion
