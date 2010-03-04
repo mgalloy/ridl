@@ -861,6 +861,10 @@ int main(int argc, char *argv[]) {
           ridl_magic_history(line, firstcharIndex, 10, 0);
         } else if (strcmp(cmd, ":histedit") == 0) {
           ridl_magic_histedit(line, firstcharIndex);
+        } else if (strcmp(cmd, ":version") == 0) {
+          ridl_printversion();
+        } else {
+          printf("unknown magic command: %s\n", cmd);
         }
       }
     } else {

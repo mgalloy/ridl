@@ -8,19 +8,18 @@
 #include "ridl.h"
 
 
-static char history_filename[1024];
-static char historybackup_filename[1024];
+/// Filename of file containing IDL's command history
+static char history_filename[1024]; 
 
-/**
-   rIDL history system implementation.
-*/
+/// rIDL backup of history file
+static char historybackup_filename[1024];
 
 
 /**
    Reads IDL history file and populates the Readline history.
 */
 int ridl_populatehistory(void) {
-  FILE *fp = fopen(history_file_location, "r");
+  FILE *fp = fopen(history_filename, "r");
   int i, cmdnum = 0, line_number = 0, rline_number;
   char history[RIDL_RBUF_SIZE][RIDL_MAX_LINE_LENGTH];
   char line[RIDL_MAX_LINE_LENGTH];
@@ -74,7 +73,7 @@ void ridl_addhistoryline(char *line) {
   FILE *fp; 
   int i, line_number = 0;
   
-  // add line to readline's history
+  // add line to Readline's history
   add_history(line);
     
   // create history line with time stamp
@@ -88,7 +87,8 @@ void ridl_addhistoryline(char *line) {
   
   // read history file into a buffer
   fp = fopen(history_filename, "r");
-  while (fgets(tmpline, RIDL_MAX_LINE_LENGTH, fp) != NULL && line_number < RIDL_RBUF_SIZE) {
+  while (fgets(tmpline, RIDL_MAX_LINE_LENGTH, fp) != NULL 
+           && line_number < RIDL_RBUF_SIZE) {
     strcpy(history[line_number++], tmpline);
   }
   fclose(fp);

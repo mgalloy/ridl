@@ -4,13 +4,13 @@
 #include "ridl.h"
 
 
-//
-// Print help for the magic commands.
-//
+/**
+   Print help for the magic commands.
+*/
 void ridl_printmagichelp(void) {
   char *indent = "  ";
   char *magic_format = "%s%-*s %s\n";
-  int magic_width = 16;
+  int magic_width = 21;
   
   ridl_printversion();
   
@@ -23,9 +23,9 @@ void ridl_printmagichelp(void) {
   printf(magic_format, indent, magic_width, ":help", 
          "show this help message");
   printf(magic_format, indent, magic_width, ":history [n]", 
-         "show the last n commands prefixed with the command number");
+         "show the last n commands; defaults to 10 lines");
   printf(magic_format, indent, magic_width, ":qhistory [n]", 
-         "show the last n commands with no prefix");
+         "show the last n commands with no prefix; defaults to 10 lines");
   printf(magic_format, indent, magic_width, ":histedit n filename", 
          "send the last n commands to filename and launch editor");
   printf(magic_format, indent, magic_width, ":log filename", 
@@ -36,4 +36,5 @@ void ridl_printmagichelp(void) {
          "log output to filename");
   printf(magic_format, indent, magic_width, ":untee", 
          "stop logging output");
-}
+  printf(magic_format, indent, magic_width, ":version", 
+         "print version information");}

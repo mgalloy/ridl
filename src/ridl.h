@@ -18,9 +18,5 @@ static int ridl_cmdnumber = 1;
 
 static float ridl_event_delay = 0.1;
 
-static char history_file_location[1024];
-static char history_file_backup_location[1024];
-
-
 char *ridl_currenttimestamp(void);
 void ridl_printversion(void);
