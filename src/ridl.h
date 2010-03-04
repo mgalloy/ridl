@@ -20,3 +20,6 @@ static float ridl_event_delay = 0.1;
 
 char *ridl_currenttimestamp(void);
 void ridl_printversion(void);
+int ridl_file_exists(const char *filename);
+void ridl_launcheditor(char *filename);
+char *ridl_getnextword(char *line, int start);

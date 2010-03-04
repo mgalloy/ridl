@@ -484,54 +484,7 @@ int ridl_readline_callback(int cont, int  widevint_allowed) {
   printf("After: %d, %d, %s\n", cont, widevint_allowed, line);
 
   return(line == 0 ? 0 : 1);
-}
-
-
-void ridl_magic_history(char *line, int firstcharIndex, int length, int printLineNum) {
-  char *nstr = ridl_getnextword(line, firstcharIndex + length);
-  int i, n = 10; 
-  
-  HIST_ENTRY *h;
-  HISTORY_STATE *hs;
-  if (strlen(nstr) > 0) n = atoi(nstr);
-  hs = history_get_history_state();
-  for (i = n - 1; i >= 0; i--) {
-    h = history_get(hs->offset - i); 
-    if (printLineNum) {
-      printf("[%d]: %s\n", hs->offset - i, h == 0 ? "" : h->line);
-    } else {
-      printf("%s\n", h == 0 ? "" : h->line);
-    }
-  }
-  free(nstr);
-}  
-
-
-void ridl_magic_histedit(char *line, int firstcharIndex) {
-  HIST_ENTRY *h;
-  HISTORY_STATE *hs;
-  char *snlines = ridl_getnextword(line, firstcharIndex + 10);
-  char *filename = ridl_getnextword(line, firstcharIndex + 10 + strlen(snlines) + 1);
-  int i, nlines = atoi(snlines);
-  
-  if (ridl_file_exists(filename)) {
-    printf("File %s already exists\n", filename);
-    return;
-  }
-  
-  FILE *fp = fopen(filename, "w");
-  
-  hs = history_get_history_state();
-  for (i = nlines - 1; i >= 0; i--) {
-    h = history_get(hs->offset - i); 
-    fprintf(fp, "%s\n", h == 0 ? "" : h->line);
-  }
-  free(snlines);
-  free(filename);
-  fclose(fp);
-  
-  ridl_launcheditor(filename); 
-}   
+} 
 
             
 /*
@@ -854,7 +807,7 @@ int main(int argc, char *argv[]) {
           }
           teeing = 0;          
         } else if (strcmp(cmd, ":help") == 0) {
-          ridl_printmagichelp();
+          ridl_magic_help();
         } else if (strcmp(cmd, ":history") == 0) {
           ridl_magic_history(line, firstcharIndex, 9, 1);
         } else if (strcmp(cmd, ":qhistory") == 0) {
