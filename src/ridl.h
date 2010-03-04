@@ -3,7 +3,7 @@ static char *ridl_version = "0.1";
 #define RIDL_PROMPT_LENGTH 1024
 #define RIDL_MAX_LINE_LENGTH 1024
 
-const int RIDL_RBUF_SIZE = 500;
+static const int RIDL_RBUF_SIZE = 500;
 
 static char *ridl_prompt = "rIDL> ";
 static char *ridl_prompt2 = "%p1dots ";
@@ -17,3 +17,10 @@ static char ridl_continuedline[RIDL_MAX_LINE_LENGTH];
 static int ridl_cmdnumber = 1;
 
 static float ridl_event_delay = 0.1;
+
+static char history_file_location[1024];
+static char history_file_backup_location[1024];
+
+
+char *ridl_currenttimestamp(void);
+void ridl_printversion(void);

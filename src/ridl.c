@@ -1,6 +1,7 @@
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <signal.h>
+#include <string.h>
 #include <time.h>
 
 #include "idl_export.h" 
@@ -9,6 +10,8 @@
 
 #include "ridl.h"
 #include "ridl_magic.h"
+#include "ridl_history.h"
+
 
 static IDL_USER_INFO user_info;
 
@@ -38,9 +41,6 @@ static IDL_MSG_DEF msg_arr[] = {
   {  "M_RIDL_SIGNAL_REG",   "%NSignal registration problem." }, 
 };
 static IDL_MSG_BLOCK msg_block; 
-
-static char history_file_location[1024];
-static char history_file_backup_location[1024];
 
 int ridl_really_exit = 1;
 
@@ -224,50 +224,6 @@ int ridl_file_exists(const char *filename) {
 }
 
 
-
-/*
-   Prepends a new command line with time stamp to the history file.
-*/
-void ridl_addhistoryline(char *line) {
-  char history[RIDL_RBUF_SIZE][RIDL_MAX_LINE_LENGTH];
-  char tmpline[RIDL_MAX_LINE_LENGTH];
-  FILE *fp; 
-  int i, line_number = 0;
-  
-  // create history line with time stamp
-  char *timestamp = ridl_currenttimestamp();
-  char historyline[RIDL_MAX_LINE_LENGTH];
-  
-  sprintf(historyline, "%s <!-- %s -->", line, timestamp);
-  free(timestamp);
-
-  // add history line to the history file
-  
-  // read history file into a buffer
-  fp = fopen(history_file_location, "r");
-  while (fgets(tmpline, RIDL_MAX_LINE_LENGTH, fp) != NULL && line_number < RIDL_RBUF_SIZE) {
-    strcpy(history[line_number++], tmpline);
-  }
-  fclose(fp);
-  
-  // write new command line plus buffer to the backup location
-  fp = fopen(history_file_backup_location, "w");
-  fprintf(fp, "%s\n", historyline);
-  for (i = 0; i < line_number; i++) {
-    fprintf(fp, "%s", history[i]); 
-  }
-  fclose(fp);
-  
-  // write new command line plus buffer
-  fp = fopen(history_file_location, "w");
-  fprintf(fp, "%s\n", historyline);
-  for (i = 0; i < line_number; i++) {
-    fprintf(fp, "%s", history[i]); 
-  }
-  fclose(fp);
-}
-
-
 void ridl_printsource(void) {
   if (IDL_DebugGetStackDepth() > 1) {
     int result = IDL_ExecuteStr("ridl_printsource");
@@ -347,7 +303,7 @@ int ridl_executestr(char *cmd) {
   
   // add line to both Readline's history and IDL's history file
   add_history(cmd);
-  ridl_addhistoryline(cmd);
+  ridl_addhistoryline(cmd, history_file_location, history_file_backup_location);
 
   // update prompt
   ridl_updateprompt();

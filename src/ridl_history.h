@@ -1,0 +1,1 @@
+void ridl_addhistoryline(char *line, char *history_file_location, char *history_file_backup_location);
