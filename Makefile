@@ -1,3 +1,5 @@
+IDL=idl
+
 .PHONY: all clean both
 	
 all:
@@ -15,3 +17,4 @@ install:
 	
 doc:
 	doxygen doxygen.config
+	$(IDL) ridl_build_docs
