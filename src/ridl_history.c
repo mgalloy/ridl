@@ -8,6 +8,13 @@
 #include "ridl.h"
 
 
+/**
+   @file
+   This file contains helper routines dealing with the rIDL command history
+   system.
+*/
+
+
 /// Filename of file containing IDL's command history
 static char history_filename[1024]; 
 

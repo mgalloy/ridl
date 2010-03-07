@@ -4,6 +4,11 @@
 
 
 /**
+   @file
+   This file contains helper routines dealing with strings specific to rIDL.
+*/
+
+/**
    Replace `name` with `value` in `text` and return the result in `result`.
 
    Use it as in the following example:

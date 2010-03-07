@@ -8,6 +8,12 @@
 
 
 /**
+   @file
+   This file contains helper routines dealing with the magic commands.
+*/
+
+
+/**
    Print help for the magic commands.
 */
 void ridl_magic_help(void) {
