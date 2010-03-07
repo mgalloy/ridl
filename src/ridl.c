@@ -124,8 +124,10 @@ void ridl_updateprompt(void) {
 }
 
 
-/*
+/**
    Registered to be called when the !prompt changes.
+   
+   @param[in] prompt string to change prompt to
 */
 void ridl_changeprompt(IDL_STRING *prompt) {
   ridl_prompt = IDL_STRING_STR(prompt);
@@ -137,7 +139,12 @@ void ridl_changeprompt(IDL_STRING *prompt) {
    Registered to be called when the current working directory changes.
 */
 void ridl_changewdir(char *dir) {
-  strcpy(ridl_current_wdir, dir);
+  if (strncmp(user_info.homedir, dir, (int) strlen(user_info.homedir)) == 0) {
+    ridl_current_wdir[0] = '~';
+    strcpy(ridl_current_wdir + 1, dir + strlen(user_info.homedir));
+  } else {
+    strcpy(ridl_current_wdir, dir);
+  }
   ridl_updateprompt();
 }
 
@@ -598,8 +605,7 @@ int main(int argc, char *argv[]) {
                                            msg_arr))) return(1);
   
   IDL_GetUserInfo(&user_info);
-
-  strcpy(ridl_current_wdir, user_info.wd);
+  ridl_changewdir(user_info.wd);
   IDL_ExecuteStr("!prompt = !prompt");  // triggers prompt to be set
 
   rl_attempted_completion_function = ridl_completion;
