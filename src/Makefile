@@ -15,8 +15,11 @@ CFLAGS=
 
 .PHONY: clean install both
 
-$(RIDL) : $(RIDL).o $(RIDL)_magic.o $(RIDL)_history.o
-	$(CC) $(RIDL).o $(RIDL)_magic.o $(RIDL)_history.o -o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
+$(RIDL) : $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o
+	$(CC) $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o -o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
+
+$(RIDL)_strings.o : $(RIDL)_strings.c
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL)_strings.c -o $(RIDL)_strings.o $(CFLAGS)
 
 $(RIDL)_history.o : $(RIDL)_history.c
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL)_history.c -o $(RIDL)_history.o $(CFLAGS)
@@ -41,6 +44,8 @@ install:
 		
 clean:
 	rm -f $(RIDL).o
+	rm -f $(RIDL)_strings.o
 	rm -f $(RIDL)_magic.o
+	rm -f $(RIDL)_history.o
 	rm -f $(RIDL)
 	

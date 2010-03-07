@@ -11,6 +11,7 @@ both:
 clean:
 	cd src; make clean
 	rm -rf capi-docs
+	rm -rf api-docs
 	
 install:
 	cd src; make install

@@ -17,6 +17,8 @@ static char historybackup_filename[1024];
 
 /**
    Reads IDL history file and populates the Readline history.
+   
+   @return integer representing number of lines in the command history loaded
 */
 int ridl_populatehistory(void) {
   FILE *fp = fopen(history_filename, "r");
