@@ -13,7 +13,7 @@
 #include "ridl_history.h"
 #include "ridl_strings.h"
 
-
+/// user information with fields: logname, homedir, pid, host, wd, date
 static IDL_USER_INFO user_info;
 
 static int ridl_options = IDL_INIT_CLARGS;
@@ -37,12 +37,14 @@ static FILE *log_fp;
 
 static int use_colors = 1;
 
-static IDL_MSG_DEF msg_arr[] = {  
+static IDL_MSG_DEF msg_arr[] = 
+{  
 #define M_RIDL_SIGNAL_REG       0
   {  "M_RIDL_SIGNAL_REG",   "%NSignal registration problem." }, 
 };
 static IDL_MSG_BLOCK msg_block; 
 
+/// set to indicate that rIDL should just exit when asked
 int ridl_really_exit = 1;
 
 
@@ -55,7 +57,15 @@ void ridl_inittextdone(void) {
 }
 
 
-// mallocs return value, caller should free
+/**
+   mallocs return value, caller should free; used in Readline completion
+   callback
+   
+   @return dynamically allocated string
+   
+   @param[in] text
+   @param[in] state
+*/
 char *ridl_command_generator(const char *text, int state) {
   if (!state) {
     char *result = (char *)malloc(6);
@@ -135,8 +145,10 @@ void ridl_changeprompt(IDL_STRING *prompt) {
 }
 
 
-/* 
+/**
    Registered to be called when the current working directory changes.
+   
+   @param[in] dir directory that working directory is changing to
 */
 void ridl_changewdir(char *dir) {
   if (strncmp(user_info.homedir, dir, (int) strlen(user_info.homedir)) == 0) {
@@ -149,6 +161,14 @@ void ridl_changewdir(char *dir) {
 }
 
 
+/**
+   Returns the current time in the form:
+   @code
+   25-Feb-2010 16:42:57.00
+   @endcode
+   
+   @return string representing the current time
+*/
 char *ridl_currenttimestamp(void) {
   char *timestamp = (char *)malloc(25);
   char *monthname[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
@@ -160,7 +180,8 @@ char *ridl_currenttimestamp(void) {
   stime = localtime(&timer);
   date = asctime(stime);
   
-  sprintf(timestamp, "%2d-%s-%4d %2d:%02d:%05.2f", 
+  sprintf(timestamp, 
+          "%2d-%s-%4d %2d:%02d:%05.2f", 
           stime->tm_mday,
           monthname[stime->tm_mon],
           1900 + stime->tm_year,
@@ -191,9 +212,7 @@ void ridl_printsource(void) {
 int ridl_stepinto(void) {
   char *cmd = ".step";
   printf("%s\n", cmd);  
-  int status = ridl_executestr(cmd);
-  ridl_cmdnumber++;
-  ridl_updateprompt();
+  int status = ridl_executestr(cmd, 1);
   ridl_printsource();  
   printf("%s", ridl_expandedprompt);
 }
@@ -202,9 +221,7 @@ int ridl_stepinto(void) {
 int ridl_stepover(void) {
   char *cmd = ".stepover";
   printf("%s\n", cmd);  
-  int status = ridl_executestr(cmd);
-  ridl_cmdnumber++;
-  ridl_updateprompt();
+  int status = ridl_executestr(cmd, 1);
   ridl_printsource();  
   printf("%s", ridl_expandedprompt);
 }
@@ -213,18 +230,22 @@ int ridl_stepover(void) {
 int ridl_stepreturn(void) {
   char *cmd = ".return";
   printf("%s\n", cmd);   
-  int status = ridl_executestr(cmd);
-  ridl_cmdnumber++;
-  ridl_updateprompt();
+  int status = ridl_executestr(cmd, 1);
   ridl_printsource();  
   printf("%s", ridl_expandedprompt);
 }
 
 
-/*
-   Execute an IDL command typed at the command line by the user.
+/**
+   Execute an IDL command.
+   
+   @return integer representing success
+   
+   @param[in] cmd IDL command to execute
+   @param[in] save flag to indicate if the command should be saved in the 
+              history and hence if command number should be incremented
 */
-int ridl_executestr(char *cmd) {
+int ridl_executestr(char *cmd, int save) {
   int result;
   
   if (logging) fprintf(log_fp, "%s%s\n", ridl_expandedprompt, cmd);
@@ -232,7 +253,10 @@ int ridl_executestr(char *cmd) {
   result = IDL_ExecuteStr(cmd);
   
   // add line to both Readline's history and IDL's history file
-  ridl_addhistoryline(cmd);
+  if (save) {
+    ridl_addhistoryline(cmd);
+    ridl_cmdnumber++;
+  }
 
   // update prompt
   ridl_updateprompt();
@@ -299,8 +323,10 @@ int ridl_firstchar(char *line) {
 }
 
 
-/*
-   Launch editor in $EDITOR environment variable.
+/**
+   Launch editor in $EDITOR environment variable on the given filename.
+   
+   @param[in] filename file to launch editor on
 */
 void ridl_launcheditor(char *filename) {
   char *cmdFormat = "ridl_launcheditor, '%s'";
@@ -311,12 +337,22 @@ void ridl_launcheditor(char *filename) {
 }
 
 
+/**
+   Calls IDL routine IDL_GETEVENTS to check for widget events. 
+   
+   This is required to allow widget programs to receive events while the 
+   command line is active.
+*/
 void ridl_getevents() {
   char *cmd = "ridl_getevents";
   int result = IDL_ExecuteStr(cmd);
 }
 
 
+/**
+   This is the Readline event hook callback; called by Readline when waiting
+   for input, but no more than 10 times per second.
+*/
 static int ridl_event_hook () {
   ridl_getevents();
   sleep(ridl_event_delay);
@@ -563,9 +599,9 @@ void ridl_handleswitches(int argc, char *argv[], int before) {
 }
 
 
-//
-//   rIDL main loop.
-//
+/**
+   rIDL main loop.
+*/
 int main(int argc, char *argv[]) { 
 
   ridl_handleswitches(argc, argv, 1);
@@ -621,7 +657,7 @@ int main(int argc, char *argv[]) {
     
     //char *pref_set_format = "pref_set, filename='%s'";
     //char *pref_set_cmd = (char *)malloc(strlen(pref_set_format) - 2 + strlen(preferences_filename) + 1);
-    ///sprintf(pref_set_cmd, pref_set_format, preferences_filename);
+    //sprintf(pref_set_cmd, pref_set_format, preferences_filename);
     //int error = IDL_ExecuteStr(pref_set_cmd);
     //free(pref_set_cmd);
   }
@@ -689,11 +725,9 @@ int main(int argc, char *argv[]) {
             break;
           case 0: 
           case 1: 
-            ridl_executestr(expansion);
+            ridl_executestr(expansion, 1);
             break;
         }
-        ridl_cmdnumber++;
-        ridl_updateprompt();
         
         free(expansion_line);
         free(expansion);
@@ -770,9 +804,7 @@ int main(int argc, char *argv[]) {
             ridl_updateprompt();
           } else {
             // execute standard executive commands
-            int error = ridl_executestr(line);
-            ridl_cmdnumber++;
-            ridl_updateprompt();            
+            int error = ridl_executestr(line, 1);
           }
           free(cmd);
         } else {
@@ -787,9 +819,7 @@ int main(int argc, char *argv[]) {
               int error;
               continued = 0;
               strcat(ridl_continuedline, line);
-              error = ridl_executestr(ridl_continuedline);
-              ridl_cmdnumber++;
-              ridl_updateprompt();
+              error = ridl_executestr(ridl_continuedline, 1);
             }
           } else {
             if (line_continued) {
@@ -797,9 +827,7 @@ int main(int argc, char *argv[]) {
               strcpy(ridl_continuedline, line);
             } else {
               // execute normal IDL commands
-              int error = ridl_executestr(line);
-              ridl_cmdnumber++;
-              ridl_updateprompt();
+              int error = ridl_executestr(line, 1);
             }  
           }
         }
