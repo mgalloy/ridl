@@ -1,5 +1,3 @@
-static char *ridl_version = "0.1";
-
 #define RIDL_PROMPT_LENGTH 1024
 #define RIDL_MAX_LINE_LENGTH 1024
 

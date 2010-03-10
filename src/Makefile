@@ -1,3 +1,4 @@
+RIDL_VERSION=0.1
 RIDL=ridl
 IDLDIR=/Applications/itt/idl
 ARCH=x86_64
@@ -17,7 +18,8 @@ CFLAGS=
 
 $(RIDL) : $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o
 	$(CC) $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o -o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
-
+	
+	
 $(RIDL)_strings.o : $(RIDL)_strings.c
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL)_strings.c -o $(RIDL)_strings.o $(CFLAGS)
 
@@ -28,6 +30,8 @@ $(RIDL)_magic.o : $(RIDL)_magic.c
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL)_magic.c -o $(RIDL)_magic.o $(CFLAGS)
 	
 $(RIDL).o : $(RIDL).c
+	echo "#define RIDL_VERSION \"$(RIDL_VERSION)\"" > ridl_version.h
+	echo "#define RIDL_REVISION \"`svnversion`\"" >> ridl_version.h
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL).c -o $(RIDL).o $(CFLAGS)
 	
 both:

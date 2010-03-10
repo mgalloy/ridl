@@ -12,6 +12,8 @@
 #include "ridl_magic.h"
 #include "ridl_history.h"
 #include "ridl_strings.h"
+#include "ridl_version.h"
+
 
 /// user information with fields: logname, homedir, pid, host, wd, date
 static IDL_USER_INFO user_info;
@@ -307,7 +309,8 @@ void ridl_exit_handler(void) {
 */
 void ridl_welcome(void) {
   if (!(ridl_options & IDL_INIT_QUIET)) {
-    printf("rIDL 0.1: Really Interactive Data Language\n");  
+    printf("rIDL %sr%s: Really Interactive Data Language\n", 
+           RIDL_VERSION, RIDL_REVISION);  
   }
 }
 
@@ -459,7 +462,7 @@ int ridl_readline_callback(int cont, int  widevint_allowed) {
 } 
 
             
-/*
+/**
    Prints version information about rIDL and IDL to stdout.
 */
 void ridl_printversion(void) {
@@ -467,7 +470,8 @@ void ridl_printversion(void) {
   IDL_STRING *os = IDL_SysvVersionOS();
   IDL_STRING *arch = IDL_SysvVersionArch();
   
-  printf("rIDL %s: Really Interactive Data Language\n", ridl_version);
+  printf("rIDL %sr%s: Really Interactive Data Language\n", 
+         RIDL_VERSION, RIDL_REVISION);
   printf("IDL %s %s %s\n", 
          IDL_STRING_STR(version), 
          IDL_STRING_STR(os), 
