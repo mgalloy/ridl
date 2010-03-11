@@ -51,8 +51,9 @@ int ridl_really_exit = 1;
 
 
 
-/*
-   Called when the initial IDL startup text has finished printing.
+/**
+   IDL callback called when the initial IDL startup text has finished 
+   printing.
 */
 void ridl_inittextdone(void) {
   
@@ -204,6 +205,10 @@ int ridl_file_exists(const char *filename) {
 }
 
 
+/**
+   Print the current line of source code that execution is stopped at (if it
+   is stopped somewhere).
+*/
 void ridl_printsource(void) {
   if (IDL_DebugGetStackDepth() > 1) {
     int result = IDL_ExecuteStr("ridl_printsource");
@@ -270,31 +275,31 @@ int ridl_executestr(char *cmd, int save) {
 }
 
 
-//
-// Registered to be called before a compiler error is shown.
-//
+/**
+   IDL callback registered to be called before a compiler error is shown.
+*/
 void ridl_show_compile_error(void) {
-  if (use_colors) fprintf(stderr, "\e[31m");  // will show compiler errors in red
+  if (use_colors) fprintf(stderr, "\e[31m");  // show compiler errors in red
 }
 
 
-/*
-   Registered to be called after IDL_Cleanup is called. 
+/**
+   IDL callback registered to be called after IDL_Cleanup is called. 
 */
 void ridl_deathhint(void) {
 }
 
 
-/*
-   Called when EXIT routine is encountered.
+/**
+   IDL callback registered to be called when EXIT routine is encountered.
 */
 void ridl_exit(void) {
   int result = IDL_Cleanup(IDL_FALSE);
 }
 
 
-/*
-   Handle any rIDL cleanup before exiting.
+/**
+   IDL callback registered to be called when IDL is done.
 */
 void ridl_exit_handler(void) {
   if (logging) fclose(log_fp); 
@@ -304,7 +309,7 @@ void ridl_exit_handler(void) {
 }
 
 
-/*
+/**
    Print rIDL welcome message if not quiet.
 */
 void ridl_welcome(void) {
@@ -361,6 +366,7 @@ static int ridl_event_hook () {
   sleep(ridl_event_delay);
   return(0);
 }
+
 
 // Find the position of the continuation $, if present; -1 if not found
 int ridl_findcontinuationpos(char *line) {
