@@ -19,7 +19,6 @@ CFLAGS=
 $(RIDL) : $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o
 	$(CC) $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o -o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
 	
-	
 $(RIDL)_strings.o : $(RIDL)_strings.c
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL)_strings.c -o $(RIDL)_strings.o $(CFLAGS)
 
@@ -29,7 +28,7 @@ $(RIDL)_history.o : $(RIDL)_history.c
 $(RIDL)_magic.o : $(RIDL)_magic.c
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL)_magic.c -o $(RIDL)_magic.o $(CFLAGS)
 	
-$(RIDL).o : $(RIDL).c
+$(RIDL).o : $(RIDL).c Makefile
 	echo "#define RIDL_VERSION \"$(RIDL_VERSION)\"" > ridl_version.h
 	echo "#define RIDL_REVISION \"`svnversion`\"" >> ridl_version.h
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL).c -o $(RIDL).o $(CFLAGS)
