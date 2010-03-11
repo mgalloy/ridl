@@ -42,7 +42,7 @@ void ridl_magic_help(void) {
   printf(magic_format, indent, magic_width, ":unlog", 
          "stop logging commands and output");
   printf(magic_format, indent, magic_width, ":tee filename", 
-         "log output to filename");
+         "start logging output to filename");
   printf(magic_format, indent, magic_width, ":untee", 
          "stop logging output");
   printf(magic_format, indent, magic_width, ":version", 

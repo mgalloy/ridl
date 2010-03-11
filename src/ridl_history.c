@@ -1,6 +1,7 @@
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <string.h>
+#include <time.h>
 
 #include "idl_export.h" 
 #include "readline/history.h"
@@ -20,6 +21,37 @@ static char history_filename[1024];
 
 /// rIDL backup of history file
 static char historybackup_filename[1024];
+
+
+/**
+   Returns the current time in the form:
+   @code
+   25-Feb-2010 16:42:57.00
+   @endcode
+   
+   @return string representing the current time
+*/
+char *ridl_currenttimestamp(void) {
+  char *timestamp = (char *)malloc(25);
+  char *monthname[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+  struct tm *stime;
+  char *date; 
+  time_t timer;
+  timer = time(NULL);
+  stime = localtime(&timer);
+  date = asctime(stime);
+  
+  sprintf(timestamp, 
+          "%2d-%s-%4d %2d:%02d:%05.2f", 
+          stime->tm_mday,
+          monthname[stime->tm_mon],
+          1900 + stime->tm_year,
+          stime->tm_hour,
+          stime->tm_min,
+          (float) stime->tm_sec);
+  return(timestamp);
+}
 
 
 /**

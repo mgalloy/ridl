@@ -2,7 +2,6 @@
 #include <stdlib.h> 
 #include <signal.h>
 #include <string.h>
-#include <time.h>
 
 #include "idl_export.h" 
 #include "readline/readline.h"
@@ -13,6 +12,7 @@
 #include "ridl_history.h"
 #include "ridl_strings.h"
 #include "ridl_version.h"
+#include "ridl_logging.h"
 
 
 /// user information with fields: logname, homedir, pid, host, wd, date
@@ -31,11 +31,6 @@ static char *runtime_filename;
 
 static int preferences_file_set = 0;
 static char *preferences_filename;
-
-static int logging = 0;
-static int teeing = 0;
-static char *log_file;
-static FILE *log_fp;
 
 static int use_colors = 1;
 
@@ -89,21 +84,6 @@ char **ridl_completion(const char *text, int start, int end) {
   
   //printf("\ntext = '%s', start = %d, end = %d\n", text, start, end);
   return((char **) NULL);
-}
-
-
-void ridl_logoutput(int flags, char *buf, int n) {
-  char *output = (char *)malloc(strlen(buf) + 1);
-  strncpy(output, buf, n);
-  output[n] = '\0';
-  
-  printf("%s", output);
-  if (flags & IDL_TOUT_F_NLPOST) printf("\n");
-
-  fprintf(log_fp, "%s", output);
-  if (flags & IDL_TOUT_F_NLPOST) fprintf(log_fp, "\n");
-  
-  free(output);
 }
 
 
@@ -161,37 +141,6 @@ void ridl_changewdir(char *dir) {
     strcpy(ridl_current_wdir, dir);
   }
   ridl_updateprompt();
-}
-
-
-/**
-   Returns the current time in the form:
-   @code
-   25-Feb-2010 16:42:57.00
-   @endcode
-   
-   @return string representing the current time
-*/
-char *ridl_currenttimestamp(void) {
-  char *timestamp = (char *)malloc(25);
-  char *monthname[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-  struct tm *stime;
-  char *date; 
-  time_t timer;
-  timer = time(NULL);
-  stime = localtime(&timer);
-  date = asctime(stime);
-  
-  sprintf(timestamp, 
-          "%2d-%s-%4d %2d:%02d:%05.2f", 
-          stime->tm_mday,
-          monthname[stime->tm_mon],
-          1900 + stime->tm_year,
-          stime->tm_hour,
-          stime->tm_min,
-          (float) stime->tm_sec);
-  return(timestamp);
 }
 
 
@@ -255,7 +204,7 @@ int ridl_stepreturn(void) {
 int ridl_executestr(char *cmd, int save) {
   int result;
   
-  if (logging) fprintf(log_fp, "%s%s\n", ridl_expandedprompt, cmd);
+  if (ridl_islogging()) ridl_logcmd(ridl_expandedprompt, cmd);
 
   result = IDL_ExecuteStr(cmd);
   
@@ -302,8 +251,8 @@ void ridl_exit(void) {
    IDL callback registered to be called when IDL is done.
 */
 void ridl_exit_handler(void) {
-  if (logging) fclose(log_fp); 
-  if (teeing) fclose(log_fp);
+  if (ridl_islogging()) ridl_closelog(); 
+  if (ridl_isteeing()) ridl_closelog();
 
   exit(EXIT_SUCCESS);
 }
@@ -758,33 +707,31 @@ int main(int argc, char *argv[]) {
           free(man);
           free(routine);
         } else if (strcmp(cmd, ":log") == 0) {
-          if (logging) fclose(log_fp);
+          if (ridl_islogging()) ridl_closelog();
 
-          logging = 1;
+          ridl_setlogging(1);
           char *filename = ridl_getnextword(line, firstcharIndex + 5);
-          log_fp = fopen(filename, "w");
-          IDL_ToutPush(ridl_logoutput);
+          ridl_initlog(filename);
           free(filename);
         } else if (strcmp(cmd, ":unlog") == 0) {
-          if (logging) {
-            fclose(log_fp);
+          if (ridl_islogging()) {
+            ridl_closelog();
             IDL_ToutPop();
           }
-          logging = 0;
+          ridl_setlogging(0);
         } else if (strcmp(cmd, ":tee") == 0) {
-          if (teeing) fclose(log_fp);
+          if (ridl_isteeing()) ridl_closelog();
 
-          teeing = 1;
+          ridl_setteeing(1);
           char *filename = ridl_getnextword(line, firstcharIndex + 5);
-          log_fp = fopen(filename, "w");
-          IDL_ToutPush(ridl_logoutput);
+          ridl_initlog(filename);
           free(filename);
         } else if (strcmp(cmd, ":untee") == 0) {
-          if (teeing) {
-            fclose(log_fp);
+          if (ridl_isteeing()) {
+            ridl_closelog();
             IDL_ToutPop();
           }
-          teeing = 0;          
+          ridl_setteeing(0);
         } else if (strcmp(cmd, ":help") == 0) {
           ridl_magic_help();
         } else if (strcmp(cmd, ":history") == 0) {

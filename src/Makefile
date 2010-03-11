@@ -16,8 +16,8 @@ CFLAGS=
 
 .PHONY: clean install both
 
-$(RIDL) : $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o
-	$(CC) $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o -o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
+$(RIDL) : $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o $(RIDL)_logging.o
+	$(CC) $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o $(RIDL)_logging.o -o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
 	
 $(RIDL)_strings.o : $(RIDL)_strings.c
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL)_strings.c -o $(RIDL)_strings.o $(CFLAGS)
@@ -27,6 +27,9 @@ $(RIDL)_history.o : $(RIDL)_history.c
 
 $(RIDL)_magic.o : $(RIDL)_magic.c
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL)_magic.c -o $(RIDL)_magic.o $(CFLAGS)
+
+$(RIDL)_logging.o : $(RIDL)_logging.c
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL)_logging.c -o $(RIDL)_logging.o $(CFLAGS)
 	
 $(RIDL).o : $(RIDL).c Makefile
 	echo "#define RIDL_VERSION \"$(RIDL_VERSION)\"" > ridl_version.h
