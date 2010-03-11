@@ -258,17 +258,6 @@ void ridl_exit_handler(void) {
 }
 
 
-/**
-   Print rIDL welcome message if not quiet.
-*/
-void ridl_welcome(void) {
-  if (!(ridl_options & IDL_INIT_QUIET)) {
-    printf("rIDL %sr%s: Really Interactive Data Language\n", 
-           RIDL_VERSION, RIDL_REVISION);  
-  }
-}
-
-
 /*
    Return the index of the first non-space character on the line.
 */
@@ -416,21 +405,35 @@ int ridl_readline_callback(int cont, int  widevint_allowed) {
   return(line == 0 ? 0 : 1);
 } 
 
+
+void ridl_printridlversion(void) {
+  printf("rIDL %s.r%s: Really Interactive Data Language. [Build: %s]\n", 
+         RIDL_VERSION, RIDL_REVISION, RIDL_BUILD_DATE);
+}
+
+
+/**
+   Print rIDL welcome message if not quiet.
+*/
+void ridl_welcome(void) {
+  if (!(ridl_options & IDL_INIT_QUIET)) {
+    ridl_printridlversion(); 
+  }
+}
+
             
 /**
    Prints version information about rIDL and IDL to stdout.
 */
-void ridl_printversion(void) {
-  IDL_STRING *version = IDL_SysvVersionRelease();
-  IDL_STRING *os = IDL_SysvVersionOS();
-  IDL_STRING *arch = IDL_SysvVersionArch();
-  
-  printf("rIDL %sr%s: Really Interactive Data Language\n", 
-         RIDL_VERSION, RIDL_REVISION);
-  printf("IDL %s %s %s\n", 
-         IDL_STRING_STR(version), 
-         IDL_STRING_STR(os), 
-         IDL_STRING_STR(arch));
+void ridl_printversion(void) {  
+  ridl_printridlversion();
+  printf("IDL Version %s, %s (%s %s m%d). [Build: %s]\n", 
+         IDL_STRING_STR(&IDL_SysvVersion.release),
+         IDL_STRING_STR(&IDL_SysvVersion.os_name),
+         IDL_STRING_STR(&IDL_SysvVersion.os),
+         IDL_STRING_STR(&IDL_SysvVersion.arch),
+         IDL_SysvVersion.memory_bits,
+         IDL_STRING_STR(&IDL_SysvVersion.build_date));
 }
 
 
