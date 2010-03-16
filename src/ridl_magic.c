@@ -17,35 +17,49 @@
 /**
    Print help for the magic commands.
 */
-void ridl_magic_help(void) {
+void ridl_magic_help(char *line, int firstcharIndex) {
   char *indent = "  ";
   char *magic_format = "%s%-*s %s\n";
   int magic_width = 21;
+  int length = 5;
+  int search_length;
+  char *argument = ridl_getnextword(line, firstcharIndex + length, &search_length);
   
-  ridl_printversion();
+  if (strlen(argument) > 0) {
+    if (strcmp(argument, "verbose") == 0) {
+      // TODO: need to be able to find resources
+      int result = IDL_ExecuteStr("$more /Users/mgalloy/projects/ridl/src/ridl_verbosehelp.txt");
+    } else {  
+      printf("unknown :help option '%s'\n", argument);         
+    }
+  } else {
+    ridl_printversion();
   
-  printf("\nmagic commands:\n");
+    printf("\nmagic commands:\n");
 
-  printf(magic_format, indent, magic_width, ":colors", 
-         "toggle whether color is used");  
-  printf(magic_format, indent, magic_width, ":doc routine", 
-         "show calling syntax and comment header for the routine");
-  printf(magic_format, indent, magic_width, ":help", 
-         "show this help message");
-  printf(magic_format, indent, magic_width, ":history [n] [nonum]", 
-         "show last n commands (defaults to 10); nonum option hides command numbers");
-  printf(magic_format, indent, magic_width, ":histedit n filename", 
-         "send last n commands to filename and launch editor");
-  printf(magic_format, indent, magic_width, ":log filename", 
-         "start logging all commands and output to filename");
-  printf(magic_format, indent, magic_width, ":unlog", 
-         "stop logging commands and output");
-  printf(magic_format, indent, magic_width, ":tee filename", 
-         "start logging output to filename");
-  printf(magic_format, indent, magic_width, ":untee", 
-         "stop logging output");
-  printf(magic_format, indent, magic_width, ":version", 
-         "print version information");
+    printf(magic_format, indent, magic_width, ":colors", 
+           "toggle whether color is used");  
+    printf(magic_format, indent, magic_width, ":doc routine", 
+           "show calling syntax and comment header for the routine");
+    printf(magic_format, indent, magic_width, ":help [verbose]", 
+           "show this help message; 'verbose' option shows longer version");
+    printf(magic_format, indent, magic_width, ":history [n] [nonum]", 
+           "show last n commands (defaults to 10); 'nonum' option hides command numbers");
+    printf(magic_format, indent, magic_width, ":histedit n filename", 
+           "send last n commands to filename and launch editor");
+    printf(magic_format, indent, magic_width, ":log filename", 
+           "start logging all commands and output to filename");
+    printf(magic_format, indent, magic_width, ":unlog", 
+           "stop logging commands and output");
+    printf(magic_format, indent, magic_width, ":tee filename", 
+           "start logging output to filename");
+    printf(magic_format, indent, magic_width, ":untee", 
+           "stop logging output");
+    printf(magic_format, indent, magic_width, ":version", 
+           "print version information");      
+  }
+  
+  free(argument);
 }
 
 
@@ -77,15 +91,15 @@ void ridl_magic_printhistory(int numCmds, int showCmdnum) {
    
    @param[in] line history magic command line
    @param[in] firstcharIndex index of magic command in line
-   @param[in] length number of characters in magic command
    
 */
-void ridl_magic_history(char *line, int firstcharIndex, int length) {
-  int showCmdnum = 1, numCmds = 10, test, show = 1;
+void ridl_magic_history(char *line, int firstcharIndex) {
+  int showCmdnum = 1, numCmds = 10, test, show = 1, length = 8;
+  int search_length;
   
   char *first, *second;
   
-  first = ridl_getnextword(line, firstcharIndex + length);
+  first = ridl_getnextword(line, firstcharIndex + length, &search_length);
   
   if (strlen(first) > 0) {
     test = atoi(first);
@@ -100,7 +114,7 @@ void ridl_magic_history(char *line, int firstcharIndex, int length) {
   }   
 
   if (show) {
-    second = ridl_getnextword(line, firstcharIndex + length + strlen(first));
+    second = ridl_getnextword(line, firstcharIndex + length + search_length + 1, &search_length);
     
     if (strlen(second) > 0) {
       test = atoi(second);
@@ -130,14 +144,15 @@ void ridl_magic_history(char *line, int firstcharIndex, int length) {
    @param[in] firstcharIndex index of magic command in line
 */
 void ridl_magic_histedit(char *line, int firstcharIndex) {
+  int search_length;
   HIST_ENTRY *h;
   HISTORY_STATE *hs;
-  char *snlines = ridl_getnextword(line, firstcharIndex + 10);
-  char *filename = ridl_getnextword(line, firstcharIndex + 10 + strlen(snlines) + 1);
+  char *snlines = ridl_getnextword(line, firstcharIndex + 10, &search_length);
+  char *filename = ridl_getnextword(line, firstcharIndex + 10 + search_length + 1, &search_length);
   int i, nlines = atoi(snlines);
   
   if (ridl_file_exists(filename)) {
-    printf("File %s already exists\n", filename);
+    printf("file %s already exists\n", filename);
     return;
   }
   

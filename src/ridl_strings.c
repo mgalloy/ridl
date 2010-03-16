@@ -80,8 +80,9 @@ int ridl_replacestr(char *result, char *text, char *name, char *value) {
    
    @param[in] line string to search for next word in
    @param[in] start index in line to start looking for next word
+   @param[out] search_length length of the string searched for the next word
 */
-char *ridl_getnextword(char *line, int start) {
+char *ridl_getnextword(char *line, int start, int *search_length) {
   int i, end, actualStart = start, actualEnd;
   char *result;
   
@@ -98,6 +99,8 @@ char *ridl_getnextword(char *line, int start) {
   for (i = actualStart; i < actualEnd; i++) {
     result[i - actualStart] = line[i];
   }
+  
+  *search_length = actualEnd - start;
   
   return(result);
 }

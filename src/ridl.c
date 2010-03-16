@@ -693,8 +693,9 @@ int main(int argc, char *argv[]) {
         
         free(expansion_line);
         free(expansion);
-      } else {                          
-        char *cmd = ridl_getnextword(line, firstcharIndex);
+      } else {   
+        int search_length;                       
+        char *cmd = ridl_getnextword(line, firstcharIndex, &search_length);
         if (strcmp(cmd, ":colors") == 0) {
           use_colors = use_colors ? 0 : 1;
           if (use_colors) {
@@ -703,7 +704,8 @@ int main(int argc, char *argv[]) {
             printf("colors off\n");
           }
         } else if (strcmp(cmd, ":doc") == 0) {
-          char *routine = ridl_getnextword(line, firstcharIndex + 5);
+          int search_length;
+          char *routine = ridl_getnextword(line, firstcharIndex + 5, &search_length);
           char *man = (char *)malloc(8 + strlen(routine));
           sprintf(man, "man, '%s'", routine);
           int error = IDL_ExecuteStr(man);
@@ -713,7 +715,8 @@ int main(int argc, char *argv[]) {
           if (ridl_islogging()) ridl_closelog();
 
           ridl_setlogging(1);
-          char *filename = ridl_getnextword(line, firstcharIndex + 5);
+          int search_length;
+          char *filename = ridl_getnextword(line, firstcharIndex + 5, &search_length);
           ridl_initlog(filename);
           free(filename);
         } else if (strcmp(cmd, ":unlog") == 0) {
@@ -723,10 +726,11 @@ int main(int argc, char *argv[]) {
           }
           ridl_setlogging(0);
         } else if (strcmp(cmd, ":tee") == 0) {
+          int search_length;
           if (ridl_isteeing()) ridl_closelog();
 
           ridl_setteeing(1);
-          char *filename = ridl_getnextword(line, firstcharIndex + 5);
+          char *filename = ridl_getnextword(line, firstcharIndex + 5, &search_length);
           ridl_initlog(filename);
           free(filename);
         } else if (strcmp(cmd, ":untee") == 0) {
@@ -736,9 +740,9 @@ int main(int argc, char *argv[]) {
           }
           ridl_setteeing(0);
         } else if (strcmp(cmd, ":help") == 0) {
-          ridl_magic_help();
+          ridl_magic_help(line, firstcharIndex);
         } else if (strcmp(cmd, ":history") == 0) {
-          ridl_magic_history(line, firstcharIndex, 9);
+          ridl_magic_history(line, firstcharIndex);
         } else if (strcmp(cmd, ":histedit") == 0) {
           ridl_magic_histedit(line, firstcharIndex);
         } else if (strcmp(cmd, ":version") == 0) {
@@ -751,9 +755,10 @@ int main(int argc, char *argv[]) {
       if (line && *line) {           
         // check for .edit
         if (firstchar == '.') {
-          char *cmd = ridl_getnextword(line, firstcharIndex);
+          int search_length;
+          char *cmd = ridl_getnextword(line, firstcharIndex, &search_length);
           if (strcmp(cmd, ".edit") == 0) {
-            char *file = ridl_getnextword(line, firstcharIndex + strlen(cmd) + 1);
+            char *file = ridl_getnextword(line, firstcharIndex + strlen(cmd) + 1, &search_length);
             ridl_launcheditor(file);              
             free(file);
             
