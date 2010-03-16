@@ -16,9 +16,10 @@ static int ridl_cmdnumber = 1;
 
 static float ridl_event_delay = 0.1;
 
+
 // public routines
 
 void ridl_printversion(void);
 int ridl_file_exists(const char *filename);
 void ridl_launcheditor(char *filename);
-char *ridl_getnextword(char *line, int start);
+

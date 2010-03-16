@@ -5,6 +5,7 @@
 #include "readline/history.h"
 
 #include "ridl.h"
+#include "ridl_strings.h"
 
 
 /**
@@ -31,12 +32,10 @@ void ridl_magic_help(void) {
          "show calling syntax and comment header for the routine");
   printf(magic_format, indent, magic_width, ":help", 
          "show this help message");
-  printf(magic_format, indent, magic_width, ":history [n]", 
-         "show the last n commands; defaults to 10 lines");
-  printf(magic_format, indent, magic_width, ":qhistory [n]", 
-         "show the last n commands with no prefix; defaults to 10 lines");
+  printf(magic_format, indent, magic_width, ":history [n] [nonum]", 
+         "show last n commands (defaults to 10); nonum option hides command numbers");
   printf(magic_format, indent, magic_width, ":histedit n filename", 
-         "send the last n commands to filename and launch editor");
+         "send last n commands to filename and launch editor");
   printf(magic_format, indent, magic_width, ":log filename", 
          "start logging all commands and output to filename");
   printf(magic_format, indent, magic_width, ":unlog", 
@@ -46,26 +45,23 @@ void ridl_magic_help(void) {
   printf(magic_format, indent, magic_width, ":untee", 
          "stop logging output");
   printf(magic_format, indent, magic_width, ":version", 
-         "print version information");}
+         "print version information");
+}
 
 
 /**
-   Print history of last n commands.
-   
-   @param[in] line history magic command line
-   @param[in] firstcharIndex index of magic command in line
-   @param[in] length number of characters in in magic command
+   Prints the last `numCmds`.
+
+   @param[in] numCmds number of commands to show
    @param[in] showCmdnum 1 if command number should be printed, 0 if not
 */
-void ridl_magic_history(char *line, int firstcharIndex, int length, int showCmdnum) {
-  char *nstr = ridl_getnextword(line, firstcharIndex + length);
-  int i, n = 10; 
-  
+void ridl_magic_printhistory(int numCmds, int showCmdnum) {
+  int i;
   HIST_ENTRY *h;
   HISTORY_STATE *hs;
-  if (strlen(nstr) > 0) n = atoi(nstr);
+
   hs = history_get_history_state();
-  for (i = n - 1; i >= 0; i--) {
+  for (i = numCmds - 1; i >= 0; i--) {
     h = history_get(hs->offset - i); 
     if (showCmdnum) {
       printf("[%d]: %s\n", hs->offset - i, h == 0 ? "" : h->line);
@@ -73,8 +69,58 @@ void ridl_magic_history(char *line, int firstcharIndex, int length, int showCmdn
       printf("%s\n", h == 0 ? "" : h->line);
     }
   }
-  free(nstr);
 } 
+
+
+/**
+   Print history of last n commands.
+   
+   @param[in] line history magic command line
+   @param[in] firstcharIndex index of magic command in line
+   @param[in] length number of characters in magic command
+   
+*/
+void ridl_magic_history(char *line, int firstcharIndex, int length) {
+  int showCmdnum = 1, numCmds = 10, test, show = 1;
+  
+  char *first, *second;
+  
+  first = ridl_getnextword(line, firstcharIndex + length);
+  
+  if (strlen(first) > 0) {
+    test = atoi(first);
+    if (test != 0) { 
+      numCmds = test;
+    } else if (strcmp(first, "nonum") == 0) {
+      showCmdnum = 0;
+    } else {
+      printf("unknown :history option '%s'\n", first);
+      show = 0;
+    }
+  }   
+
+  if (show) {
+    second = ridl_getnextword(line, firstcharIndex + length + strlen(first));
+    
+    if (strlen(second) > 0) {
+      test = atoi(second);
+      if (test != 0) { 
+        numCmds = test;
+      } else if (strcmp(second, "nonum") == 0) {
+        showCmdnum = 0;
+      } else {
+        printf("unknown :history option '%s'\n", second);
+        show = 0;
+      }
+    }
+
+    free(second);    
+  }
+  
+  free(first); 
+      
+  if (show) ridl_magic_printhistory(numCmds, showCmdnum);
+}
 
 
 /**

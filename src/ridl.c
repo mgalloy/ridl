@@ -738,9 +738,7 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(cmd, ":help") == 0) {
           ridl_magic_help();
         } else if (strcmp(cmd, ":history") == 0) {
-          ridl_magic_history(line, firstcharIndex, 9, 1);
-        } else if (strcmp(cmd, ":qhistory") == 0) {
-          ridl_magic_history(line, firstcharIndex, 10, 0);
+          ridl_magic_history(line, firstcharIndex, 9);
         } else if (strcmp(cmd, ":histedit") == 0) {
           ridl_magic_histedit(line, firstcharIndex);
         } else if (strcmp(cmd, ":version") == 0) {
