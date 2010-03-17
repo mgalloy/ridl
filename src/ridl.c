@@ -575,6 +575,7 @@ int main(int argc, char *argv[]) {
   ridl_changewdir(user_info.wd);
   IDL_ExecuteStr("!prompt = !prompt");  // triggers prompt to be set
 
+  rl_readline_name = "rIDL";
   rl_attempted_completion_function = ridl_completion;
   
   // TODO: add completers for routines and variables completion

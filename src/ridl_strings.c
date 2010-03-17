@@ -8,6 +8,21 @@
    This file contains helper routines dealing with strings specific to rIDL.
 */
 
+
+/**
+   Copies a string. Allocates dynamic memory for return value which the caller
+   is responsible for freeing.
+   
+   @return string
+   @param[in] s string to copy
+*/
+char *ridl_copystr(char *s) {
+  char *r = (char *)malloc(strlen(s) + 1); 
+  strcpy(r, s);
+  return(r);
+}
+
+
 /**
    Replace `name` with `value` in `text` and return the result in `result`.
 

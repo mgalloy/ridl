@@ -45,7 +45,8 @@ $(RIDL).o : $(RIDL).c Makefile
 	echo "#define RIDL_VERSION \"$(RIDL_VERSION)\"" > ridl_version.h
 	echo "#define RIDL_REVISION \"`svnversion`\"" >> ridl_version.h
 	echo "#define RIDL_BUILD_DATE \"`date \"+%b %d %Y\"`\"" >> ridl_version.h
-	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include -c $(RIDL).c -o $(RIDL).o $(CFLAGS)
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include \
+	      -c $(RIDL).c -o $(RIDL).o $(CFLAGS)
 	
 both:
 	make clean
