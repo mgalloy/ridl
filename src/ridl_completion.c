@@ -69,7 +69,7 @@ char *ridl_localvariable_generator(const char *text, int state) {
     name = IDL_STRING_STR(&s[list_index]);
     //printf("checking against %s...\n", name);
     list_index++;
-    if (strncmp(name, text, len) == 0) {
+    if (strncasecmp(name, text, len) == 0) {
       return(ridl_copystr(name));
     }
   }
