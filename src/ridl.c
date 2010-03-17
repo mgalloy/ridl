@@ -757,7 +757,8 @@ int main(int argc, char *argv[]) {
         if (firstchar == '.') {
           int search_length;
           char *cmd = ridl_getnextword(line, firstcharIndex, &search_length);
-          if (strcmp(cmd, ".edit") == 0) {
+          if (strcmp(cmd, ".edit") == 0 || strcmp(cmd, ".edi") == 0 
+                || strcmp(cmd, ".ed") == 0 || strcmp(cmd, ".e") == 0) {
             char *file = ridl_getnextword(line, firstcharIndex + strlen(cmd) + 1, &search_length);
             ridl_launcheditor(file);              
             free(file);
