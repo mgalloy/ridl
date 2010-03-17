@@ -1,18 +1,18 @@
 rIDL 0.1
 --------
 
-  * The .edit executive command uses RIDL_EDITOR and EDITOR environment 
-    variables to launch an editor.
+  * The .edit executive command uses RIDL_EDITOR or EDITOR environment 
+    variables to launch the specified editor.
     
-  * Hitting tab will do filename completion.
+  * Hitting tab will do completion on filenames and system variables.
   
   * The :doc magic command displays header information about a routine.
   
   * Use the :history magic command to retrieve the command line history or 
     :histedit to send the commands to a file and launch your editor.
     
-  * :log/:unlog magic command. To get a log of the session, containing both 
-    commands and output, use::
+  * Use :log/:unlog magic command to get a log of the session, containing both 
+    commands and output::
     
        rIDL> :log filename
 
@@ -53,11 +53,11 @@ rIDL 0.1
 IDL functionality not in rIDL
 -----------------------------
   
-  * setting preferences via a command line switch when starting is not 
-    supported
+  * Setting preferences except for IDL_PROMPT via a command line switch when
+    starting is not supported.
 
-  * command line args specified via a command line switch when starting and
-    retrieved with the COMMAND_LINE_ARGS routine are not supported
+  * Command line args specified via a command line switch when starting and
+    retrieved with the COMMAND_LINE_ARGS routine are not supported.
     
   * .step'ing into an OBJ_NEW or OBJ_DESTROY call will leave rIDL's command 
     line reading and into IDL's default mechanism until scope returns to the
