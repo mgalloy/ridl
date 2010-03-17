@@ -13,6 +13,7 @@
 #include "ridl_strings.h"
 #include "ridl_version.h"
 #include "ridl_logging.h"
+#include "ridl_completion.h"
 
 
 /// user information with fields: logname, homedir, pid, host, wd, date
@@ -52,38 +53,6 @@ int ridl_really_exit = 1;
 */
 void ridl_inittextdone(void) {
   
-}
-
-
-/**
-   mallocs return value, caller should free; used in Readline completion
-   callback
-   
-   @return dynamically allocated string
-   
-   @param[in] text
-   @param[in] state
-*/
-char *ridl_command_generator(const char *text, int state) {
-  if (!state) {
-    char *result = (char *)malloc(6);
-    strcpy(result, "print");
-    return(result);
-  } else { 
-    return((char *)NULL);
-  }
-}
-
-
-char **ridl_completion(const char *text, int start, int end) {
-  char **matches = (char **) NULL;
-  // determines state and calls the correct generator
-    
-  //matches = rl_completion_matches(text, ridl_command_generator);
-  //return(matches);
-  
-  //printf("\ntext = '%s', start = %d, end = %d\n", text, start, end);
-  return((char **) NULL);
 }
 
 
