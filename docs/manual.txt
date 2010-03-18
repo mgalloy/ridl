@@ -1,0 +1,16 @@
+rIDL User Manual
+================
+
+:Author: Michael Galloy
+
+
+What is rIDL?
+-------------
+
+
+Where to go for more help?
+--------------------------
+
+Mailing list?
+Trac site
+Contact me

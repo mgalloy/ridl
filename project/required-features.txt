@@ -4,24 +4,26 @@ These are the features that I believe rIDL should have before it reaches version
 
 #. tab completion of: 
 
-   #. structure/object fields fields
-   #. variable names
+   #. structure/object fields fields (done)
+   #. local variable names (done)
    #. routine/method names
-   #. routine params/keywords
-   #. filenames in executive command or strings
+   #. routine keyword names
+   #. filenames in executive command or strings (done)
+   #. system variables (done)
+   #. executive commands
 
-#. .edit should work
+#. .edit should work (done)
 
-#. copy and paste multiple lines
+#. copy and paste multiple lines (done)
 
-#. history magic command
+#. history magic command (done)
 
-#. enhanced journal magic command
+#. enhanced journal magic command (done)
 
-#. magic command to send commands from current session to file
+#. magic command to send commands from current session to file (done)
 
 #. multiple IDL_IDLBridge like Abraham's command line
 
 #. should except all IDL command line options plus --help and --version
 
-#. handle long command lines with some kinds of grace, i.e., able to combine a several commands ending with $'s into one long command
+#. handle long command lines with some kinds of grace, i.e., able to combine a several commands ending with $'s into one long command (done)

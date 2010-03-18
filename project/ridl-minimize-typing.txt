@@ -1,0 +1,21 @@
+::
+
+  IDL> print, !
+  !c            !dpi          !except       !more         !pi           !version      
+  !cpu          !dtor         !help_path    !mouse        !prompt       !warn         
+  !d            !edit_input   !journal      !order        !quiet        !x            
+  !dir          !err          !make_dll     !p            !radeg        !y            
+  !dlm_path     !error_state  !map          !path         !values       !z 
+  IDL> print, !ver
+  IDL> print, !version.
+  !version.arch              !version.memory_bits       !version.os_name
+  !version.build_date        !version.os                !version.release
+  !version.file_offset_bits  !version.os_family 
+  IDL> print, !version.o
+  IDL> print, !version.os
+  IDL> print, !version.os_
+  IDL> print, !version.os_family
+  unix
+  IDL> loc = '~/projects/idllib/trunk/src'
+  IDL> .run ~/projects/idllib/trunk/src/hdf5/mg_h5.pro
+  IDL> f = '~'  ; will expand to /Users/mgalloy/

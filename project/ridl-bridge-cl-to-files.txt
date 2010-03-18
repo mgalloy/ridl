@@ -1,0 +1,37 @@
+show:
+
+  1. .edit
+  2. how continuation works with history
+  3. :history (cut-and-paste)
+  4. :histedit
+
+Type in a few lines
+  note that the continued line is put back together
+do :history
+do :history 10
+do :qhistory 10
+copy-and-paste the lines back to the command line
+do :histedit 10 animation_demo.pro
+
+
+One of the goals of rIDL is to bridge the gap between working from the command line and writing routines in files.
+
+For example, it is common to try some code at the command line so that progress can be checked after each line is entered. For example, ...
+
+
+
+Now that we have it working on the command line, rIDL has a couple ways to repeat several commands. First, the history magic command can be used to display the last commands:
+
+  IDL> :history 10
+
+But, more appropriately for cutting-and-pasting, use the qhistory magic command:
+
+  IDL> :qhistory 10
+
+(cut-and-paste back to command line)
+
+This cut-and-paste technique can be used to paste the code into a file as well, but there is an even better way to do that using the histedit magic command:
+
+  IDL> :histedit 10 mg_...
+
+Thanks for listening, 
