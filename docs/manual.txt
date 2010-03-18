@@ -7,6 +7,27 @@ rIDL User Manual
 What is rIDL?
 -------------
 
+rIDL is an enhanced command line interface to IDL. 
+
+rIDL is a C program that uses the Callable IDL API to pass your commands to IDL, while adding a few extra features.
+
+
+Magic commands
+--------------
+
+::
+
+  :colors               toggle whether color is used
+  :doc routine          show calling syntax and comment header for the routine
+  :help [verbose]       show this help message; 'verbose' option shows longer version
+  :history [n] [nonum]  show last n commands (defaults to 10); 'nonum' option hides command numbers
+  :histedit n filename  send last n commands to filename and launch editor
+  :log filename         start logging all commands and output to filename
+  :unlog                stop logging commands and output
+  :tee filename         start logging output to filename
+  :untee                stop logging output
+  :version              print version information
+
 
 Where to go for more help?
 --------------------------
