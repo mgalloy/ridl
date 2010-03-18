@@ -2,7 +2,13 @@ These are the features that I believe rIDL should have before it reaches version
 
 #. everything in regular IDL command line should work in rIDL
 
-#. tab completion of: structure/object fields fields, variable names, routine/method names, routine params/keywords, filenames in executive command or strings
+#. tab completion of: 
+
+   #. structure/object fields fields
+   #. variable names
+   #. routine/method names
+   #. routine params/keywords
+   #. filenames in executive command or strings
 
 #. .edit should work
 
