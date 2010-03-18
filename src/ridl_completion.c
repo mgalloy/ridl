@@ -19,6 +19,9 @@ char *system_variables[] = {
 
 IDL_VPTR local_variables;
 
+IDL_VPTR structure_fields;
+char *current_struct;
+
 
 /* Look up NAME as the name of a command, and return a pointer to that 
    command. Return a NULL pointer if NAME isn’t a command name. 
@@ -38,13 +41,14 @@ char **ridl_find_systemvariable(char *name) {
 
 void ridl_get_localvariables_list(void) {
   int status = IDL_ExecuteStr("_ridl_localvars = strlowcase(scope_varname())");
-   local_variables = IDL_FindNamedVariable("_ridl_localvars", 0);
+  local_variables = IDL_FindNamedVariable("_ridl_localvars", 0);
 }
 
 
 void ridl_remove_localvariables_list(void) {
   int status = IDL_ExecuteStr("delvar, _ridl_localvars");
 }
+
 
 char *ridl_localvariable_generator(const char *text, int state) {
   static int list_index, len;  
@@ -58,19 +62,60 @@ char *ridl_localvariable_generator(const char *text, int state) {
     list_index = 0;
     len = strlen(text);
   }
-    
-  //printf("\nnumber of local variables = %d\n", nlocals);
-  
-  //for (i = 0; i < nlocals; i++) {
-  //  printf("  %s\n", IDL_STRING_STR(&s[i]));
-  //}
 
   while (list_index < nlocals) {
     name = IDL_STRING_STR(&s[list_index]);
-    //printf("checking against %s...\n", name);
+
     list_index++;
     if (strncasecmp(name, text, len) == 0) {
       return(ridl_copystr(name));
+    }
+  }
+    
+  return((char *)NULL);
+}
+
+
+void ridl_get_structurefields_list(char *varname) {
+  char cmd[1000];
+  int status;
+
+  // construct command to get field names
+  sprintf(cmd, "_ridl_structurefields = ridl_getfields(%s)", varname);
+  status = IDL_ExecuteStr(cmd);
+  structure_fields = IDL_FindNamedVariable("_ridl_structurefields", 0);
+}
+
+
+void ridl_remove_structurefields_list(void) {
+  int status = IDL_ExecuteStr("delvar, _ridl_structurefields");
+}
+
+
+char *ridl_structurefield_generator(const char *varname, int state) {
+  static int list_index, len;  
+  int nfields = (int) (*structure_fields->value.arr).n_elts;
+  int i;
+  IDL_STRING *s = (IDL_STRING *)structure_fields->value.arr->data;
+  char *name;
+  
+  // state == 0 the first time this is called, non-zero on subsequent calls
+  if (!state) {
+    list_index = 0;
+    len = strlen(varname);
+  }
+
+  while (list_index < nfields) {
+    name = IDL_STRING_STR(&s[list_index]);
+
+    list_index++;
+    if (strncasecmp(name, varname, len) == 0) {
+      char *struct_and_field = (char *)malloc(strlen(current_struct) + strlen(name) + 1 + 1);
+      strcpy(struct_and_field, current_struct);
+      strcpy(struct_and_field + strlen(current_struct), ".");      
+      strcpy(struct_and_field + strlen(current_struct) + 1, name);
+      struct_and_field[strlen(current_struct) + strlen(name) + 1] = '\0';
+      return(struct_and_field);
     }
   }
     
@@ -127,7 +172,21 @@ char **ridl_completion(const char *text, int start, int end) {
     ridl_remove_localvariables_list();
   }
   
-  // TODO: check for structure fields
+  // check for structure fields
+  if (matches == (char **)NULL) {
+    char *dotpos = strstr(text, ".");
+    if (dotpos != (char *)NULL) {
+      int varlen = (int) (dotpos - text);
+      char *varname = (char *)malloc(varlen + 1);
+      strncpy(varname, text, varlen);
+      varname[varlen] = '\0';
+      current_struct = varname;
+      ridl_get_structurefields_list(varname);
+      matches = rl_completion_matches(dotpos + 1, ridl_structurefield_generator);
+      ridl_remove_structurefields_list();
+      free(varname);
+    }
+  }
   
   // TODO: check for routine names if nothing found yet
   if (matches == (char **)NULL) {

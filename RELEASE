@@ -4,7 +4,8 @@ rIDL 0.1
   * The .edit executive command uses RIDL_EDITOR or EDITOR environment 
     variables to launch the specified editor.
     
-  * Hitting tab will do completion on filenames and system variables.
+  * Hitting tab will do completion on filenames, system variable names, local
+    variable names, and structure field names.
   
   * The :doc magic command displays header information about a routine.
   
