@@ -37,7 +37,7 @@ char **ridl_find_systemvariable(char *name) {
 
 
 void ridl_get_localvariables_list(void) {
-  int status = IDL_ExecuteStr("_ridl_localvars = scope_varname()");
+  int status = IDL_ExecuteStr("_ridl_localvars = strlowcase(scope_varname())");
    local_variables = IDL_FindNamedVariable("_ridl_localvars", 0);
 }
 
