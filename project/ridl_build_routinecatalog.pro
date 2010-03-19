@@ -6,11 +6,11 @@ pro ridl_routinecatalog::startElement, uri, local, qName, attname, attvalue
     if (count gt 0L) then begin
       routine_name = attvalue[ind[0]]
       if (idl_validname(routine_name) ne '') then begin
-        printf, self.lun, routine_name
+        printf, self.lun, strlowcase(routine_name)
       endif else begin
         routine_names = strsplit(routine_name, '/', count=count, /extract)
         if (count gt 1) then begin
-          printf, self.lun, transpose(routine_names)
+          printf, self.lun, strlowcase(transpose(routine_names))
         endif else begin
           print, routine_name, format='(%"Excluding %s...")'
         endelse

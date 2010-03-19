@@ -5,10 +5,10 @@
 #include "idl_export.h" 
 #include "readline/readline.h"
 
+#include "ridl.h"
 #include "ridl_strings.h"
 
 
-/// TODO: system variables to complete on
 char *system_variables[] = { 
   "!c", "!cpu", "!d", "!dir", "!dlm_path", "!dpi", "!dtor",  "!edit_input", 
   "!err", "!error_state", "!except", "!help_path", "!journal", "!make_dll",
@@ -17,26 +17,22 @@ char *system_variables[] = {
   (char *)NULL
 };
 
+char *reserved_words[] = { 
+  "begin", "break", "case", "common", "compile_opt", "continue", "do", "else", 
+  "end", "endcase", "endelse", "endif", "endfor", "endforeach", "endrep", 
+  "endswitch", "endwhile", 
+  "for", "foreach", "forward_function", "goto", "inherits", 
+  "of", "on_ierror", "repeat", "return", "switch", "then", "while", 
+  "and", "eq", "ge", "gt", "lt", "le",  "mod", "ne", "not",  "or", "xor", 
+  (char *)NULL
+};
+
+char *idl_routines[1479];
+
 IDL_VPTR local_variables;
 
 IDL_VPTR structure_fields;
 char *current_struct;
-
-
-/* Look up NAME as the name of a command, and return a pointer to that 
-   command. Return a NULL pointer if NAME isn’t a command name. 
-*/
-char **ridl_find_systemvariable(char *name) {
-  register int i;
-  
-  for (i = 0; system_variables[i]; i++) {
-    if (strcmp(name, system_variables[i]) == 0) {
-      return(&system_variables[i]); 
-    }
-  }
-  
-  return ((char **)NULL);
-}
 
 
 void ridl_get_localvariables_list(void) {
@@ -133,6 +129,37 @@ char *ridl_structurefield_generator(const char *varname, int state) {
    @param[in] state 0 for the first call on an attempted completion, non-zero
                     for subsequent calls
 */
+char *ridl_reservedwords_generator(const char *text, int state) {
+  static int list_index, len;
+  char *name;
+  
+  // state == 0 the first time this is called, non-zero on subsequent calls
+  if (!state) {
+    list_index = 0;
+    len = strlen(text);
+  }
+  
+  while (name = reserved_words[list_index]) {
+    list_index++;
+    if (strncmp(name, text, len) == 0) {
+      return(ridl_copystr(name));
+    }
+  }
+  
+  return((char *)NULL);
+}
+
+
+/**
+   mallocs return value, caller should free; used in Readline completion
+   callback
+   
+   @return dynamically allocated string
+   
+   @param[in] text string to complete on
+   @param[in] state 0 for the first call on an attempted completion, non-zero
+                    for subsequent calls
+*/
 char *ridl_systemvariable_generator(const char *text, int state) {
   static int list_index, len;
   char *name;
@@ -154,17 +181,63 @@ char *ridl_systemvariable_generator(const char *text, int state) {
 }
 
 
+/**
+   mallocs return value, caller should free; used in Readline completion
+   callback
+   
+   @return dynamically allocated string
+   
+   @param[in] text string to complete on
+   @param[in] state 0 for the first call on an attempted completion, non-zero
+                    for subsequent calls
+*/
+char *ridl_idlroutine_generator(const char *text, int state) {
+  static int list_index, len;
+  char *name;
+  
+  // state == 0 the first time this is called, non-zero on subsequent calls
+  if (!state) {
+    list_index = 0;
+    len = strlen(text);
+  }
+  
+  while (name = idl_routines[list_index]) {
+    list_index++;
+    if (strncmp(name, text, len) == 0) {
+      return(ridl_copystr(name));
+    }
+  }
+  
+  return((char *)NULL);
+}
+
+
 char **ridl_completion(const char *text, int start, int end) {
   char **matches = (char **)NULL;
   int loc;
   
   //printf("\ntext = %s, start = %d, end = %d\n", text, start, end);
 
-  rl_completion_append_character = '\0';
+  // if no text, quit
+  if (strlen(text) == 0) return(matches);
   
-  // check for system variables first
-  matches = rl_completion_matches(text, ridl_systemvariable_generator);
+  rl_completion_append_character = '\0';
 
+  // check for reserved words first
+  if (matches == (char **)NULL) {
+    matches = rl_completion_matches(text, ridl_reservedwords_generator);
+  }
+  
+  // check for system variables
+  if (matches == (char **)NULL) {
+    matches = rl_completion_matches(text, ridl_systemvariable_generator);
+  }
+
+  // check for IDL library routines
+  if (matches == (char **)NULL) {
+    matches = rl_completion_matches(text, ridl_idlroutine_generator);
+  }
+  
   // check for local variables if no system variables found
   if (matches == (char **)NULL) {
     ridl_get_localvariables_list();
@@ -194,4 +267,22 @@ char **ridl_completion(const char *text, int start, int end) {
   }
   
   return(matches);
+}
+
+
+void ridl_completion_init(void) {
+  char line[RIDL_MAX_LINE_LENGTH];
+  FILE *fp = fopen("/Users/mgalloy/projects/ridl/project/idl_routines.txt", "r");
+  int r, i;
+  
+  r = 0;
+  while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
+    idl_routines[r] = (char *)calloc(strlen(line), 1);
+    for (i = 0; i < strlen(line) - 1; i++) {
+      if (line[i] == '\n') break;
+      idl_routines[r][i] = line[i];
+    }
+    r++;
+  }
+  fclose(fp);
 }

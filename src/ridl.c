@@ -576,9 +576,8 @@ int main(int argc, char *argv[]) {
   IDL_ExecuteStr("!prompt = !prompt");  // triggers prompt to be set
 
   rl_readline_name = "rIDL";
+  ridl_completion_init();
   rl_attempted_completion_function = ridl_completion;
-  
-  // TODO: add completers for routines and variables completion
   
   // load -pref filename if present on the command line
   if (preferences_file_set) {
