@@ -320,7 +320,7 @@ void ridl_completion_init(void) {
   FILE *fp;
   int r, i;
   
-  sprintf(idl_routines_filename, "%s/project/idl_routines.txt", ridl_dir); 
+  sprintf(idl_routines_filename, "%s/src/idl_routines.txt", ridl_dir); 
   if (!ridl_file_exists(idl_routines_filename)) {
     ridl_warning("catalog of IDL library routines not found, completion on routine names not available");
     idl_routines_available = 0; 
