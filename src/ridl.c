@@ -2,6 +2,7 @@
 #include <stdlib.h> 
 #include <signal.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "idl_export.h" 
 #include "readline/readline.h"
@@ -113,9 +114,18 @@ void ridl_changewdir(char *dir) {
 }
 
 
-void ridl_warning(char *msg) {
-  printf("%% %s\n", msg);
+/**
+   Variable argument wrapper to printf-like routine to print error messages.
+*/
+void ridl_warning(const char *format, ...) {
+  va_list args;
+  printf("%% ");
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
+  printf("\n");
 }
+
 
 int ridl_file_exists(const char *filename) {
   FILE *file;
@@ -551,7 +561,7 @@ int main(int argc, char *argv[]) {
   IDL_UicbRegInitTextDone(ridl_inittextdone);
                                                
   if (!IDL_Initialize(&init_data)) {
-    printf("Failed to initialize Callable IDL session.\n");
+    ridl_warning("failed to initialize Callable IDL session.\n");
     return(EXIT_FAILURE);
   }
       
@@ -653,7 +663,7 @@ int main(int argc, char *argv[]) {
         expansion_result = history_expand(expansion_line, &expansion);
         switch (expansion_result) {
           case -1: 
-            printf("Error in expansion\n");
+            ridl_warning("error in expansion");
             break;
           case 2: 
             printf("%s\n", expansion);
@@ -721,7 +731,7 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(cmd, ":version") == 0) {
           ridl_printversion();
         } else {
-          printf("unknown magic command: %s\n", cmd);
+          ridl_warning("unknown magic command '%s'", cmd);
         }
       }
     } else {

@@ -20,7 +20,7 @@ static float ridl_event_delay = 0.1;
 // public routines
 
 void ridl_printversion(void);
-void ridl_warning(char *msg);
+void ridl_warning(const char *format, ...);
 int ridl_file_exists(const char *filename);
 void ridl_launcheditor(char *filename);
 

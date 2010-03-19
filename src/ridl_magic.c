@@ -24,13 +24,15 @@ void ridl_magic_help(char *line, int firstcharIndex) {
   int length = 5;
   int search_length;
   char *argument = ridl_getnextword(line, firstcharIndex + length, &search_length);
+  char show_verbose_cmd[RIDL_MAX_LINE_LENGTH];
+  int result;
   
   if (strlen(argument) > 0) {
     if (strcmp(argument, "verbose") == 0) {
-      // TODO: need to be able to find resources
-      int result = IDL_ExecuteStr("$more /Users/mgalloy/projects/ridl/src/ridl_verbosehelp.txt");
+      sprintf(show_verbose_cmd, "$more %s/src/ridl_verbosehelp.txt", getenv("RIDL_DIR"));
+      result = IDL_ExecuteStr(show_verbose_cmd);
     } else {  
-      printf("unknown :help option '%s'\n", argument);         
+      ridl_warning("unknown :help option '%s'", argument);         
     }
   } else {
     ridl_printversion();
@@ -108,7 +110,7 @@ void ridl_magic_history(char *line, int firstcharIndex) {
     } else if (strcmp(first, "nonum") == 0) {
       showCmdnum = 0;
     } else {
-      printf("unknown :history option '%s'\n", first);
+      ridl_warning("unknown :history option '%s'", first);
       show = 0;
     }
   }   
@@ -123,7 +125,7 @@ void ridl_magic_history(char *line, int firstcharIndex) {
       } else if (strcmp(second, "nonum") == 0) {
         showCmdnum = 0;
       } else {
-        printf("unknown :history option '%s'\n", second);
+        ridl_warning("unknown :history option '%s'", second);
         show = 0;
       }
     }
@@ -152,7 +154,7 @@ void ridl_magic_histedit(char *line, int firstcharIndex) {
   int i, nlines = atoi(snlines);
   
   if (ridl_file_exists(filename)) {
-    printf("file %s already exists\n", filename);
+    ridl_warning("file '%s' already exists", filename);
     return;
   }
   
