@@ -113,6 +113,10 @@ void ridl_changewdir(char *dir) {
 }
 
 
+void ridl_warning(char *msg) {
+  printf("%% %s\n", msg);
+}
+
 int ridl_file_exists(const char *filename) {
   FILE *file;
   if (file = fopen(filename, "r")) {

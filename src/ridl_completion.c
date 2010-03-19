@@ -34,8 +34,8 @@ char *executive_cmds[] = {
   (char *)NULL
 };
 
+int idl_routines_available = 1;
 char *idl_routines[1479];
-char *idl_routines_filename = "/Users/mgalloy/projects/ridl/project/idl_routines.txt";
 
 IDL_VPTR local_variables;
 
@@ -278,7 +278,7 @@ char **ridl_completion(const char *text, int start, int end) {
   }
   
   // check for IDL library routines
-  if (matches == (char **)NULL) {
+  if (matches == (char **)NULL && idl_routines_available) {
     matches = rl_completion_matches(text, ridl_idlroutine_generator);
   }
   
@@ -315,8 +315,19 @@ char **ridl_completion(const char *text, int start, int end) {
 */
 void ridl_completion_init(void) {
   char line[RIDL_MAX_LINE_LENGTH];
-  FILE *fp = fopen(idl_routines_filename, "r");
+  char *ridl_dir = getenv("RIDL_DIR");
+  char idl_routines_filename[RIDL_MAX_LINE_LENGTH];   
+  FILE *fp;
   int r, i;
+  
+  sprintf(idl_routines_filename, "%s/project/idl_routines.txt", ridl_dir); 
+  if (!ridl_file_exists(idl_routines_filename)) {
+    ridl_warning("catalog of IDL library routines not found, completion on routine names not available");
+    idl_routines_available = 0; 
+    return;
+  }
+
+  fp = fopen(idl_routines_filename, "r");
   
   r = 0;
   while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
