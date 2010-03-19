@@ -2,6 +2,10 @@
 # 
 #    $include /Users/mgalloy/projects/ridl/trunk/src/inputrc
 
+$if rIDL
+
 "\e[15~": ridl-stepinto
 "\e[17~": ridl-stepover
 "\e[18~": ridl-stepreturn
+
+$endif
