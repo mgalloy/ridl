@@ -6,11 +6,11 @@ These are the features that I believe rIDL should have before it reaches version
 
    #. structure/object fields fields (done)
    #. local variable names (done)
-   #. routine/method names
+   #. routine/method names (done)
    #. routine keyword names
    #. filenames in executive command or strings (done)
    #. system variables (done)
-   #. executive commands
+   #. executive commands (done)
 
 #. .edit should work (done)
 
@@ -24,6 +24,6 @@ These are the features that I believe rIDL should have before it reaches version
 
 #. multiple IDL_IDLBridge like Abraham's command line
 
-#. should except all IDL command line options plus --help and --version
+#. should accept all IDL command line options plus --help and --version
 
 #. handle long command lines with some kinds of grace, i.e., able to combine a several commands ending with $'s into one long command (done)

@@ -27,7 +27,15 @@ char *reserved_words[] = {
   (char *)NULL
 };
 
+char *executive_cmds[] = {
+  ".compile", ".continue", ".edit", ".full_reset_session", ".go", ".out",
+  ".reset_session", ".return", ".rnew", ".run", ".skip", ".step", ".stepover", 
+  ".trace", 
+  (char *)NULL
+};
+
 char *idl_routines[1479];
+char *idl_routines_filename = "/Users/mgalloy/projects/ridl/project/idl_routines.txt";
 
 IDL_VPTR local_variables;
 
@@ -191,6 +199,37 @@ char *ridl_systemvariable_generator(const char *text, int state) {
    @param[in] state 0 for the first call on an attempted completion, non-zero
                     for subsequent calls
 */
+char *ridl_executivecmd_generator(const char *text, int state) {
+  static int list_index, len;
+  char *name;
+  
+  // state == 0 the first time this is called, non-zero on subsequent calls
+  if (!state) {
+    list_index = 0;
+    len = strlen(text);
+  }
+  
+  while (name = executive_cmds[list_index]) {
+    list_index++;
+    if (strncmp(name, text, len) == 0) {
+      return(ridl_copystr(name));
+    }
+  }
+  
+  return((char *)NULL);
+}
+
+
+/**
+   mallocs return value, caller should free; used in Readline completion
+   callback
+   
+   @return dynamically allocated string
+   
+   @param[in] text string to complete on
+   @param[in] state 0 for the first call on an attempted completion, non-zero
+                    for subsequent calls
+*/
 char *ridl_idlroutine_generator(const char *text, int state) {
   static int list_index, len;
   char *name;
@@ -235,6 +274,11 @@ char **ridl_completion(const char *text, int start, int end) {
 
   // check for IDL library routines
   if (matches == (char **)NULL) {
+    matches = rl_completion_matches(text, ridl_executivecmd_generator);
+  }
+  
+  // check for IDL library routines
+  if (matches == (char **)NULL) {
     matches = rl_completion_matches(text, ridl_idlroutine_generator);
   }
   
@@ -261,18 +305,17 @@ char **ridl_completion(const char *text, int start, int end) {
     }
   }
   
-  // TODO: check for routine names if nothing found yet
-  if (matches == (char **)NULL) {
-    
-  }
-  
   return(matches);
 }
 
 
+/**
+   The routine is required to be called before the completion routine can be
+   used.
+*/
 void ridl_completion_init(void) {
   char line[RIDL_MAX_LINE_LENGTH];
-  FILE *fp = fopen("/Users/mgalloy/projects/ridl/project/idl_routines.txt", "r");
+  FILE *fp = fopen(idl_routines_filename, "r");
   int r, i;
   
   r = 0;
