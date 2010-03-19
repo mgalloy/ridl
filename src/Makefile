@@ -58,7 +58,7 @@ both:
 	
 install:
 	mkdir -p bin.darwin.$(ARCH)
-	mv $(RIDL) bin.darwin.$(ARCH)
+	cp $(RIDL) bin.darwin.$(ARCH)
 		
 clean:
 	rm -f $(RIDL).o
