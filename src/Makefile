@@ -4,7 +4,7 @@ IDLDIR=/Applications/itt/idl
 ARCH=x86_64
 #ARCH=i386
 ARCHFLAGS= -arch $(ARCH)
-OS=darwin
+OS=`uname -s | tr [A-Z] [a-z]`
 CC=cc
 BINDIR=$(IDLDIR)/bin/bin.$(OS).$(ARCH)
 READLINE_LIB=/usr/local/lib
@@ -57,8 +57,8 @@ both:
 	make ARCH=i386 install
 	
 install:
-	mkdir -p bin.darwin.$(ARCH)
-	cp $(RIDL) bin.darwin.$(ARCH)
+	mkdir -p bin.$(OS).$(ARCH)
+	cp $(RIDL) bin.$(OS).$(ARCH)
 		
 clean:
 	rm -f $(RIDL).o
