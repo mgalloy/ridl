@@ -1,37 +1,40 @@
-show:
+Hello, I would like to show you a few features I have recently added to rIDL, an enhanced command line for IDL.
 
-  1. .edit
-  2. how continuation works with history
-  3. :history (cut-and-paste)
-  4. :histedit
+I frequently find myself entering a sequence of a few commands at the command line so that I can verify intermediate results. After getting the sequence working, I then would like to save those commands to a file. IDL has a JOURNAL command and rIDL adds the log and tee magic commands, but these commands require that you begin the logging before you start entering the commands, which I'm never aware enough to do. I will demonstrate some new rIDL features to retroactively save commands using rIDL's command history.
 
-Type in a few lines
-  note that the continued line is put back together
-do :history
-do :history 10
-do :qhistory 10
-copy-and-paste the lines back to the command line
-do :histedit 10 animation_demo.pro
+First, I need to type in a few lines. My simple example will load an image from a file and display it::
+  
+  IDL> filename = filepath('people.jpg', $
+  .... subdir=['examples', 'data'])
+  
+Note that rIDL combines these two lines into a single line in the history. ::
 
+  IDL> print, filename
+  IDL> people = read_image(filename)
+  IDL> dimensions = size(people, /dimensions)
+  IDL> window, /free, xsize=dimensions[1], ysize=dimensions[2]
+  IDL> tv, people, true=1
 
-One of the goals of rIDL is to bridge the gap between working from the command line and writing routines in files.
+Now that we have it working at the command line, rIDL has a couple ways to repeat a sequence of commands. First, the history magic command can be used to display the last commands::
 
-For example, it is common to try some code at the command line so that progress can be checked after each line is entered. For example, ...
+  IDL> :history
 
+This defaults to the last 10 commands, but a particular number can be asked for::
 
+  IDL> :history 20
 
-Now that we have it working on the command line, rIDL has a couple ways to repeat several commands. First, the history magic command can be used to display the last commands:
+By default, history numbers the commands to show where they are in your command history, but more convenient for saving is the "nonum" option::
 
-  IDL> :history 10
+  IDL> :history nonum
 
-But, more appropriately for cutting-and-pasting, use the qhistory magic command:
+Now, the lines can be copy-and-pasted easily back to the command line or to a file. Even more convenient is the histedit magic command which sends a particular number of commands to a file::
 
-  IDL> :qhistory 10
+   IDL> :histedit 6 mg_readpeople.pro
 
-(cut-and-paste back to command line)
+The file can be viewed and edited again with `.edit`::
 
-This cut-and-paste technique can be used to paste the code into a file as well, but there is an even better way to do that using the histedit magic command:
+  IDL> .edit mg_readpeople
 
-  IDL> :histedit 10 mg_...
+One of the goals of rIDL is to bridge the gap between working from the command line and writing routines in files and I hope these new features can help achieve that.
 
-Thanks for listening, 
+Thanks for listening.
