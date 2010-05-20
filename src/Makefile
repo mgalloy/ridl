@@ -68,4 +68,5 @@ clean:
 	rm -f $(RIDL)_logging.o
 	rm -f $(RIDL)_completion.o
 	rm -f $(RIDL)
+	rm -rf bin.*
 	
