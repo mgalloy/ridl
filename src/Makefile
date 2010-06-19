@@ -1,6 +1,6 @@
 RIDL_VERSION=0.1
 RIDL=ridl
-IDLDIR=/Applications/itt/idl
+IDLDIR=/Applications/itt/idl/idl
 ARCH=x86_64
 #ARCH=i386
 ARCHFLAGS= -arch $(ARCH)
