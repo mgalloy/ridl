@@ -722,6 +722,10 @@ int main(int argc, char *argv[]) {
             IDL_ToutPop();
           }
           ridl_setteeing(0);
+        } else if (strcmp(cmd, ":time") == 0) {
+          int search_length;
+          char *command = line + 6;
+          ridl_magic_time(command, firstcharIndex);
         } else if (strcmp(cmd, ":help") == 0) {
           ridl_magic_help(line, firstcharIndex);
         } else if (strcmp(cmd, ":history") == 0) {

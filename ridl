@@ -8,6 +8,8 @@ do
   fi
 done
 
+export IDL_DIR=/Applications/itt/idl/idl
+
 if [ $PREFER_32 = 1 ]; then 
   DYLD_LIBRARY_PATH=/Applications/itt/idl/idl/bin/bin.$OS.i386
   $RIDL_DIR/src/bin.$OS.i386/ridl $@

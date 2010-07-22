@@ -1,6 +1,7 @@
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <string.h>
+#include <time.h>
 
 #include "readline/history.h"
 
@@ -55,6 +56,8 @@ void ridl_magic_help(char *line, int firstcharIndex) {
            "stop logging commands and output");
     printf(magic_format, indent, magic_width, ":tee filename", 
            "start logging output to filename");
+    printf(magic_format, indent, magic_width, ":time cmd", 
+           "time the given command");
     printf(magic_format, indent, magic_width, ":untee", 
            "stop logging output");
     printf(magic_format, indent, magic_width, ":version", 
@@ -62,6 +65,22 @@ void ridl_magic_help(char *line, int firstcharIndex) {
   }
   
   free(argument);
+}
+
+
+/**
+   Time the command.
+*/
+void ridl_magic_time(char *cmd, int firstcharIndex) {
+  clock_t clk0 = clock(), clk1;
+  double seconds;
+  
+  int error = ridl_executestr(cmd, 1);
+  
+  clk1 = clock();
+  seconds = (double) (clk1 - clk0) / (double) CLOCKS_PER_SEC;
+
+  printf("%% time for '%s': %f seconds\n", cmd, seconds);
 }
 
 
