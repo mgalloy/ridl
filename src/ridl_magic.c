@@ -69,9 +69,11 @@ void ridl_magic_help(char *line, int firstcharIndex) {
 
 
 /**
-   Time the command.
+   Time a command.
+   
+   @param[in] cmd IDL command to time
 */
-void ridl_magic_time(char *cmd, int firstcharIndex) {
+void ridl_magic_time(char *cmd) {
   clock_t clk0 = clock(), clk1;
   double seconds;
   
