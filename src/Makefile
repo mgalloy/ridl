@@ -5,11 +5,11 @@ ARCH=x86_64
 #ARCH=i386
 ARCHFLAGS= -arch $(ARCH)
 OS=`uname -s | tr [A-Z] [a-z]`
-CC=cc
+CC=gcc
 BINDIR=$(IDLDIR)/bin/bin.$(OS).$(ARCH)
-READLINE_LIB=/usr/local/lib
+READLINE_DIR=/usr/local/Cellar/readline/6.1
 LDFLAGS= -no-cpp-precomp -dynamic -fno-common \
-	-L$(BINDIR) -L/usr/X11/lib -L$(READLINE_LIB) \
+	-L$(BINDIR) -L/usr/X11/lib -L$(READLINE_DIR)/lib \
 	-lidl -lXm -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2 -lreadline -lfreetype \
 	-multiply_defined suppress
 CFLAGS=
@@ -22,30 +22,30 @@ $(RIDL) : $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o $(RIDL)_
 	      $(ARCHFLAGS) $(LDFLAGS)
 	
 $(RIDL)_strings.o : $(RIDL)_strings.c
-	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include \
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I$(READLINE_DIR)/include \
 	      -c $(RIDL)_strings.c -o $(RIDL)_strings.o $(CFLAGS)
 
 $(RIDL)_history.o : $(RIDL)_history.c
-	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include \
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I$(READLINE_DIR)/include \
 				-c $(RIDL)_history.c -o $(RIDL)_history.o $(CFLAGS)
 
 $(RIDL)_magic.o : $(RIDL)_magic.c
-	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include \
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I$(READLINE_DIR)/include \
 				-c $(RIDL)_magic.c -o $(RIDL)_magic.o $(CFLAGS)
 
 $(RIDL)_logging.o : $(RIDL)_logging.c
-	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include \
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I$(READLINE_DIR)/include \
 				-c $(RIDL)_logging.c -o $(RIDL)_logging.o $(CFLAGS)
 
 $(RIDL)_completion.o : $(RIDL)_completion.c
-	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include \
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I$(READLINE_DIR)/include \
 				-c $(RIDL)_completion.c -o $(RIDL)_completion.o $(CFLAGS)
 
 $(RIDL).o : $(RIDL).c Makefile
 	echo "#define RIDL_VERSION \"$(RIDL_VERSION)\"" > ridl_version.h
 	echo "#define RIDL_REVISION \"`svnversion`\"" >> ridl_version.h
 	echo "#define RIDL_BUILD_DATE \"`date \"+%b %d %Y\"`\"" >> ridl_version.h
-	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I/usr/local/include \
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I$(READLINE_DIR)/include \
 	      -c $(RIDL).c -o $(RIDL).o $(CFLAGS)
 	
 both:
