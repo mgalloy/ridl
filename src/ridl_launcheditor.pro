@@ -1,11 +1,11 @@
 ; docformat = 'rst'
 
 ;+
-; Finds .pro files in the !path or current directory.
+; Finds `.pro` files in the `!path` or current directory.
 ;
 ; :Params:
 ;    basename : in, required, type=string
-;       basename of .pro file to find in !path or current directory
+;       basename of `.pro` file to find in `!path` or current directory
 ;-
 pro ridl_launcheditor, basename
   compile_opt strictarr, hidden

@@ -1,4 +1,16 @@
-function ridl_getfields, varname
+; docformat = 'rst'
+
+;+
+; Get the field names of a structure. 
+;
+; :Returns:
+;    `strarr`
+;
+; :Params:
+;    var : in, required, type=structure
+;       structure to obtain the field names of
+;-
+function ridl_getfields, var
   compile_opt strictarr, hidden
   
   catch, error
@@ -7,5 +19,5 @@ function ridl_getfields, varname
     return, ['']
   endif
 
-  return, strlowcase(tag_names(varname))
+  return, strlowcase(tag_names(var))
 end

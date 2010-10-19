@@ -1,0 +1,1 @@
+These are helper IDL routines called from callable IDL to simplify the C code in the rIDL code.
