@@ -54,12 +54,16 @@ void ridl_magic_help(char *line, int firstcharIndex) {
            "start logging all commands and output to filename");
     printf(magic_format, indent, magic_width, ":unlog", 
            "stop logging commands and output");
+    printf(magic_format, indent, magic_width, ":notebook filename", 
+           "start sending all commands and output to an HTML notebook filename");
+    printf(magic_format, indent, magic_width, ":unnotebook", 
+           "stop logging commands and output to notebook");
     printf(magic_format, indent, magic_width, ":tee filename", 
            "start logging output to filename");
-    printf(magic_format, indent, magic_width, ":time cmd", 
-           "time the given command");
     printf(magic_format, indent, magic_width, ":untee", 
            "stop logging output");
+    printf(magic_format, indent, magic_width, ":time cmd", 
+           "time the given command");
     printf(magic_format, indent, magic_width, ":version", 
            "print version information");      
   }

@@ -1,5 +1,10 @@
 // public routines
 
+int ridl_isnotebooking(void);
+int ridl_setnotebooking(int notebooking);
+void ridl_notebookcmd(char *prompt, char *cmd);
+void ridl_notebookoutput(int flags, char *buf, int n);
+  
 int ridl_islogging(void);
 void ridl_setlogging(int logging);
 

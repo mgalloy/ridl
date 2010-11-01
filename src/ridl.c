@@ -188,7 +188,8 @@ int ridl_executestr(char *cmd, int save) {
   int result;
   
   if (ridl_islogging()) ridl_logcmd(ridl_expandedprompt, cmd);
-
+  if (ridl_isnotebooking()) ridl_notebookcmd(ridl_expandedprompt, cmd);
+  
   result = IDL_ExecuteStr(cmd);
   
   // add line to both Readline's history and IDL's history file
@@ -234,6 +235,7 @@ void ridl_exit(void) {
    IDL callback registered to be called when IDL is done.
 */
 void ridl_exit_handler(void) {
+  if (ridl_isnotebooking()) ridl_closenotebook();
   if (ridl_islogging()) ridl_closelog(); 
   if (ridl_isteeing()) ridl_closelog();
 
@@ -694,6 +696,14 @@ int main(int argc, char *argv[]) {
           int error = IDL_ExecuteStr(man);
           free(man);
           free(routine);
+        }  else if (strcmp(cmd, ":notebook") == 0) {
+          if (ridl_isnotebooking()) ridl_closenotebook();
+
+          ridl_setnotebooking(1);
+          int search_length;
+          char *filename = ridl_getnextword(line, firstcharIndex + 10, &search_length);
+          ridl_initnotebook(filename);
+          free(filename);
         } else if (strcmp(cmd, ":log") == 0) {
           if (ridl_islogging()) ridl_closelog();
 
@@ -702,12 +712,18 @@ int main(int argc, char *argv[]) {
           char *filename = ridl_getnextword(line, firstcharIndex + 5, &search_length);
           ridl_initlog(filename);
           free(filename);
+        } else if (strcmp(cmd, ":unnotebook") == 0) {
+          if (ridl_isnotebooking()) {
+            ridl_closenotebook();
+            IDL_ToutPop();
+            ridl_setnotebooking(0);
+          }
         } else if (strcmp(cmd, ":unlog") == 0) {
           if (ridl_islogging()) {
             ridl_closelog();
             IDL_ToutPop();
+            ridl_setlogging(0);
           }
-          ridl_setlogging(0);
         } else if (strcmp(cmd, ":tee") == 0) {
           int search_length;
           if (ridl_isteeing()) ridl_closelog();
@@ -720,8 +736,8 @@ int main(int argc, char *argv[]) {
           if (ridl_isteeing()) {
             ridl_closelog();
             IDL_ToutPop();
+            ridl_setteeing(0);
           }
-          ridl_setteeing(0);
         } else if (strcmp(cmd, ":time") == 0) {
           int search_length;
           char *command = line + 6;
