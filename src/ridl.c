@@ -743,7 +743,33 @@ int main(int argc, char *argv[]) {
           char *command = line + 6;
           ridl_magic_time(command);
         } else if (strcmp(cmd, ":help") == 0) {
+          char **keyseqs;
+          int binding;
+          
           ridl_magic_help(line, firstcharIndex);
+
+          printf("\nrIDL keybindings:\n");
+          
+          keyseqs = rl_invoking_keyseqs((rl_command_func_t *)ridl_stepinto);
+          printf("  ridl-stepinto: ");
+          for (binding = 0; keyseqs[binding] != 0; binding++) {
+            printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
+          }
+          printf("\n");
+          
+          keyseqs = rl_invoking_keyseqs((rl_command_func_t *)ridl_stepover);
+          printf("  ridl-stepover: ");
+          for (binding = 0; keyseqs[binding] != 0; binding++) {
+            printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
+          }
+          printf("\n");
+
+          keyseqs = rl_invoking_keyseqs((rl_command_func_t *)ridl_stepreturn);
+          printf("  ridl-stepreturn: ");
+          for (binding = 0; keyseqs[binding] != 0; binding++) {
+            printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
+          }
+          printf("\n");
         } else if (strcmp(cmd, ":history") == 0) {
           ridl_magic_history(line, firstcharIndex);
         } else if (strcmp(cmd, ":histedit") == 0) {
