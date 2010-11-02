@@ -391,6 +391,17 @@ int ridl_readline_callback(int cont, int  widevint_allowed) {
 } 
 
 
+void ridl_printfunmap(char *funmap_function_name, rl_command_func_t *funmap_function) {
+  int binding;
+  char **keyseqs = rl_invoking_keyseqs(funmap_function);
+  printf("  %s: ", funmap_function_name);
+  for (binding = 0; keyseqs[binding] != 0; binding++) {
+    printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
+  }
+  printf("\n");  
+}
+
+
 void ridl_printridlversion(void) {
   printf("rIDL %s.r%s: Really Interactive Data Language. [Build: %s]\n", 
          RIDL_VERSION, RIDL_REVISION, RIDL_BUILD_DATE);
@@ -549,8 +560,18 @@ void ridl_handleswitches(int argc, char *argv[], int before) {
 /**
    rIDL main loop.
 */
-int main(int argc, char *argv[]) { 
-
+int main(int argc, char *argv[]) {
+  char *funmap_function_names[] 
+    = { "ridl-stepinto", 
+        "ridl-stepover", 
+        "ridl-stepreturn" };
+  rl_command_func_t *funmap_functions[] 
+    = { (rl_command_func_t *)ridl_stepinto, 
+        (rl_command_func_t *)ridl_stepover, 
+        (rl_command_func_t *)ridl_stepreturn }; 
+  int n_funmap_functions = 3;
+  int f;
+  
   ridl_handleswitches(argc, argv, 1);
   
   IDL_INIT_DATA init_data;
@@ -636,9 +657,9 @@ int main(int argc, char *argv[]) {
   // bind these commands to keys in an Readline configuration file, i.e., 
   // like ~/.inputrc (an example inputrc is given in the src/ directory of the
   // distribution)
-  rl_add_funmap_entry("ridl-stepinto", (rl_command_func_t *)ridl_stepinto);
-  rl_add_funmap_entry("ridl-stepover", (rl_command_func_t *)ridl_stepover);
-  rl_add_funmap_entry("ridl-stepreturn", (rl_command_func_t *)ridl_stepreturn);
+  for (f = 0; f < n_funmap_functions; f++) {
+    rl_add_funmap_entry(funmap_function_names[f], funmap_functions[f]);
+  }
 
   while (1) {
     char *line = ridl_readline();
@@ -743,33 +764,13 @@ int main(int argc, char *argv[]) {
           char *command = line + 6;
           ridl_magic_time(command);
         } else if (strcmp(cmd, ":help") == 0) {
-          char **keyseqs;
-          int binding;
-          
+          int f;
           ridl_magic_help(line, firstcharIndex);
 
-          printf("\nrIDL keybindings:\n");
-          
-          keyseqs = rl_invoking_keyseqs((rl_command_func_t *)ridl_stepinto);
-          printf("  ridl-stepinto: ");
-          for (binding = 0; keyseqs[binding] != 0; binding++) {
-            printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
+          printf("\nrIDL keybindings:\n");          
+          for(f = 0; f < n_funmap_functions; f++) {
+            ridl_printfunmap(funmap_function_names[f], funmap_functions[f]);
           }
-          printf("\n");
-          
-          keyseqs = rl_invoking_keyseqs((rl_command_func_t *)ridl_stepover);
-          printf("  ridl-stepover: ");
-          for (binding = 0; keyseqs[binding] != 0; binding++) {
-            printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
-          }
-          printf("\n");
-
-          keyseqs = rl_invoking_keyseqs((rl_command_func_t *)ridl_stepreturn);
-          printf("  ridl-stepreturn: ");
-          for (binding = 0; keyseqs[binding] != 0; binding++) {
-            printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
-          }
-          printf("\n");
         } else if (strcmp(cmd, ":history") == 0) {
           ridl_magic_history(line, firstcharIndex);
         } else if (strcmp(cmd, ":histedit") == 0) {
