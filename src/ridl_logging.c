@@ -96,8 +96,8 @@ void ridl_initnotebook(char *filename) {
 
 void ridl_closenotebook(void) {
   char *ts = ridl_currenttimestamp();
-  fprintf(notebook_fp, "    <p class=\"date\">Notebook produced by rIDL %s [%s] on %s.</p>", 
-          RIDL_VERSION, RIDL_REVISION, ts);
+  fprintf(notebook_fp, "    <p class=\"date\">Notebook produced by rIDL %s [%s] with IDL %s on %s.</p>", 
+          RIDL_VERSION, RIDL_REVISION, IDL_STRING_STR(&IDL_SysvVersion.release), ts);
   free(ts);
   
   fprintf(notebook_fp, "  </body>\n");  
