@@ -32,7 +32,7 @@ int ridl_setnotebooking(int notebooking) {
 
 
 void ridl_notebookcmd(char *prompt, char *cmd) {
-  fprintf(notebook_fp, "    <p class=\"command\">%s%s</p>\n", prompt, cmd);  
+  fprintf(notebook_fp, "    <p class=\"command\"><span class=\"prompt\">%s</span>%s</p>\n", prompt, cmd);  
 }
 
 
@@ -61,10 +61,10 @@ void ridl_notebookoutput(int flags, char *buf, int n) {
   printf("%s", output);
   if (flags & IDL_TOUT_F_NLPOST) printf("\n");
 
-  if (flags & IDL_TOUT_F_STDERR == 0) {
+  //if (flags & IDL_TOUT_F_STDERR == 0) {
     fprintf(notebook_fp, "    <pre class=\"output\">%s</pre>", output);
     if (flags & IDL_TOUT_F_NLPOST) fprintf(notebook_fp, "\n");
-  }
+  //}
   free(output);
 }
 
@@ -81,7 +81,8 @@ void ridl_initnotebook(char *filename) {
   fprintf(notebook_fp, "  <head>\n");
   fprintf(notebook_fp, "    <style type=\"text/css\" media=\"all\">\n");
   fprintf(notebook_fp, "      p.command { whitespace: pre; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
-  fprintf(notebook_fp, "      pre.output { font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
+  fprintf(notebook_fp, "      span.prompt { color: red; font-weight: bold; }\n");
+  fprintf(notebook_fp, "      pre.output { color: #666; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
   fprintf(notebook_fp, "    </style>\n");
   fprintf(notebook_fp, "  </head>\n");  
 
