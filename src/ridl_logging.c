@@ -81,8 +81,8 @@ void ridl_initnotebook(char *filename) {
   fprintf(notebook_fp, "  <head>\n");
   fprintf(notebook_fp, "    <style type=\"text/css\" media=\"all\">\n");
   fprintf(notebook_fp, "      p.command { whitespace: pre; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
-  fprintf(notebook_fp, "      span.prompt { color: red; font-weight: bold; }\n");
-  fprintf(notebook_fp, "      pre.output { color: #666; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
+  fprintf(notebook_fp, "      span.prompt { color: #A00; }\n");
+  fprintf(notebook_fp, "      pre.output { color: #4A62A4; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
   fprintf(notebook_fp, "    </style>\n");
   fprintf(notebook_fp, "  </head>\n");  
 
