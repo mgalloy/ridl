@@ -8,8 +8,5 @@ $if rIDL
 "\e[15~": ridl-stepinto
 "\e[17~": ridl-stepover
 "\e[18~": ridl-stepreturn
-"\C-i": ridl-stepinto
-"\C-o": ridl-stepover
-"\C-r": ridl-stepreturn
 
 $endif

@@ -3,6 +3,9 @@
 
 #include "idl_export.h"
 
+#include "ridl_version.h"
+#include "ridl_history.h"
+
 
 static int ridl_logging = 0;
 static int ridl_teeing = 0;
@@ -83,6 +86,7 @@ void ridl_initnotebook(char *filename) {
   fprintf(notebook_fp, "      p.command { whitespace: pre; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
   fprintf(notebook_fp, "      span.prompt { color: #A00; }\n");
   fprintf(notebook_fp, "      pre.output { color: #4A62A4; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
+  fprintf(notebook_fp, "      p.date { color: #666; font-size: 0.9em; }\n");
   fprintf(notebook_fp, "    </style>\n");
   fprintf(notebook_fp, "  </head>\n");  
 
@@ -91,6 +95,11 @@ void ridl_initnotebook(char *filename) {
 
 
 void ridl_closenotebook(void) {
+  char *ts = ridl_currenttimestamp();
+  fprintf(notebook_fp, "    <p class=\"date\">Notebook produced by rIDL %s [%s] on %s.</p>", 
+          RIDL_VERSION, RIDL_REVISION, ts);
+  free(ts);
+  
   fprintf(notebook_fp, "  </body>\n");  
   fprintf(notebook_fp, "</html>\n");
   fclose(notebook_fp);
