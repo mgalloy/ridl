@@ -11,9 +11,9 @@ static int ridl_notebooking = 0;
 static char *log_file;
 static FILE *log_fp;
 
-static char *notebook_file;
+static char *notebook_filename;
 static FILE *notebook_fp;
-
+static int notebook_image_counter = 0;
 
 /**
    @file
@@ -36,6 +36,23 @@ void ridl_notebookcmd(char *prompt, char *cmd) {
 }
 
 
+void ridl_notebookgraphic(void) {
+  // save .png file
+  char *savecmd_format = "ridl_savegraphic, '%s-%d.png'";
+  int cmd_length = strlen(notebook_filename) + strlen(savecmd_format) - 4 + 1 + 1;
+  char *savecmd = (char *)malloc(cmd_length);
+  sprintf(savecmd, savecmd_format, notebook_filename, notebook_image_counter);
+  int result = IDL_ExecuteStr(savecmd);  
+  free(savecmd);
+
+  // put reference to .png file into notebook
+  fprintf(notebook_fp, "    <img src=\"%s-%d.png\"/>\n", notebook_filename, notebook_image_counter); 
+  
+  // increment image counter
+  notebook_image_counter++; 
+}
+
+
 void ridl_notebookoutput(int flags, char *buf, int n) {
   char *output = (char *)malloc(strlen(buf) + 1);
   strncpy(output, buf, n);
@@ -44,14 +61,18 @@ void ridl_notebookoutput(int flags, char *buf, int n) {
   printf("%s", output);
   if (flags & IDL_TOUT_F_NLPOST) printf("\n");
 
-  fprintf(notebook_fp, "    <pre class=\"output\">%s</pre>", output);
-  if (flags & IDL_TOUT_F_NLPOST) fprintf(notebook_fp, "\n");
-  
+  if (flags & IDL_TOUT_F_STDERR == 0) {
+    fprintf(notebook_fp, "    <pre class=\"output\">%s</pre>", output);
+    if (flags & IDL_TOUT_F_NLPOST) fprintf(notebook_fp, "\n");
+  }
   free(output);
 }
 
 
 void ridl_initnotebook(char *filename) {
+  notebook_filename = (char *)malloc(strlen(filename) + 1);
+  strcpy(notebook_filename, filename);
+  
   notebook_fp = fopen(filename, "w");
   IDL_ToutPush(ridl_notebookoutput);
   

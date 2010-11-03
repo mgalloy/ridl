@@ -759,6 +759,12 @@ int main(int argc, char *argv[]) {
             IDL_ToutPop();
             ridl_setteeing(0);
           }
+        } else if (strcmp(cmd, ":save_graphic") == 0) {
+          if (ridl_isnotebooking()) {
+            ridl_notebookgraphic();
+          } else {
+            ridl_warning("turn on notebooking to save graphics");
+          }
         } else if (strcmp(cmd, ":time") == 0) {
           int search_length;
           char *command = line + 6;
