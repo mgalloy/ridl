@@ -46,7 +46,10 @@ static IDL_MSG_BLOCK msg_block;
 /// set to indicate that rIDL should just exit when asked
 int ridl_really_exit = 1;
 
-
+#define N_FUNMAP_FUNCTIONS 3
+char *funmap_function_names[N_FUNMAP_FUNCTIONS] = { "ridl-stepinto", "ridl-stepover", "ridl-stepreturn" }; 
+rl_command_func_t *funmap_functions[N_FUNMAP_FUNCTIONS];
+ 
 
 /**
    IDL callback called when the initial IDL startup text has finished 
@@ -380,6 +383,181 @@ char *ridl_readline(void) {
   }
 }
 
+int ridl_executeline(char *line, int flags) {
+  int error = 0;
+  
+  // normal exit by hitting ^D
+  if (line == NULL) { 
+    printf("\n");
+    return(IDL_Cleanup(IDL_FALSE)); 
+  };
+  
+  // magic lines start with :, anything else is passed to IDL
+  int firstcharIndex = ridl_firstchar(line);
+  char firstchar = line[firstcharIndex];
+  if (firstchar == ':') {
+    if ((firstcharIndex + 1 < strlen(line)) 
+          && (line[firstcharIndex + 1] == '!' || line[firstcharIndex + 1] == '^')) {
+      // TODO: eventually this shouldn't be a magic command, but should be
+      //       activated when a space is entered
+      char *expansion;
+      int expansion_result;
+      char *expansion_line = (char *)malloc(strlen(line) + 1);
+      strcpy(expansion_line, line + firstcharIndex + 1);
+      expansion_result = history_expand(expansion_line, &expansion);
+      switch (expansion_result) {
+        case -1: 
+          ridl_warning("error in expansion");
+          break;
+        case 2: 
+          printf("%s\n", expansion);
+          break;
+        case 0: 
+        case 1: 
+          ridl_executestr(expansion, 1);
+          break;
+      }
+      
+      free(expansion_line);
+      free(expansion);
+    } else {   
+      int search_length;                       
+      char *cmd = ridl_getnextword(line, firstcharIndex, &search_length);
+      if (strcmp(cmd, ":colors") == 0) {
+        use_colors = use_colors ? 0 : 1;
+        if (use_colors) {
+          printf("colors on\n");
+        } else {
+          printf("colors off\n");
+        }
+      } else if (strcmp(cmd, ":doc") == 0) {
+        int search_length;
+        char *routine = ridl_getnextword(line, firstcharIndex + 5, &search_length);
+        char *man = (char *)malloc(8 + strlen(routine));
+        sprintf(man, "man, '%s'", routine);
+        int error = IDL_ExecuteStr(man);
+        free(man);
+        free(routine);
+      }  else if (strcmp(cmd, ":notebook") == 0) {
+        if (ridl_isnotebooking()) ridl_closenotebook();
+
+        ridl_setnotebooking(1);
+        int search_length;
+        char *filename = ridl_getnextword(line, firstcharIndex + 10, &search_length);
+        ridl_initnotebook(filename);
+        free(filename);
+      } else if (strcmp(cmd, ":log") == 0) {
+        if (ridl_islogging()) ridl_closelog();
+
+        ridl_setlogging(1);
+        int search_length;
+        char *filename = ridl_getnextword(line, firstcharIndex + 5, &search_length);
+        ridl_initlog(filename);
+        free(filename);
+      } else if (strcmp(cmd, ":unnotebook") == 0) {
+        if (ridl_isnotebooking()) {
+          ridl_closenotebook();
+          IDL_ToutPop();
+          ridl_setnotebooking(0);
+        }
+      } else if (strcmp(cmd, ":unlog") == 0) {
+        if (ridl_islogging()) {
+          ridl_closelog();
+          IDL_ToutPop();
+          ridl_setlogging(0);
+        }
+      } else if (strcmp(cmd, ":tee") == 0) {
+        int search_length;
+        if (ridl_isteeing()) ridl_closelog();
+
+        ridl_setteeing(1);
+        char *filename = ridl_getnextword(line, firstcharIndex + 5, &search_length);
+        ridl_initlog(filename);
+        free(filename);
+      } else if (strcmp(cmd, ":untee") == 0) {
+        if (ridl_isteeing()) {
+          ridl_closelog();
+          IDL_ToutPop();
+          ridl_setteeing(0);
+        }
+      } else if (strcmp(cmd, ":save_graphic") == 0) {
+        if (ridl_isnotebooking()) {
+          ridl_notebookgraphic();
+        } else {
+          ridl_warning("turn on notebooking to save graphics");
+        }
+      } else if (strcmp(cmd, ":time") == 0) {
+        int search_length;
+        char *command = line + 6;
+        ridl_magic_time(command);
+      } else if (strcmp(cmd, ":help") == 0) {
+        int f;
+        ridl_magic_help(line, firstcharIndex);
+
+        printf("\nrIDL keybindings:\n");          
+        for(f = 0; f < N_FUNMAP_FUNCTIONS; f++) {
+          ridl_printfunmap(funmap_function_names[f], funmap_functions[f]);
+        }
+      } else if (strcmp(cmd, ":history") == 0) {
+        ridl_magic_history(line, firstcharIndex);
+      } else if (strcmp(cmd, ":histedit") == 0) {
+        ridl_magic_histedit(line, firstcharIndex);
+      } else if (strcmp(cmd, ":version") == 0) {
+        ridl_printversion();
+      } else {
+        ridl_warning("unknown magic command '%s'", cmd);
+        error = 1;
+      }
+    }
+  } else {
+    if (line && *line) {           
+      // check for .edit
+      if (firstchar == '.') {
+        int search_length;
+        char *cmd = ridl_getnextword(line, firstcharIndex, &search_length);
+        if (strcmp(cmd, ".edit") == 0 || strcmp(cmd, ".edi") == 0 
+              || strcmp(cmd, ".ed") == 0 || strcmp(cmd, ".e") == 0) {
+          char *file = ridl_getnextword(line, firstcharIndex + strlen(cmd) + 1, &search_length);
+          ridl_launcheditor(file);              
+          free(file);
+          
+          add_history(line);
+          ridl_cmdnumber++;
+          ridl_updateprompt();
+        } else {
+          // execute standard executive commands
+          error = ridl_executestr(line, 1);
+        }
+        free(cmd);
+      } else {
+        // determine if line is continued
+        char *line_continued = ridl_linecontinued(line);
+
+        if (continued) {
+          if (line_continued) {
+            strcat(ridl_continuedline, line);
+          } else {
+            // execute IDL commands that were continued on several lines
+            continued = 0;
+            strcat(ridl_continuedline, line);
+            error = ridl_executestr(ridl_continuedline, 1);
+          }
+        } else {
+          if (line_continued) {
+            continued = 1;
+            strcpy(ridl_continuedline, line);
+          } else {
+            // execute normal IDL commands
+            error = ridl_executestr(line, 1);
+          }  
+        }
+      }
+    }
+  }
+  
+  return(error);
+}
+
 
 int ridl_readline_callback(int cont, int  widevint_allowed) {
   char *line;
@@ -560,18 +738,12 @@ void ridl_handleswitches(int argc, char *argv[], int before) {
 /**
    rIDL main loop.
 */
-int main(int argc, char *argv[]) {
-  char *funmap_function_names[] 
-    = { "ridl-stepinto", 
-        "ridl-stepover", 
-        "ridl-stepreturn" };
-  rl_command_func_t *funmap_functions[] 
-    = { (rl_command_func_t *)ridl_stepinto, 
-        (rl_command_func_t *)ridl_stepover, 
-        (rl_command_func_t *)ridl_stepreturn }; 
-  int n_funmap_functions = 3;
-  int f;
-  
+int main(int argc, char *argv[]) {  
+  rl_command_func_t *funmap_functions[N_FUNMAP_FUNCTIONS];
+  funmap_functions[0] = (rl_command_func_t *)ridl_stepinto;
+  funmap_functions[1] = (rl_command_func_t *)ridl_stepover; 
+  funmap_functions[2] = (rl_command_func_t *)ridl_stepreturn;
+      
   ridl_handleswitches(argc, argv, 1);
   
   IDL_INIT_DATA init_data;
@@ -646,6 +818,8 @@ int main(int argc, char *argv[]) {
   if (execute_batch_file) {
     char *batch_cmd = (char *)malloc(strlen(batch_file) + 2);
     sprintf(batch_cmd, "@%s", batch_file);
+    // TODO: should actually loop through the lines of the file and send each 
+    // one to "ridl_executeline(line, 0)"
     int error = IDL_ExecuteStr(batch_cmd);
     free(batch_cmd);
   }
@@ -657,7 +831,8 @@ int main(int argc, char *argv[]) {
   // bind these commands to keys in an Readline configuration file, i.e., 
   // like ~/.inputrc (an example inputrc is given in the src/ directory of the
   // distribution)
-  for (f = 0; f < n_funmap_functions; f++) {
+  int f;
+  for (f = 0; f < N_FUNMAP_FUNCTIONS; f++) {
     rl_add_funmap_entry(funmap_function_names[f], funmap_functions[f]);
   }
 
@@ -665,175 +840,8 @@ int main(int argc, char *argv[]) {
     char *line = ridl_readline();
     ridl_getevents();
     
-    // normal exit by hitting ^D
-    if (line == NULL) { 
-      printf("\n");
-      return(IDL_Cleanup(IDL_FALSE)); 
-    };
-    
-    // magic lines start with :, anything else is passed to IDL
-    int firstcharIndex = ridl_firstchar(line);
-    char firstchar = line[firstcharIndex];
-    if (firstchar == ':') {
-      if ((firstcharIndex + 1 < strlen(line)) 
-            && (line[firstcharIndex + 1] == '!' || line[firstcharIndex + 1] == '^')) {
-        // TODO: eventually this shouldn't be a magic command, but should be
-        //       activated when a space is entered
-        char *expansion;
-        int expansion_result;
-        char *expansion_line = (char *)malloc(strlen(line) + 1);
-        strcpy(expansion_line, line + firstcharIndex + 1);
-        expansion_result = history_expand(expansion_line, &expansion);
-        switch (expansion_result) {
-          case -1: 
-            ridl_warning("error in expansion");
-            break;
-          case 2: 
-            printf("%s\n", expansion);
-            break;
-          case 0: 
-          case 1: 
-            ridl_executestr(expansion, 1);
-            break;
-        }
+    int error = ridl_executeline(line, 1);
         
-        free(expansion_line);
-        free(expansion);
-      } else {   
-        int search_length;                       
-        char *cmd = ridl_getnextword(line, firstcharIndex, &search_length);
-        if (strcmp(cmd, ":colors") == 0) {
-          use_colors = use_colors ? 0 : 1;
-          if (use_colors) {
-            printf("colors on\n");
-          } else {
-            printf("colors off\n");
-          }
-        } else if (strcmp(cmd, ":doc") == 0) {
-          int search_length;
-          char *routine = ridl_getnextword(line, firstcharIndex + 5, &search_length);
-          char *man = (char *)malloc(8 + strlen(routine));
-          sprintf(man, "man, '%s'", routine);
-          int error = IDL_ExecuteStr(man);
-          free(man);
-          free(routine);
-        }  else if (strcmp(cmd, ":notebook") == 0) {
-          if (ridl_isnotebooking()) ridl_closenotebook();
-
-          ridl_setnotebooking(1);
-          int search_length;
-          char *filename = ridl_getnextword(line, firstcharIndex + 10, &search_length);
-          ridl_initnotebook(filename);
-          free(filename);
-        } else if (strcmp(cmd, ":log") == 0) {
-          if (ridl_islogging()) ridl_closelog();
-
-          ridl_setlogging(1);
-          int search_length;
-          char *filename = ridl_getnextword(line, firstcharIndex + 5, &search_length);
-          ridl_initlog(filename);
-          free(filename);
-        } else if (strcmp(cmd, ":unnotebook") == 0) {
-          if (ridl_isnotebooking()) {
-            ridl_closenotebook();
-            IDL_ToutPop();
-            ridl_setnotebooking(0);
-          }
-        } else if (strcmp(cmd, ":unlog") == 0) {
-          if (ridl_islogging()) {
-            ridl_closelog();
-            IDL_ToutPop();
-            ridl_setlogging(0);
-          }
-        } else if (strcmp(cmd, ":tee") == 0) {
-          int search_length;
-          if (ridl_isteeing()) ridl_closelog();
-
-          ridl_setteeing(1);
-          char *filename = ridl_getnextword(line, firstcharIndex + 5, &search_length);
-          ridl_initlog(filename);
-          free(filename);
-        } else if (strcmp(cmd, ":untee") == 0) {
-          if (ridl_isteeing()) {
-            ridl_closelog();
-            IDL_ToutPop();
-            ridl_setteeing(0);
-          }
-        } else if (strcmp(cmd, ":save_graphic") == 0) {
-          if (ridl_isnotebooking()) {
-            ridl_notebookgraphic();
-          } else {
-            ridl_warning("turn on notebooking to save graphics");
-          }
-        } else if (strcmp(cmd, ":time") == 0) {
-          int search_length;
-          char *command = line + 6;
-          ridl_magic_time(command);
-        } else if (strcmp(cmd, ":help") == 0) {
-          int f;
-          ridl_magic_help(line, firstcharIndex);
-
-          printf("\nrIDL keybindings:\n");          
-          for(f = 0; f < n_funmap_functions; f++) {
-            ridl_printfunmap(funmap_function_names[f], funmap_functions[f]);
-          }
-        } else if (strcmp(cmd, ":history") == 0) {
-          ridl_magic_history(line, firstcharIndex);
-        } else if (strcmp(cmd, ":histedit") == 0) {
-          ridl_magic_histedit(line, firstcharIndex);
-        } else if (strcmp(cmd, ":version") == 0) {
-          ridl_printversion();
-        } else {
-          ridl_warning("unknown magic command '%s'", cmd);
-        }
-      }
-    } else {
-      if (line && *line) {           
-        // check for .edit
-        if (firstchar == '.') {
-          int search_length;
-          char *cmd = ridl_getnextword(line, firstcharIndex, &search_length);
-          if (strcmp(cmd, ".edit") == 0 || strcmp(cmd, ".edi") == 0 
-                || strcmp(cmd, ".ed") == 0 || strcmp(cmd, ".e") == 0) {
-            char *file = ridl_getnextword(line, firstcharIndex + strlen(cmd) + 1, &search_length);
-            ridl_launcheditor(file);              
-            free(file);
-            
-            add_history(line);
-            ridl_cmdnumber++;
-            ridl_updateprompt();
-          } else {
-            // execute standard executive commands
-            int error = ridl_executestr(line, 1);
-          }
-          free(cmd);
-        } else {
-          // determine if line is continued
-          char *line_continued = ridl_linecontinued(line);
-
-          if (continued) {
-            if (line_continued) {
-              strcat(ridl_continuedline, line);
-            } else {
-              // execute IDL commands that were continued on several lines
-              int error;
-              continued = 0;
-              strcat(ridl_continuedline, line);
-              error = ridl_executestr(ridl_continuedline, 1);
-            }
-          } else {
-            if (line_continued) {
-              continued = 1;
-              strcpy(ridl_continuedline, line);
-            } else {
-              // execute normal IDL commands
-              int error = ridl_executestr(line, 1);
-            }  
-          }
-        }
-      }
-    }
-    
     free(line);
   }    
   
