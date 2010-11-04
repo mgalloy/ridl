@@ -5,23 +5,29 @@ rIDL 0.1
     variables to launch the specified editor.
     
   * Hitting tab will do completion on filenames, system variable names, local
-    variable names, and structure field names.
+    variable names (including structure field names), reserved words, 
+    executive commands, and magic commands.
   
   * The :doc magic command displays header information about a routine.
   
-  * Use the :history magic command to retrieve the command line history or 
+  * Use the :history magic commands to retrieve the command line history or 
     :histedit to send the commands to a file and launch your editor.
     
-  * Use :log/:unlog magic command to get a log of the session, containing both 
-    commands and output::
+  * Use :log/:unlog magic commands to get a log of the session, containing 
+    both commands and output::
     
        rIDL> :log filename
+
+  * Use the :notebook/:unnotebook magic commands to log the commands entered 	     
+    and both the output log and graphics output into a notebook. Use the 
+    :save_graphic command to place the current new graphic, iTool, or direct
+    graphics window into the notebook.
 
   * Use the :help magic command to get information about all the currently
     available magic commands.
 
   * Keybindings are supported. Currently step into, step over, and step return
-    can be mapped via a Readline configuration file.
+    can be mapped via a Readline resource file file.
   
   * Readline history commands are available with :!. For example, to replace a 
     string::
@@ -49,7 +55,7 @@ rIDL 0.1
     
   * Multi-line commands, when entered at the interactive command line, are 
     combined into a single line in the command history.
-  
+ 
   
 IDL functionality not in rIDL
 -----------------------------

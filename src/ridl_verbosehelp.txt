@@ -20,7 +20,16 @@ magic commands
            
 :unlog
   stop logging commands and output
-           
+
+:notebook filename
+  start sending all commands and output to an HTML notebook filename
+
+:unnotebook           
+  stop logging commands and output to notebook
+
+:save_graphic      
+  save current new graphic, iTool, or direct graphic window to notebook           
+
 :tee filename 
   start logging output to filename
            
