@@ -383,6 +383,18 @@ char *ridl_readline(void) {
   }
 }
 
+
+void ridl_printfunmap(char *funmap_function_name, rl_command_func_t *funmap_function) {
+  int binding;
+  char **keyseqs = rl_invoking_keyseqs(funmap_function);
+  printf("  %s: ", funmap_function_name);
+  for (binding = 0; keyseqs[binding] != 0; binding++) {
+    printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
+  }
+  printf("\n");  
+}
+
+
 int ridl_executeline(char *line, int flags) {
   int error = 0;
   
@@ -582,17 +594,6 @@ int ridl_readline_callback(int cont, int  widevint_allowed) {
 } 
 
 
-void ridl_printfunmap(char *funmap_function_name, rl_command_func_t *funmap_function) {
-  int binding;
-  char **keyseqs = rl_invoking_keyseqs(funmap_function);
-  printf("  %s: ", funmap_function_name);
-  for (binding = 0; keyseqs[binding] != 0; binding++) {
-    printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
-  }
-  printf("\n");  
-}
-
-
 void ridl_printridlversion(void) {
   printf("rIDL %s.r%s: Really Interactive Data Language. [Build: %s]\n", 
          RIDL_VERSION, RIDL_REVISION, RIDL_BUILD_DATE);
@@ -752,7 +753,8 @@ void ridl_handleswitches(int argc, char *argv[], int before) {
    rIDL main loop.
 */
 int main(int argc, char *argv[]) {  
-  rl_command_func_t *funmap_functions[N_FUNMAP_FUNCTIONS];
+
+  // initialize funmap_functions
   funmap_functions[0] = (rl_command_func_t *)ridl_stepinto;
   funmap_functions[1] = (rl_command_func_t *)ridl_stepover; 
   funmap_functions[2] = (rl_command_func_t *)ridl_stepreturn;
