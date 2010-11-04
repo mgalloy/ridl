@@ -441,45 +441,58 @@ int ridl_executeline(char *line, int flags) {
       }  else if (strcmp(cmd, ":notebook") == 0) {
         if (ridl_isnotebooking()) ridl_closenotebook();
 
-        ridl_setnotebooking(1);
         int search_length;
-        char *filename = ridl_getnextword(line, firstcharIndex + 10, &search_length);
-        ridl_initnotebook(filename);
+        char *filename = ridl_getnextword(line, firstcharIndex + 9, &search_length);
+        if (strlen(filename) == 0) {
+          ridl_warning("must specify filename of notebook");
+        } else {
+          ridl_setnotebooking(1);
+          ridl_initnotebook(filename);
+        }
         free(filename);
       } else if (strcmp(cmd, ":log") == 0) {
         if (ridl_islogging()) ridl_closelog();
 
-        ridl_setlogging(1);
         int search_length;
-        char *filename = ridl_getnextword(line, firstcharIndex + 5, &search_length);
-        ridl_initlog(filename);
+        char *filename = ridl_getnextword(line, firstcharIndex + 4, &search_length);
+        if (strlen(filename) == 0) {
+          ridl_warning("must specify filename of log");
+        } else {
+          ridl_setlogging(1);
+          ridl_initlog(filename);          
+        }
+
         free(filename);
       } else if (strcmp(cmd, ":unnotebook") == 0) {
         if (ridl_isnotebooking()) {
           ridl_closenotebook();
           IDL_ToutPop();
           ridl_setnotebooking(0);
-        }
+        } else ridl_warning("not currently notebooking");
       } else if (strcmp(cmd, ":unlog") == 0) {
         if (ridl_islogging()) {
           ridl_closelog();
           IDL_ToutPop();
           ridl_setlogging(0);
-        }
+        } else ridl_warning("not currently logging");
       } else if (strcmp(cmd, ":tee") == 0) {
-        int search_length;
         if (ridl_isteeing()) ridl_closelog();
 
-        ridl_setteeing(1);
-        char *filename = ridl_getnextword(line, firstcharIndex + 5, &search_length);
-        ridl_initlog(filename);
+        int search_length;
+        char *filename = ridl_getnextword(line, firstcharIndex + 4, &search_length);
+        if (strlen(filename) == 0) {
+        } else {
+          ridl_setteeing(1);
+          ridl_initlog(filename);
+        }
+        
         free(filename);
       } else if (strcmp(cmd, ":untee") == 0) {
         if (ridl_isteeing()) {
           ridl_closelog();
           IDL_ToutPop();
           ridl_setteeing(0);
-        }
+        } else ridl_warning("not currently teeing");
       } else if (strcmp(cmd, ":save_graphic") == 0) {
         if (ridl_isnotebooking()) {
           ridl_notebookgraphic();
