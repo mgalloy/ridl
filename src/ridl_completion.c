@@ -37,6 +37,14 @@ char *executive_cmds[] = {
   (char *)NULL
 };
 
+/// list of magic commands
+char *magic_cmds[] = {
+  ":colors", ":doc", ":help", ":history", ":histedit", ":log", ":unlog", 
+  ":notebook", ":unnotebook", ":save_graphic", ":tee", ":untee", ":time",
+  ":version",
+  (char *)NULL
+};
+
 /// determines if the catalog of IDL library routines was found
 int idl_routines_available = 1;
 
@@ -136,6 +144,7 @@ char *ridl_generator(const char *text, int state) {
   static int processed_reservedwords;
   static int processed_systemvariables;
   static int processed_executivecmds;
+  static int processed_magiccmds;
   static int processed_idlroutines;
   static int processed_localvariables;
   
@@ -149,6 +158,7 @@ char *ridl_generator(const char *text, int state) {
     processed_reservedwords = 0;
     processed_systemvariables = 0;
     processed_executivecmds = 0;
+    processed_magiccmds = 0;
     processed_idlroutines = 0;
     processed_localvariables = 0;
   }
@@ -191,10 +201,25 @@ char *ridl_generator(const char *text, int state) {
       }
     }
   }
-  
+
   if (!processed_executivecmds) {
     //printf("processed executive commands...\n");    
     processed_executivecmds = 1;
+    list_index = 0;
+  }
+
+  if (!processed_magiccmds) {
+    while (name = magic_cmds[list_index]) {
+      list_index++;
+      if (strncmp(name, text, len) == 0) {
+        return(ridl_copystr(name));
+      }
+    }
+  }
+    
+  if (!processed_magiccmds) {
+    //printf("processed magic commands...\n");    
+    processed_magiccmds = 1;
     list_index = 0;
   }
   
