@@ -73,6 +73,8 @@ void ridl_notebookoutput(int flags, char *buf, int n) {
 
 
 void ridl_initnotebook(char *filename) {
+  char *ts = ridl_currenttimestamp();
+  
   notebook_filename = (char *)malloc(strlen(filename) + 1);
   strcpy(notebook_filename, filename);
   
@@ -80,11 +82,14 @@ void ridl_initnotebook(char *filename) {
   IDL_ToutPush(ridl_notebookoutput);
   
   fprintf(notebook_fp, "<html>\n");
-
+  
   fprintf(notebook_fp, "  <head>\n");
+  fprintf(notebook_fp, "    <title>Notebook from %s</title>\n", ts);
+  
+  // TODO: eventually this should be put into a stylesheet file and imported
   fprintf(notebook_fp, "    <style type=\"text/css\" media=\"all\">\n");
   fprintf(notebook_fp, "      p.command { whitespace: pre; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
-  fprintf(notebook_fp, "      span.prompt { color: #A00; }\n");
+  fprintf(notebook_fp, "      span.prompt { color: #C65D09; }\n");
   fprintf(notebook_fp, "      pre.output { color: #4A62A4; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
   fprintf(notebook_fp, "      p.date { color: #666; font-size: 0.9em; }\n");
   fprintf(notebook_fp, "    </style>\n");
