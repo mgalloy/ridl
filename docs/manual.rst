@@ -83,11 +83,52 @@ example ``inputrc`` file is provided in the ``src`` directory which defines a
 few rIDL specific key bindings. It can be called from a ``.inputrc`` file.
 
 
+Other features
+--------------
+
+TODO: continued lines merged into a single line
+
+TODO: ``.edit`` works (uses ``RIDL_EDITOR`` or ``EDITOR`` environment variables)
+
+TODO: : ``-h`` and ``-v`` options to the binary::
+
+   $ ridl -v
+   rIDL 0.1.r166: Really Interactive Data Language. [Build: Nov 04 2010]
+   IDL Version 8.0.1, Mac OS X (darwin x86_64 m64). [Build: Oct  5 2010]
+
+   $ ridl -h
+   rIDL 0.1.r166: Really Interactive Data Language. [Build: Nov 04 2010]
+   IDL Version 8.0.1, Mac OS X (darwin x86_64 m64). [Build: Oct  5 2010]
+
+   usage: ridl [options] [batch_filename]
+
+   options:
+     -32                       start in 32-bit mode
+     -arg value                saves a single command line argument
+     -args value1 value2 ...   saves multiple command line arguments
+     -demo                     start in 7-minute demo mode
+     -e command                executes command and exit
+     -em=FILENAME              execute the given .sav file containing an embedded license
+     -h                        display this help message
+     -IDL_PREF value           set the IDL_PREF preference for this session
+     -novm                     use 7-minute demo mode instead of virtual machine with -rt
+     -pref=FILENAME            load the given preference file
+     -queue                    wait for a license when none are available
+     -quiet                    suppress printing information about IDL on startup
+     -rt=FILENAME              start with a runtime license on the given .sav file
+     -student                  start in student mode
+     -ulicense                 start IDL with a unique license
+     -v                        display version information
+     -vm=FILENAME              start the virtual machine with the given .sav file
+
+TODO: prompt: ``%wdir`` and ``cmdnum`` variables can be used in the prompt
+
+
 Where to go for more help?
 --------------------------
 
 Mailing list?
 
-Trac site, `rIDL Trac site <http://ridl.idldev.com>`_
+rIDL Trac site `ridl.idldev.com <http://ridl.idldev.com>`_
 
-Contact me at `mgalloy at idldev dot com`.
+Contact me at ``mgalloy at idldev dot com``.

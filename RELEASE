@@ -49,9 +49,6 @@ rIDL 0.1
   
   * The prompt can contain variables such as %wdir or %cmdnum which will be
     expanded for display.
-  
-  * Certain commands can be bound to keystrokes. Currently .step, .stepover, 
-    and .return are available.
     
   * Multi-line commands, when entered at the interactive command line, are 
     combined into a single line in the command history.
