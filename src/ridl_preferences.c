@@ -5,23 +5,23 @@
 
 /*
   IDL_DATAFILE_USER_COMMENTS    
-  IDL_DEVICE                    
-  IDL_EDIT_INPUT                
-  IDL_EXCEPT                    
-  IDL_MORE                      
+  + IDL_DEVICE                    
+  + IDL_EDIT_INPUT                
+  + IDL_EXCEPT                    
+  + IDL_MORE                      
   IDL_MSG_PREFIX                
   + IDL_PROMPT                    
-  IDL_QUIET                     
+  + IDL_QUIET                     
   IDL_RBUF_PERSIST              
   IDL_RBUF_SIZE                 
   IDL_DIR                       
-  IDL_DLM_PATH                  
+  + IDL_DLM_PATH                  
   IDL_HELP_PATH                 
   IDL_MAKE_DLL_COMPILE_DIRECTORY                
   + IDL_PATH                      
   IDL_PATH_CACHE_DISABLE        
-  IDL_STARTUP                   
-  IDL_START_DIR                 
+  - IDL_STARTUP                   
+  - IDL_START_DIR                 
   IDL_TMPDIR                    
   IDL_CPU_TPOOL_MAX_ELTS        
   IDL_CPU_TPOOL_MIN_ELTS        
@@ -53,19 +53,54 @@ void ridl_readpreferencefile(char *filename) {
 void ridl_setpreference(char *name, char *value) {
   char *cmd;
   int status;
-  
-  if (strcmp(name, "IDL_PATH") == 0) {
+
+  if (strcmp(name, "IDL_DEVICE") == 0) {
+    cmd = (char *)calloc(strlen(value) + 13, 1);
+    sprintf(cmd, "set_plot, '%s'", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);    
+  } else if (strcmp(name, "IDL_EDIT_INPUT") == 0) {
+    cmd = (char *)calloc(strlen(value) + 14, 1);
+    sprintf(cmd, "!edit_input = %s", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);    
+  } else if (strcmp(name, "IDL_EXCEPT") == 0) {
+    cmd = (char *)calloc(strlen(value) + 11, 1);
+    sprintf(cmd, "!except = %s", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);    
+  } else if (strcmp(name, "IDL_MORE") == 0) {
+    cmd = (char *)calloc(strlen(value) + 9, 1);
+    sprintf(cmd, "!more = %s", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);    
+  } else if (strcmp(name, "IDL_PROMPT") == 0) {
+    char space = value[strlen(value) - 1] == ' ' ? '\0' : ' ';
+    cmd = (char *)calloc(strlen(value) + 13, 1);
+    sprintf(cmd, "!prompt = '%s%c'", value, space);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);
+  } else if (strcmp(name, "IDL_QUIET") == 0) {
+    cmd = (char *)calloc(strlen(value) + 10, 1);
+    sprintf(cmd, "!quiet = %s", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);
+  } else if (strcmp(name, "IDL_DLM_PATH") == 0) {
+    cmd = (char *)calloc(strlen(value) + 15, 1);
+    sprintf(cmd, "!dlm_path = '%s'", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);
+  } else if (strcmp(name, "IDL_PATH") == 0) {
     cmd = (char *)calloc(strlen(value) + 11, 1);
     sprintf(cmd, "!path = '%s'", value);
     status = IDL_ExecuteStr(cmd);
     free(cmd);
-  } else if (strcmp(name, "IDL_PROMPT") == 0) {
-    char space = value[strlen(value) - 1] == ' ' ? '\0' : ' ';
-    cmd = (char *)calloc(strlen(value) + 13, 1);
-    
-    sprintf(cmd, "!prompt = '%s%c'", value, space);
-    status = IDL_ExecuteStr(cmd);
-    free(cmd);    
+  } else if (strcmp(name, "IDL_STARTUP") == 0) {
+    // TODO: implement
+    ridl_warning("IDL_STARTUP pref not implemented");
+  } else if (strcmp(name, "IDL_START_DIR") == 0) {
+    // TODO: implement
+    ridl_warning("IDL_START_DIR pref not implemented");
   } else {
     ridl_warning("unknown preference: %s", name);
   }
