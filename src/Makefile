@@ -22,11 +22,15 @@ CFLAGS=
 
 .PHONY: clean install both
 
-$(RIDL) : $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o $(RIDL)_logging.o $(RIDL)_completion.o
+$(RIDL) : $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o $(RIDL)_logging.o $(RIDL)_completion.o $(RIDL)_preferences.o
 	$(CC) $(RIDL).o $(RIDL)_strings.o $(RIDL)_magic.o $(RIDL)_history.o \
-	      $(RIDL)_logging.o $(RIDL)_completion.o -o $(RIDL) \
-	      $(ARCHFLAGS) $(LDFLAGS)
-	
+	      $(RIDL)_logging.o $(RIDL)_completion.o $(RIDL)_preferences.o \
+				-o $(RIDL) $(ARCHFLAGS) $(LDFLAGS)
+
+$(RIDL)_preferences.o : $(RIDL)_preferences.c
+	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I$(READLINE_INCLUDEDIR) \
+				-c $(RIDL)_preferences.c -o $(RIDL)_preferences.o $(CFLAGS)
+
 $(RIDL)_strings.o : $(RIDL)_strings.c
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I$(READLINE_INCLUDEDIR) \
 	      -c $(RIDL)_strings.c -o $(RIDL)_strings.o $(CFLAGS)
@@ -73,6 +77,7 @@ clean:
 	rm -f $(RIDL)_history.o
 	rm -f $(RIDL)_logging.o
 	rm -f $(RIDL)_completion.o
+	rm -f $(RIDL)_preferences.o
 	rm -f $(RIDL)
 	rm -rf bin.*
 	

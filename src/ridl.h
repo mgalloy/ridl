@@ -17,6 +17,13 @@ static int ridl_cmdnumber = 1;
 static float ridl_event_delay = 0.1;
 
 
+// bindable routines
+
+int ridl_stepinto(void);
+int ridl_stepover(void);
+int ridl_stepreturn(void);
+
+
 // public routines
 
 void ridl_printversion(void);

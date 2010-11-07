@@ -15,6 +15,7 @@
 #include "ridl_version.h"
 #include "ridl_logging.h"
 #include "ridl_completion.h"
+#include "ridl_preferences.h"
 
 
 /// user information with fields: logname, homedir, pid, host, wd, date
@@ -36,8 +37,7 @@ static char *preferences_filename;
 
 static int use_colors = 1;
 
-static IDL_MSG_DEF msg_arr[] = 
-{  
+static IDL_MSG_DEF msg_arr[] = {  
 #define M_RIDL_SIGNAL_REG       0
   {  "M_RIDL_SIGNAL_REG",   "%NSignal registration problem." }, 
 };
@@ -47,16 +47,20 @@ static IDL_MSG_BLOCK msg_block;
 int ridl_really_exit = 1;
 
 #define N_FUNMAP_FUNCTIONS 3
-char *funmap_function_names[N_FUNMAP_FUNCTIONS] = { "ridl-stepinto", "ridl-stepover", "ridl-stepreturn" }; 
-rl_command_func_t *funmap_functions[N_FUNMAP_FUNCTIONS];
- 
+char *funmap_function_names[] = { "ridl-stepinto", "ridl-stepover", "ridl-stepreturn" }; 
+rl_command_func_t *funmap_functions[] = {
+  (rl_command_func_t *)ridl_stepinto,
+  (rl_command_func_t *)ridl_stepover,
+  (rl_command_func_t *)ridl_stepreturn
+};
+
+  
 
 /**
    IDL callback called when the initial IDL startup text has finished 
    printing.
 */
 void ridl_inittextdone(void) {
-  
 }
 
 
@@ -730,14 +734,7 @@ void ridl_handleswitches(int argc, char *argv[], int before) {
     } else if (argv[a][0] == '-') {
       // assuming that this is setting a preference
       if (before == 0) {
-        // TODO: convert each preference name to a system variable name
-        if (strcmp(argv[a] + 1, "IDL_PROMPT") == 0) {
-          char space[2];
-          space[0] = argv[a + 1][strlen(argv[a + 1]) - 1] == ' ' ? '\0' : ' ';
-          space[1] = '\0';
-          sprintf(tmpcmd, "!prompt = '%s%s'", argv[a + 1], space);
-          IDL_ExecuteStr(tmpcmd);
-        }
+        ridl_setpreference(argv[a] + 1, argv[a + 1]);
       }
       a++;
     } else {
@@ -752,13 +749,7 @@ void ridl_handleswitches(int argc, char *argv[], int before) {
 /**
    rIDL main loop.
 */
-int main(int argc, char *argv[]) {  
-
-  // initialize funmap_functions
-  funmap_functions[0] = (rl_command_func_t *)ridl_stepinto;
-  funmap_functions[1] = (rl_command_func_t *)ridl_stepover; 
-  funmap_functions[2] = (rl_command_func_t *)ridl_stepreturn;
-      
+int main(int argc, char *argv[]) {
   ridl_handleswitches(argc, argv, 1);
   
   IDL_INIT_DATA init_data;
