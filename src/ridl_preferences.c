@@ -9,15 +9,15 @@
   + IDL_EDIT_INPUT                
   + IDL_EXCEPT                    
   + IDL_MORE                      
-  IDL_MSG_PREFIX                
+  + IDL_MSG_PREFIX                
   + IDL_PROMPT                    
   + IDL_QUIET                     
   IDL_RBUF_PERSIST              
   IDL_RBUF_SIZE                 
-  IDL_DIR                       
+  + IDL_DIR                       
   + IDL_DLM_PATH                  
-  IDL_HELP_PATH                 
-  IDL_MAKE_DLL_COMPILE_DIRECTORY                
+  + IDL_HELP_PATH                 
+  + IDL_MAKE_DLL_COMPILE_DIRECTORY                
   + IDL_PATH                      
   IDL_PATH_CACHE_DISABLE        
   - IDL_STARTUP                   
@@ -54,7 +54,10 @@ void ridl_setpreference(char *name, char *value) {
   char *cmd;
   int status;
 
-  if (strcmp(name, "IDL_DEVICE") == 0) {
+  if (strcmp(name, "IDL_DATAFILE_USER_COMMENTS") == 0) {
+    // TODO: implement
+    ridl_warning("IDL_DATAFILE_USER_COMMENTS pref not implemented");    
+  } else if (strcmp(name, "IDL_DEVICE") == 0) {
     cmd = (char *)calloc(strlen(value) + 13, 1);
     sprintf(cmd, "set_plot, '%s'", value);
     status = IDL_ExecuteStr(cmd);
@@ -74,6 +77,11 @@ void ridl_setpreference(char *name, char *value) {
     sprintf(cmd, "!more = %s", value);
     status = IDL_ExecuteStr(cmd);
     free(cmd);    
+  } else if (strcmp(name, "IDL_MSG_PREFIX") == 0) {
+    cmd = (char *)calloc(strlen(value) + 29, 1);
+    sprintf(cmd, "!error_state.msg_prefix = '%s'", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);    
   } else if (strcmp(name, "IDL_PROMPT") == 0) {
     char space = value[strlen(value) - 1] == ' ' ? '\0' : ' ';
     cmd = (char *)calloc(strlen(value) + 13, 1);
@@ -85,11 +93,32 @@ void ridl_setpreference(char *name, char *value) {
     sprintf(cmd, "!quiet = %s", value);
     status = IDL_ExecuteStr(cmd);
     free(cmd);
+  } else if (strcmp(name, "IDL_RBUF_PERSIST") == 0) {
+    // TODO: implement
+    ridl_warning("IDL_RBUF_PERSIST pref not implemented");
+  } else if (strcmp(name, "IDL_RBUF_SIZE") == 0) {
+    // TODO: implement
+    ridl_warning("IDL_RBUF_SIZE pref not implemented");
+  } else if (strcmp(name, "IDL_DIR") == 0) {
+    cmd = (char *)calloc(strlen(value) + 10, 1);
+    sprintf(cmd, "!dir = '%s'", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);
   } else if (strcmp(name, "IDL_DLM_PATH") == 0) {
     cmd = (char *)calloc(strlen(value) + 15, 1);
     sprintf(cmd, "!dlm_path = '%s'", value);
     status = IDL_ExecuteStr(cmd);
     free(cmd);
+  } else if (strcmp(name, "IDL_HELP_PATH") == 0) {
+    cmd = (char *)calloc(strlen(value) + 16, 1);
+    sprintf(cmd, "!help_path = '%s'", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);
+  } else if (strcmp(name, "IDL_MAKE_DLL_COMPILE_DIRECTORY") == 0) {
+    cmd = (char *)calloc(strlen(value) + 33, 1);
+    sprintf(cmd, "!make_dll.compile_directory = '%s'", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);    
   } else if (strcmp(name, "IDL_PATH") == 0) {
     cmd = (char *)calloc(strlen(value) + 11, 1);
     sprintf(cmd, "!path = '%s'", value);
