@@ -4,7 +4,7 @@
 
 
 /*
-  IDL_DATAFILE_USER_COMMENTS    
+  - IDL_DATAFILE_USER_COMMENTS    
   + IDL_DEVICE                    
   + IDL_EDIT_INPUT                
   + IDL_EXCEPT                    
@@ -12,21 +12,24 @@
   + IDL_MSG_PREFIX                
   + IDL_PROMPT                    
   + IDL_QUIET                     
-  IDL_RBUF_PERSIST              
-  IDL_RBUF_SIZE                 
+  - IDL_RBUF_PERSIST              
+  - IDL_RBUF_SIZE   
+                
   + IDL_DIR                       
   + IDL_DLM_PATH                  
   + IDL_HELP_PATH                 
   + IDL_MAKE_DLL_COMPILE_DIRECTORY                
   + IDL_PATH                      
-  IDL_PATH_CACHE_DISABLE        
+  + IDL_PATH_CACHE_DISABLE        
   - IDL_STARTUP                   
   - IDL_START_DIR                 
-  IDL_TMPDIR                    
-  IDL_CPU_TPOOL_MAX_ELTS        
-  IDL_CPU_TPOOL_MIN_ELTS        
-  IDL_CPU_TPOOL_NTHREADS        
-  IDL_CPU_VECTOR_ENABLE         
+  - IDL_TMPDIR       
+               
+  + IDL_CPU_TPOOL_MAX_ELTS        
+  + IDL_CPU_TPOOL_MIN_ELTS        
+  + IDL_CPU_TPOOL_NTHREADS        
+  + IDL_CPU_VECTOR_ENABLE  
+         
   IDL_GR_TILECACHESIZE          
   IDL_GR_TTCACHESIZE            
   IDL_GR_X_COLORS               
@@ -37,7 +40,8 @@
   IDL_GR_X_RENDERER             
   IDL_GR_X_RETAIN               
   IDL_GR_X_VISUAL               
-  IDL_GR_X_WIDTH                
+  IDL_GR_X_WIDTH            
+      
   IDL_PREF_OBSOLETE_MIGRATE     
   IDL_PREF_OBSOLETE_WARN
   
@@ -124,12 +128,40 @@ void ridl_setpreference(char *name, char *value) {
     sprintf(cmd, "!path = '%s'", value);
     status = IDL_ExecuteStr(cmd);
     free(cmd);
+  } else if (strcmp(name, "IDL_PATH_CACHE_DISABLE") == 0) {
+    cmd = (char *)calloc(strlen(value) + 26, 1);
+    sprintf(cmd, "path_cache, enable=%s eq 0B", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);
   } else if (strcmp(name, "IDL_STARTUP") == 0) {
     // TODO: implement
     ridl_warning("IDL_STARTUP pref not implemented");
   } else if (strcmp(name, "IDL_START_DIR") == 0) {
     // TODO: implement
     ridl_warning("IDL_START_DIR pref not implemented");
+  } else if (strcmp(name, "IDL_TMPDIR") == 0) {
+    // TODO: implement
+    ridl_warning("IDL_TMPDIR pref not implemented");
+  } else if (strcmp(name, "IDL_CPU_TPOOL_MAX_ELTS") == 0) {
+    cmd = (char *)calloc(strlen(value) + 23, 1);
+    sprintf(cmd, "!cpu.tpool_max_elts = %s", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);    
+  } else if (strcmp(name, "IDL_CPU_TPOOL_MIN_ELTS") == 0) {
+    cmd = (char *)calloc(strlen(value) + 23, 1);
+    sprintf(cmd, "!cpu.tpool_min_elts = %s", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);    
+  } else if (strcmp(name, "IDL_CPU_TPOOL_NTHREADS") == 0) {
+    cmd = (char *)calloc(strlen(value) + 23, 1);
+    sprintf(cmd, "!cpu.tpool_nthreads = %s", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);    
+  } else if (strcmp(name, "IDL_CPU_VECTOR_ENABLE") == 0) {
+    cmd = (char *)calloc(strlen(value) + 22, 1);
+    sprintf(cmd, "!cpu.vector_enable = %s", value);
+    status = IDL_ExecuteStr(cmd);
+    free(cmd);    
   } else {
     ridl_warning("unknown preference: %s", name);
   }
