@@ -1,21 +1,21 @@
 IDL=idl
 
 .PHONY: all clean both
-	
+
 all:
 	cd src; make
 
 both:
 	cd src; make both
-	
+
 clean:
 	cd src; make clean
 	rm -rf capi-docs
 	rm -rf api-docs
-	
+
 install:
 	cd src; make install
-	
+
 doc:
 	doxygen doxygen.config
 	$(IDL) ridl_build_docs

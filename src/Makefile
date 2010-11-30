@@ -5,7 +5,7 @@ ARCH=x86_64
 #ARCH=i386
 ARCHFLAGS= -arch $(ARCH)
 OS=`uname -s | tr [A-Z] [a-z]`
-CC=gcc
+CC=/usr/bin/gcc
 
 IDLDIR=/Applications/itt/idl/idl
 IDL_BINDIR=$(IDLDIR)/bin/bin.$(OS).$(ARCH)
@@ -57,7 +57,7 @@ $(RIDL).o : $(RIDL).c Makefile
 	echo "#define RIDL_BUILD_DATE \"`date \"+%b %d %Y\"`\"" >> ridl_version.h
 	$(CC) $(ARCHFLAGS) -I$(IDLDIR)/external/include -I$(READLINE_INCLUDEDIR) \
 	      -c $(RIDL).c -o $(RIDL).o $(CFLAGS)
-	
+
 both:
 	make clean
 	make
@@ -65,11 +65,11 @@ both:
 	make clean
 	make ARCH=i386 READLINE_LIB=/Users/mgalloy/lib/readline-6.0-32/lib
 	make ARCH=i386 install
-	
+
 install:
 	mkdir -p bin.$(OS).$(ARCH)
 	cp $(RIDL) bin.$(OS).$(ARCH)
-		
+
 clean:
 	rm -f $(RIDL).o
 	rm -f $(RIDL)_strings.o
@@ -80,4 +80,3 @@ clean:
 	rm -f $(RIDL)_preferences.o
 	rm -f $(RIDL)
 	rm -rf bin.*
-	
