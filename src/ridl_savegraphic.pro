@@ -15,7 +15,9 @@
 ;    direct_graphic : in, optionall, type=boolean
 ;       set to indicate to save the current direct graphics window
 ;-
-pro ridl_savegraphic, filename, new_graphic=newGraphic, itool=itool, $
+pro ridl_savegraphic, filename, 
+                      new_graphic=newGraphic, $
+                      itool=itool, $
                       direct_graphic=directGraphic
   compile_opt strictarr
   on_error, 2
@@ -26,7 +28,7 @@ pro ridl_savegraphic, filename, new_graphic=newGraphic, itool=itool, $
         g = windows[-1L]
         if (~obj_valid(g)) then return   ; do nothing if no new graphic
         dims = g.window.dimensions
-        g.save, filename, width=dims[0], height=dims[1]
+        g->save, filename, width=dims[0], height=dims[1]
       end
     keyword_set(itool): begin
         id = iGetCurrent(tool=tool)
