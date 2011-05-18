@@ -11,9 +11,9 @@
 
 /// list of system variables
 char *system_variables[] = { 
-  "!c", "!cpu", "!d", "!dir", "!dlm_path", "!dpi", "!dtor",  "!edit_input", 
+  "!c", "!color", "!cpu", "!d", "!dir", "!dlm_path", "!dpi", "!dtor",  "!edit_input", 
   "!err", "!error_state", "!except", "!help_path", "!journal", "!make_dll",
-  "!map", "!more", "!mouse", "!order", "!p", "!path", "!pi", "!prompt", 
+  "!map", "!more", "!mouse", "!null", "!order", "!p", "!path", "!pi", "!prompt", 
   "!quiet", "!radeg", "!values", "!version", "!warn", "!x", "!y", "!z",
   (char *)NULL
 };
