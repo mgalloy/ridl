@@ -12,10 +12,10 @@
 ;       set to indictate to save the current new graphics window
 ;    itool : in, optional, type=boolean
 ;       set to indicate to save the current iTools graphic window
-;    direct_graphic : in, optionall, type=boolean
+;    direct_graphic : in, optional, type=boolean
 ;       set to indicate to save the current direct graphics window
 ;-
-pro ridl_savegraphic, filename, 
+pro ridl_savegraphic, filename, $
                       new_graphic=newGraphic, $
                       itool=itool, $
                       direct_graphic=directGraphic
