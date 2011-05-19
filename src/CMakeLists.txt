@@ -5,4 +5,22 @@ configure_file (
   "${PROJECT_BINARY_DIR}/src/ridl_config.h"
   )
   
-add_executable(ridl ridl.c)
+add_executable(ridl 
+               ridl.c
+               ridl_completion.c
+               ridl_history.c
+               ridl_logging.c
+               ridl_magic.c
+               ridl_preferences.c
+               ridl_strings.c
+               )
+               
+target_link_libraries(ridl
+                      "/usr/local/Cellar/readline/6.1/lib/libreadline.a"
+                      "${IDL_LIBRARY}"
+                      )  
+
+set_target_properties(ridl 
+                      PROPERTIES 
+                        LINK_FLAGS "-L/Applications/itt/idl/idl/bin/bin.darwin.x86_64  -L/usr/X11/lib -lXm -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2 -lreadline -lfreetype"
+)                                   
