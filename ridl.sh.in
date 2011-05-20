@@ -16,8 +16,8 @@ fi
 
 if [ $PREFER_32 = 1 ]; then 
   export DYLD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.i386:$DYLD_LIBRARY_PATH
-  $RIDL_DIR/src/bin.$OS.i386/ridl $@
+  $RIDL_DIR/bin/bin.$OS.i386/ridl $@
 else
   export DYLD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.x86_64:$DYLD_LIBRARY_PATH
-  $RIDL_DIR/src/bin.$OS.x86_64/ridl $@
+  $RIDL_DIR/bin/bin.$OS.x86_64/ridl $@
 fi

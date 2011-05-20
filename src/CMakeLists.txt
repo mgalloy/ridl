@@ -1,15 +1,16 @@
 TODAY(rIDL_BUILD_DATE)
 
+# needed to prevent warnings generated when using the Subversion package
+cmake_policy(SET CMP0017 NEW)
 find_package(Subversion)
-if(Subversion_FOUND)
+if (Subversion_FOUND)
   Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} rIDL)
-endif(Subversion_FOUND)
+endif ()
 
-# configure a header file to pass some of the CMake settings to the source 
-# code
+# configure a header file to pass some CMake settings to the source code
 configure_file (
-  "${PROJECT_SOURCE_DIR}/src/ridl_config.h.in"
-  "${PROJECT_BINARY_DIR}/src/ridl_config.h"
+  "ridl_config.h.in"
+  "ridl_config.h"
   )
   
 add_executable(ridl 
@@ -23,12 +24,16 @@ add_executable(ridl
                )
                
 target_link_libraries(ridl
-                      #"/usr/local/Cellar/readline/6.1/lib/libreadline.a"
                       "${Readline_LIBRARY}"
                       "${IDL_LIBRARY}"
                       )  
 
+# TODO: get rid of this!
 set_target_properties(ridl 
                       PROPERTIES 
                         LINK_FLAGS "-L/Applications/itt/idl/idl/bin/bin.darwin.x86_64  -L/usr/X11/lib -lXm -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2 -lreadline -lfreetype"
 )                                   
+
+# TODO: fix this!
+install(TARGETS ridl DESTINATION bin/bin.darwin.x86_64)
+install(FILES idl_routines.txt DESTINATION share)
