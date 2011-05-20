@@ -8,10 +8,7 @@ if (Subversion_FOUND)
 endif ()
 
 # configure a header file to pass some CMake settings to the source code
-configure_file(
-  "ridl_config.h.in"
-  "ridl_config.h"
-  )
+configure_file("ridl_config.h.in" "ridl_config.h")
 
 if (UNIX AND NOT APPLE)
   add_definitions(-m64)
@@ -47,3 +44,9 @@ set_target_properties(ridl
 install(TARGETS ridl DESTINATION bin/${IDL_BIN_DIR})
 install(FILES idl_routines.txt DESTINATION share)
 install(FILES ridl_verbosehelp.txt DESTINATION share)
+
+install(DIRECTORY . 
+        DESTINATION share/idl        
+        FILES_MATCHING PATTERN "*.pro"
+        PATTERN ".svn" EXCLUDE
+        PATTERN "CMakeFiles" EXCLUDE)
