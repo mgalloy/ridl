@@ -24,6 +24,22 @@ include_directories("${PROJECT_SOURCE_DIR}/src"
 
 add_subdirectory(src)
 
+add_custom_command(
+  OUTPUT api-docs/index.html
+  COMMAND idl ridl_build_docs
+  DEPENDS src/*.pro
+ )
+   
+add_custom_target(apidocs ALL DEPENDS api-docs/index.html)
+
+add_custom_command(
+  OUTPUT capi-docs/html/index.html
+  COMMAND doxygen doxygen.config
+  DEPENDS src/*.c
+ )
+   
+add_custom_target(capidocs ALL DEPENDS capi-docs/html/index.html)
+
 # TODO: need to generate this file from ridl.sh.in
 install(PROGRAMS ridl.sh DESTINATION bin)
 

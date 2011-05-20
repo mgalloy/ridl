@@ -66,4 +66,4 @@ pro ridl_savegraphic, filename, $
         endif
       end
   endcase
-end                      
+end
