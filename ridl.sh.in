@@ -1,0 +1,21 @@
+PREFER_32=0
+OS=`uname -s | tr [A-Z] [a-z]`
+
+for arg
+do
+  if [ "$arg" = "-32" ]; then
+    PREFER_32=1
+  fi
+done
+
+export IDL_DIR=${IDL_PROGRAM_FILES_DIR}
+
+if [ $PREFER_32 = 1 ]; then 
+  export DYLD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.i386:$DYLD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.i386:$LD_LIBRARY_PATH
+  $RIDL_DIR/bin/bin.$OS.i386/ridl $@
+else
+  export DYLD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.x86_64:$DYLD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.x86_64:$LD_LIBRARY_PATH
+  $RIDL_DIR/bin/bin.$OS.x86_64/ridl $@
+fi

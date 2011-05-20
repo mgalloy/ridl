@@ -8,11 +8,15 @@ if (Subversion_FOUND)
 endif ()
 
 # configure a header file to pass some CMake settings to the source code
-configure_file (
+configure_file(
   "ridl_config.h.in"
   "ridl_config.h"
   )
-  
+
+if (UNIX AND NOT APPLE)
+  add_definitions(-m64)
+endif ()
+
 add_executable(ridl 
                ridl.c
                ridl_completion.c
@@ -30,20 +34,14 @@ target_link_libraries(ridl
 
 # Freetype library not included in Mac OS X distribution of IDL
 if (UNIX AND APPLE)
-  set(Freetype_LIBRARY_DIR "/usr/X11/lib")
+  set(rIDL_LD_FLAGS "-L${IDL_LIBRARY_DIR} -lXm -L/usr/X11/lib -lfreetype -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2")
 else ()
-  set(Freetype_LIBRARY_DIR "${IDL_LIBRARY_DIR}")
-endif ()
-
-if (UNIX)
-  set(X11_FLAGS "-lXm")
-else ()
-  set(X11_FLAGS "")
+  set(rIDL_LD_FLAGS "")
 endif ()
 
 set_target_properties(ridl 
                       PROPERTIES 
-                        LINK_FLAGS "-L${IDL_LIBRARY_DIR} ${X11_FLAGS} -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2 -L${Freetype_LIBRARY_DIR} -lfreetype"
+                        LINK_FLAGS "${rIDL_LD_FLAGS}"
 )                                   
 
 install(TARGETS ridl DESTINATION bin/${IDL_BIN_DIR})

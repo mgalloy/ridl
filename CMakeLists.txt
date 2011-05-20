@@ -24,6 +24,13 @@ include_directories("${PROJECT_SOURCE_DIR}/src"
 
 add_subdirectory(src)
 
+message(STATUS "IDL_PROGRAM_FILES_DIR = ${IDL_PROGRAM_FILES_DIR}")
+
+configure_file (
+  "ridl.sh.in"
+  "ridl.sh"
+  )
+
 add_custom_command(
   OUTPUT api-docs/index.html
   COMMAND idl ridl_build_docs
@@ -49,4 +56,4 @@ add_custom_command(
 add_custom_target(docs DEPENDS docs/manual.pdf)
 
 install(PROGRAMS ridl.sh DESTINATION bin)
-install(FILES docs/manual.pdf DESTINATION docs)
+install(FILES docs/manual.pdf DESTINATION docs OPTIONAL)

@@ -1,14 +1,14 @@
 # convenience variable for IDL's default install directories
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  set(_IDL_PROGRAM_FILES_DIR "C:/Program Files/ITT/IDL")
+  set(IDL_PROGRAM_FILES_DIR "C:/Program Files/ITT/IDL")
   set(_IDL_NAME "IDL")
   set(_IDL_OS "")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  set(_IDL_PROGRAM_FILES_DIR "/Applications/itt/idl")
+  set(IDL_PROGRAM_FILES_DIR "/Applications/itt/idl")
   set(_IDL_NAME "idl")
   set(_IDL_OS ".darwin")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(_IDL_PROGRAM_FILES_DIR "/usr/local/itt/idl")
+  set(IDL_PROGRAM_FILES_DIR "/usr/local/itt/idl")
   set(_IDL_NAME "idl")
   set(_IDL_OS ".linux")
 endif ()
@@ -18,16 +18,16 @@ endif ()
 if (NOT DEFINED IDL_FIND_VERSION)
   set(_IDL_KNOWN_VERSIONS "81" "80" "71" "706")
 
-  set(_IDL_SEARCH_DIRS "${_IDL_PROGRAM_FILES_DIR}")
+  set(_IDL_SEARCH_DIRS "${IDL_PROGRAM_FILES_DIR}")
   foreach (_IDL_KNOWN_VERSION ${_IDL_KNOWN_VERSIONS})
     list(APPEND _IDL_SEARCH_DIRS
-         "${_IDL_PROGRAM_FILES_DIR}${_IDL_KNOWN_VERSION}")
+         "${IDL_PROGRAM_FILES_DIR}${_IDL_KNOWN_VERSION}")
   endforeach ()
 
-  list(APPEND _IDL_SEARCH_DIRS "${_IDL_PROGRAM_FILES_DIR}/${_IDL_NAME}")
+  list(APPEND _IDL_SEARCH_DIRS "${IDL_PROGRAM_FILES_DIR}/${_IDL_NAME}")
   foreach (_IDL_KNOWN_VERSION ${_IDL_KNOWN_VERSIONS})
     list(APPEND _IDL_SEARCH_DIRS
-         "${_IDL_PROGRAM_FILES_DIR}/${_IDL_NAME}${_IDL_KNOWN_VERSION}")
+         "${IDL_PROGRAM_FILES_DIR}/${_IDL_NAME}${_IDL_KNOWN_VERSION}")
   endforeach ()
 endif ()
 
