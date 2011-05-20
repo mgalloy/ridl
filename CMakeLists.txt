@@ -1,6 +1,5 @@
-# not really sure what the actual required version is, just using the same as 
-# in the CMake tutorial
-cmake_minimum_required(VERSION 2.6)
+# required for setting policy CMP0017 (for using FindSubversion.cmake)
+cmake_minimum_required(VERSION 2.8.4)
 
 project(rIDL)
 
@@ -25,8 +24,8 @@ include_directories("${PROJECT_SOURCE_DIR}/src"
 
 add_subdirectory(src)
 
-# TODO: need to make this file executable
-install(FILES ridl.sh DESTINATION bin)
+# TODO: need to generate this file from ridl.sh.in
+install(PROGRAMS ridl.sh DESTINATION bin)
 
 # TODO: build/install docs
 
