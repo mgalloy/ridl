@@ -1,3 +1,10 @@
+TODAY(rIDL_BUILD_DATE)
+
+find_package(Subversion)
+if(Subversion_FOUND)
+  Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} rIDL)
+endif(Subversion_FOUND)
+
 # configure a header file to pass some of the CMake settings to the source 
 # code
 configure_file (
@@ -16,7 +23,8 @@ add_executable(ridl
                )
                
 target_link_libraries(ridl
-                      "/usr/local/Cellar/readline/6.1/lib/libreadline.a"
+                      #"/usr/local/Cellar/readline/6.1/lib/libreadline.a"
+                      "${Readline_LIBRARY}"
                       "${IDL_LIBRARY}"
                       )  
 

@@ -12,7 +12,7 @@
 #include "ridl_magic.h"
 #include "ridl_history.h"
 #include "ridl_strings.h"
-#include "ridl_version.h"
+#include "ridl_config.h"
 #include "ridl_logging.h"
 #include "ridl_completion.h"
 #include "ridl_preferences.h"
