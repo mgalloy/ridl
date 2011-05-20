@@ -24,8 +24,6 @@ include_directories("${PROJECT_SOURCE_DIR}/src"
 
 add_subdirectory(src)
 
-message(STATUS "IDL_PROGRAM_FILES_DIR = ${IDL_PROGRAM_FILES_DIR}")
-
 configure_file (
   "ridl.sh.in"
   "ridl.sh"

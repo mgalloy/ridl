@@ -8,7 +8,7 @@ do
   fi
 done
 
-export IDL_DIR=${IDL_PROGRAM_FILES_DIR}
+export IDL_DIR=${IDL_DIR}
 
 if [ $PREFER_32 = 1 ]; then 
   export DYLD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.i386:$DYLD_LIBRARY_PATH
