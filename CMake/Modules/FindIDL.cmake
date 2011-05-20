@@ -30,14 +30,14 @@ find_path(IDL_INCLUDE_DIR
   PATHS ${_IDL_SEARCH_DIRS}
   HINTS ${IDL_ROOT}
   PATH_SUFFIXES external/include
-)
+  )
 
 find_library(IDL_LIBRARY
   NAMES idl
   PATHS ${_IDL_SEARCH_DIRS}
   HINTS ${IDL_ROOT}
-  PATH_SUFFIXES /bin/bin${_IDL_OS}.x86_64 /bin/bin${_IDL_OS}.x86
-)
+  PATH_SUFFIXES /bin/bin${_IDL_OS}.x86_64 /bin/bin${_IDL_OS}.x86 /bin/bin${_IDL_OS}.i386
+  )
 
 if (IDL_INCLUDE_DIR AND IDL_LIBRARY)
    set(IDL_FOUND TRUE)
@@ -49,6 +49,8 @@ if (IDL_FOUND)
     message(STATUS "IDL include: ${IDL_INCLUDE_DIR}")
   endif ()
   set(HAVE_IDL 1 CACHE BOOL "Whether have IDL")
+  get_filename_component(IDL_LIBRARY_DIR ${IDL_LIBRARY} PATH)
+  get_filename_component(IDL_BIN_DIR ${IDL_LIBRARY_DIR} NAME)
 else ()
    if (IDL_FIND_REQUIRED)
       message(FATAL_ERROR "Could not find IDL")

@@ -28,13 +28,24 @@ target_link_libraries(ridl
                       "${IDL_LIBRARY}"
                       )  
 
-# TODO: get rid of this!
+# Freetype library not included in Mac OS X distribution of IDL
+if (UNIX AND APPLE)
+  set(Freetype_LIBRARY_DIR "/usr/X11/lib")
+else ()
+  set(Freetype_LIBRARY_DIR "${IDL_LIBRARY_DIR}")
+endif ()
+
+if (UNIX)
+  set(X11_FLAGS "-lXm")
+else ()
+  set(X11_FLAGS "")
+endif ()
+
 set_target_properties(ridl 
                       PROPERTIES 
-                        LINK_FLAGS "-L/Applications/itt/idl/idl/bin/bin.darwin.x86_64  -L/usr/X11/lib -lXm -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2 -lreadline -lfreetype"
+                        LINK_FLAGS "-L${IDL_LIBRARY_DIR} ${X11_FLAGS} -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2 -L${Freetype_LIBRARY_DIR} -lfreetype"
 )                                   
 
-# TODO: fix this!
-install(TARGETS ridl DESTINATION bin/bin.darwin.x86_64)
+install(TARGETS ridl DESTINATION bin/${IDL_BIN_DIR})
 install(FILES idl_routines.txt DESTINATION share)
 install(FILES ridl_verbosehelp.txt DESTINATION share)
