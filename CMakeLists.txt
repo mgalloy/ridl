@@ -40,9 +40,13 @@ add_custom_command(
    
 add_custom_target(capidocs ALL DEPENDS capi-docs/html/index.html)
 
-# TODO: need to generate this file from ridl.sh.in
+add_custom_command(
+  OUTPUT docs/manual.pdf
+  COMMAND make_docs.sh
+  DEPENDS docs/manual.rst
+ )
+   
+add_custom_target(docs ALL DEPENDS docs/manual.pdf)
+
 install(PROGRAMS ridl.sh DESTINATION bin)
-
-# TODO: build/install docs
-
-# TODO: add way to generate API docs
+install(FILES docs/manual.pdf DESTINATION docs)
