@@ -37,3 +37,4 @@ set_target_properties(ridl
 # TODO: fix this!
 install(TARGETS ridl DESTINATION bin/bin.darwin.x86_64)
 install(FILES idl_routines.txt DESTINATION share)
+install(FILES ridl_verbosehelp.txt DESTINATION share)

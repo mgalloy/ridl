@@ -3,7 +3,7 @@
 
 #include "idl_export.h"
 
-#include "ridl_version.h"
+#include "ridl_config.h"
 #include "ridl_history.h"
 
 
