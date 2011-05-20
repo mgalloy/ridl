@@ -30,7 +30,7 @@ add_custom_command(
   DEPENDS src/*.pro
  )
    
-add_custom_target(apidocs ALL DEPENDS api-docs/index.html)
+add_custom_target(apidocs DEPENDS api-docs/index.html)
 
 add_custom_command(
   OUTPUT capi-docs/html/index.html
@@ -38,7 +38,7 @@ add_custom_command(
   DEPENDS src/*.c
  )
    
-add_custom_target(capidocs ALL DEPENDS capi-docs/html/index.html)
+add_custom_target(capidocs DEPENDS capi-docs/html/index.html)
 
 add_custom_command(
   OUTPUT docs/manual.pdf
@@ -46,7 +46,7 @@ add_custom_command(
   DEPENDS docs/manual.rst
  )
    
-add_custom_target(docs ALL DEPENDS docs/manual.pdf)
+add_custom_target(docs DEPENDS docs/manual.pdf)
 
 install(PROGRAMS ridl.sh DESTINATION bin)
 install(FILES docs/manual.pdf DESTINATION docs)
