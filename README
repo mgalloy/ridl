@@ -42,6 +42,20 @@ would be::
   export RIDL_EDITOR="emacs -nw"
 
 
+Optional targets
+================
+
+There are several optional targets that can be built from the source. The
+`apidocs` and `capidocs` targets are primarily for developers of rIDL to
+create API documentation for the rIDL source code. The `apidocs` target
+requires IDLdoc to be installed and in IDL's path; the `capidocs` target
+requires Doxygen to be installed.
+
+More useful for end users, the `docs` target produces a PDF manual and man
+page for rIDL. If you want `man` to find your man pages, make sure to add the
+$INSTALL_DIR/man to the MANPATH environment variable.
+
+
 More Information
 ================
 

@@ -55,3 +55,4 @@ add_custom_target(docs DEPENDS docs/manual.pdf)
 
 install(PROGRAMS ridl.sh DESTINATION bin)
 install(FILES docs/manual.pdf DESTINATION docs OPTIONAL)
+install(FILES docs/ridl.1 DESTINATION man/man1 OPTIONAL)
