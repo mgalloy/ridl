@@ -23,8 +23,8 @@ char *reserved_words[] = {
   "begin", "break", "case", "common", "compile_opt", "continue", "do", "else", 
   "end", "endcase", "endelse", "endif", "endfor", "endforeach", "endrep", 
   "endswitch", "endwhile", 
-  "for", "foreach", "forward_function", "goto", "inherits", 
-  "of", "on_ierror", "repeat", "return", "switch", "then", "while", 
+  "for", "foreach", "forward_function", "function", "goto", "inherits", 
+  "of", "on_ierror", "pro", "repeat", "return", "switch", "then", "while", 
   "and", "eq", "ge", "gt", "lt", "le",  "mod", "ne", "not",  "or", "xor", 
   (char *)NULL
 };
