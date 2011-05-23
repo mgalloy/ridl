@@ -49,7 +49,7 @@ char *magic_cmds[] = {
 int idl_routines_available = 1;
 
 /// list of IDL library routines
-char *idl_routines[1479];
+char *idl_routines[1540];
 
 /// IDL array of local variable names
 IDL_VPTR local_variables;
