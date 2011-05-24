@@ -32,10 +32,7 @@ if (UNIX)
   endif ()
 endif ()
 
-configure_file (
-  "ridl.sh.in"
-  "ridl.sh"
-  )
+configure_file("ridl.sh.in" "ridl.sh")
 
 add_custom_command(
   OUTPUT api-docs/index.html

@@ -2,10 +2,6 @@ TODAY(rIDL_BUILD_DATE)
 
 # needed to prevent warnings generated when using the Subversion package
 cmake_policy(SET CMP0017 NEW)
-find_package(Subversion)
-if (Subversion_FOUND)
-  Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} rIDL)
-endif ()
 
 # configure a header file to pass some CMake settings to the source code
 configure_file("ridl_config.h.in" "ridl_config.h")

@@ -599,8 +599,8 @@ int ridl_readline_callback(int cont, int  widevint_allowed) {
 
 
 void ridl_printridlversion(void) {
-  printf("rIDL %s.r%s: Really Interactive Data Language. [Build: %s]\n", 
-         RIDL_VERSION, RIDL_REVISION, RIDL_BUILD_DATE);
+  printf("rIDL %s: Really Interactive Data Language. [Build: %s]\n", 
+         RIDL_VERSION, RIDL_BUILD_DATE);
 }
 
 
