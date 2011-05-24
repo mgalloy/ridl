@@ -7,6 +7,7 @@
 
 #include "ridl.h"
 #include "ridl_strings.h"
+#include "ridl_config.h"
 
 
 /**
@@ -30,7 +31,7 @@ void ridl_magic_help(char *line, int firstcharIndex) {
   
   if (strlen(argument) > 0) {
     if (strcmp(argument, "verbose") == 0) {
-      sprintf(show_verbose_cmd, "$more %s/share/ridl_verbosehelp.txt", getenv("RIDL_DIR"));
+      sprintf(show_verbose_cmd, "$more %s/share/ridl_verbosehelp.txt", RIDL_DIR);
       result = IDL_ExecuteStr(show_verbose_cmd);
     } else {  
       ridl_warning("unknown :help option '%s'", argument);         

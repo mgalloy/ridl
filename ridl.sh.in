@@ -11,11 +11,9 @@ done
 export IDL_DIR=${IDL_DIR}
 
 if [ $PREFER_32 = 1 ]; then 
-  export DYLD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.i386:$DYLD_LIBRARY_PATH
-  export LD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.i386:$LD_LIBRARY_PATH
-  $RIDL_DIR/bin/bin.$OS.i386/ridl $@
+  export @rIDL_LIBRARY_PATH@=$IDL_DIR/bin/bin.$OS.i386:$@rIDL_LIBRARY_PATH@
+  @CMAKE_INSTALL_PREFIX@/bin/bin.$OS.i386/ridl $@
 else
-  export DYLD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.x86_64:$DYLD_LIBRARY_PATH
-  export LD_LIBRARY_PATH=$IDL_DIR/bin/bin.$OS.x86_64:$LD_LIBRARY_PATH
-  $RIDL_DIR/bin/bin.$OS.x86_64/ridl $@
+  export @rIDL_LIBRARY_PATH@=$IDL_DIR/bin/bin.$OS.x86_64:$@rIDL_LIBRARY_PATH@
+  @CMAKE_INSTALL_PREFIX@/bin/bin.$OS.x86_64/ridl $@
 fi

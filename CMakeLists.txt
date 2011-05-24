@@ -24,6 +24,14 @@ include_directories("${PROJECT_SOURCE_DIR}/src"
 
 add_subdirectory(src)
 
+if (UNIX)
+  if (APPLE)
+    set(rIDL_LIBRARY_PATH "DYLD_LIBRARY_PATH")
+  elseif ()
+    set(rIDL_LIBRARY_PATH "LD_LIBRARY_PATH")    
+  endif ()
+endif ()
+
 configure_file (
   "ridl.sh.in"
   "ridl.sh"

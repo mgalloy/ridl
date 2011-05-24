@@ -32,9 +32,6 @@ work correctly.
 
 The share/idl/ directory of the installation should in your IDL_PATH.
 
-Also, set the RIDL_DIR environment variable to the top-level directory of the
-rIDL installation.
-
 Set the RIDL_EDITOR or the EDITOR environment variable to specify the editor
 to use with the ``.edit command``. For example, under the Bash shell this
 would be::
