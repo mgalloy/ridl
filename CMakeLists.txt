@@ -9,9 +9,9 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
     )
 include(${CMAKE_SOURCE_DIR}/CMake/GetDate.cmake)
-    
+
 find_package(IDL REQUIRED)
-find_package(Readline REQUIRED)
+find_package(Readline 6.0 REQUIRED)
 
 set(rIDL_VERSION_MAJOR 0)
 set(rIDL_VERSION_MINOR 1)
