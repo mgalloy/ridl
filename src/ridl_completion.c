@@ -48,9 +48,11 @@ char *magic_cmds[] = {
 
 /// determines if the catalog of IDL library routines was found
 int idl_routines_available = 1;
+int idl_classes_available = 1;
 
 /// list of IDL library routines
 char *idl_routines[1540];
+char *idl_classes[75];
 
 /// IDL array of local variable names
 IDL_VPTR local_variables;
@@ -147,6 +149,7 @@ char *ridl_generator(const char *text, int state) {
   static int processed_executivecmds;
   static int processed_magiccmds;
   static int processed_idlroutines;
+  static int processed_idlclasses;
   static int processed_localvariables;
   
   char *name;
@@ -161,6 +164,7 @@ char *ridl_generator(const char *text, int state) {
     processed_executivecmds = 0;
     processed_magiccmds = 0;
     processed_idlroutines = 0;
+    processed_idlclasses = 0;
     processed_localvariables = 0;
   }
 
@@ -232,11 +236,29 @@ char *ridl_generator(const char *text, int state) {
       }
     }
   }
-  
+
   if (!processed_idlroutines) {
     //printf("processed IDL routines...\n");
     processed_idlroutines = 1;
     list_index = 0;
+  }
+
+  if (!processed_idlclasses) {
+    while (name = idl_classes[list_index]) {
+      list_index++;
+      if (strncasecmp(name, text, len) == 0) {
+        return(ridl_copystr(name));
+      }
+    }
+  }
+
+  if (!processed_idlclasses) {
+    //printf("processed IDL classes...\n");
+    processed_idlclasses = 1;
+    list_index = 0;
+  }
+    
+  if (!processed_localvariables) {
     ridl_get_localvariables_list();  
     nlocals = (int) (*local_variables->value.arr).n_elts;
     locals = (IDL_STRING *)local_variables->value.arr->data;      
@@ -317,6 +339,7 @@ char **ridl_completion(const char *text, int start, int end) {
 void ridl_completion_init(void) {
   char line[RIDL_MAX_LINE_LENGTH];
   char idl_routines_filename[RIDL_MAX_LINE_LENGTH];   
+  char idl_classes_filename[RIDL_MAX_LINE_LENGTH];   
   FILE *fp;
   int r, i;
   
@@ -339,4 +362,24 @@ void ridl_completion_init(void) {
     r++;
   }
   fclose(fp);
+  
+  sprintf(idl_classes_filename, "%s/share/idl_classes.txt", RIDL_DIR); 
+  if (!ridl_file_exists(idl_classes_filename)) {
+    ridl_warning("catalog of IDL library classes not found, completion on class names not available");
+    idl_classes_available = 0; 
+    return;
+  }
+
+  fp = fopen(idl_classes_filename, "r");
+  
+  r = 0;
+  while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
+    idl_classes[r] = (char *)calloc(strlen(line), 1);
+    for (i = 0; i < strlen(line) - 1; i++) {
+      if (line[i] == '\n') break;
+      idl_classes[r][i] = line[i];
+    }
+    r++;
+  }
+  fclose(fp);  
 }
