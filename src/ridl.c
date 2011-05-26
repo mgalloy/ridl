@@ -687,8 +687,10 @@ void ridl_handleswitches(int argc, char *argv[], int before) {
   for (a = 1; a < argc; a++) {
     if (strcmp(argv[a], "-arg") == 0) {
       // TODO: handle
+      a++;
     } else if (strcmp(argv[a], "-args") == 0) {
       // TODO: handle
+      break;
     } else if (strcmp(argv[a], "-demo") == 0) {
       ridl_options |= IDL_INIT_DEMO;
     } else if (strcmp(argv[a], "-e") == 0) {
