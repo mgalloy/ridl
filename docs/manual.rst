@@ -57,12 +57,13 @@ can be displayed.
 rIDL completes on:
 
   1. IDL library routines
-  2. system variables
-  3. local variables (including fields of structures)
-  4. reserved words
-  5. executive commands
-  6. magic commands
-  7. filenames
+  2. IDL library classnames
+  3. system variables
+  4. local variables (including fields of structures)
+  5. reserved words
+  6. executive commands
+  7. magic commands
+  8. filenames
   
 Use the tab key to indicate that rIDL should attempt a completion on the
 current command line. For example, if you have already entered::
@@ -86,11 +87,14 @@ few rIDL specific key bindings. It can be called from a ``.inputrc`` file.
 Other features
 --------------
 
-TODO: continued lines merged into a single line
+The ``.edit`` executive command works as it does in the IDL Workbench::
 
-TODO: ``.edit`` works (uses ``RIDL_EDITOR`` or ``EDITOR`` environment variables)
+  rIDL> .edit my_file
 
-TODO: : ``-h`` and ``-v`` options to the binary::
+It uses the ``RIDL_EDITOR`` or ``EDITOR`` environment variables to indicate the editor it should launch to edit the given file.
+
+rIDL adds ``-h`` and ``-v`` options to the options present in the standard IDL
+command line::
 
    $ ridl -v
    rIDL 0.1.r166: Really Interactive Data Language. [Build: Nov 04 2010]
@@ -121,14 +125,35 @@ TODO: : ``-h`` and ``-v`` options to the binary::
      -v                        display version information
      -vm=FILENAME              start the virtual machine with the given .sav file
 
-TODO: prompt: ``%wdir`` and ``cmdnum`` variables can be used in the prompt
+The rIDL prompt uses the ``IDL_PROMPT`` preference to set the prompt in the
+same manner as IDL, but expands the ``%wdir`` and ``%cmdnum`` variables. For example, a numbered prompt can be convenient::
+
+  IDL> pref_set, 'IDL_PROMPT', '[%cmdnum]> ', /commit
+  [126]>
+
+Note that this will cause the prompt in the standard IDL command line to be::
+
+  [%cmdnum]> 
+
+Typically, an alias which sets the prompt preference is useful::
+
+  alias ridl="ridl -IDL_PROMPT '[%cmdnum]>'"
+
+rIDL merges continued lines into a single line for easier command line history access. For example, if a line is entered as below::
+
+  [127]> a = $
+  ...... 5
+
+Then accessing the list line through history, e.g., by hitting up arrow
+yields::
+
+  [128]> a = 5
 
 
 Where to go for more help?
 --------------------------
 
-Mailing list?
+For creating new requests and reporting bugs, see the rIDL Trac site
+``ridl.idldev.com``.
 
-rIDL Trac site `ridl.idldev.com <http://ridl.idldev.com>`_
-
-Contact me at ``mgalloy at idldev dot com``.
+Contact me at ``mgalloy@idldev.com``.

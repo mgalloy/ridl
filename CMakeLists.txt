@@ -53,7 +53,7 @@ add_custom_target(capidocs DEPENDS capi-docs/html/index.html)
 add_custom_command(
   OUTPUT docs/manual.pdf
   COMMAND make_docs.sh
-  DEPENDS docs/manual.rst
+  DEPENDS docs/manual.rst docs/ridl.rst
  )
    
 add_custom_target(docs DEPENDS docs/manual.pdf)
