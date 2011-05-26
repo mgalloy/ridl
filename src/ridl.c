@@ -234,7 +234,8 @@ void ridl_deathhint(void) {
    IDL callback registered to be called when EXIT routine is encountered.
 */
 void ridl_exit(void) {
-  int result = IDL_Cleanup(IDL_FALSE);
+  int status = IDL_Cleanup(IDL_FALSE);
+  exit(status);  
 }
 
 
@@ -245,8 +246,6 @@ void ridl_exit_handler(void) {
   if (ridl_isnotebooking()) ridl_closenotebook();
   if (ridl_islogging()) ridl_closelog(); 
   if (ridl_isteeing()) ridl_closelog();
-
-  exit(EXIT_SUCCESS);
 }
 
 
