@@ -28,8 +28,8 @@ Magic command             Description
 ``:colors``               toggle whether color is used
 ``:doc routine``          show calling syntax and comment header for the
                           routine
-``:help [verbose]``       show this help message; 'verbose' option shows 
-                          longer version
+``:help [cmd]``           show this help message; show help on 'cmd', if 
+                          present 
 ``:history [n] [nonum]``  show last n commands (defaults to 10); 'nonum' 
                           option hides command numbers
 ``:histedit n filename``  send last n commands to filename and launch editor

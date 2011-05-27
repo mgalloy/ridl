@@ -520,11 +520,13 @@ int ridl_executeline(char *line, int flags) {
         ridl_magic_time(command);
       } else if (strcmp(cmd, ":help") == 0) {
         int f;
-        ridl_magic_help(line, firstcharIndex);
+        int display_keybindings = ridl_magic_help(line, firstcharIndex);
 
-        printf("\nrIDL keybindings:\n");          
-        for(f = 0; f < N_FUNMAP_FUNCTIONS; f++) {
-          ridl_printfunmap(funmap_function_names[f], funmap_functions[f]);
+        if (display_keybindings) {
+          printf("\nrIDL keybindings:\n");          
+          for(f = 0; f < N_FUNMAP_FUNCTIONS; f++) {
+            ridl_printfunmap(funmap_function_names[f], funmap_functions[f]);
+          }
         }
       } else if (strcmp(cmd, ":history") == 0) {
         ridl_magic_history(line, firstcharIndex);

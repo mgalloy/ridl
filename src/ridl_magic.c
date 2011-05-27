@@ -2,6 +2,7 @@
 #include <stdlib.h> 
 #include <string.h>
 #include <time.h>
+#include <ctype.h>
 
 #include "readline/history.h"
 
@@ -19,22 +20,39 @@
 /**
    Print help for the magic commands.
 */
-void ridl_magic_help(char *line, int firstcharIndex) {
+int ridl_magic_help(char *line, int firstcharIndex) {
   char *indent = "  ";
   char *magic_format = "%s%-*s %s\n";
   int magic_width = 21;
   int length = 5;
   int search_length;
   char *argument = ridl_getnextword(line, firstcharIndex + length, &search_length);
-  char show_verbose_cmd[RIDL_MAX_LINE_LENGTH];
+  char show_cmd[RIDL_MAX_LINE_LENGTH];
+  char help_filename[RIDL_MAX_LINE_LENGTH];
   int result;
+  char first_char[2];
+  int plain_help = 1;
+  int i;
+  
+  first_char[1] = '\0';
   
   if (strlen(argument) > 0) {
     if (strcmp(argument, "verbose") == 0) {
-      sprintf(show_verbose_cmd, "$more %s/share/ridl_verbosehelp.txt", RIDL_DIR);
-      result = IDL_ExecuteStr(show_verbose_cmd);
-    } else {  
-      ridl_warning("unknown :help option '%s'", argument);         
+      sprintf(show_cmd, "$more %s/share/ridl_verbosehelp.txt", RIDL_DIR);
+      result = IDL_ExecuteStr(show_cmd);
+    } else {
+      plain_help = 0;
+      first_char[0] = toupper(argument[0]);
+      for (i = 0; i < strlen(argument); i++) {
+        argument[i] = toupper(argument[i]);
+      }
+      sprintf(help_filename, "%s/online_help/%s/%s.txt", RIDL_DIR, first_char, argument);
+      if (!ridl_file_exists(help_filename)) {
+        ridl_warning("unknown :help topic '%s'", argument); 
+      } else {
+        sprintf(show_cmd, "$more %s", help_filename);
+        result = IDL_ExecuteStr(show_cmd);
+      }
     }
   } else {
     ridl_printversion();
@@ -45,8 +63,8 @@ void ridl_magic_help(char *line, int firstcharIndex) {
            "toggle whether color is used");  
     printf(magic_format, indent, magic_width, ":doc routine", 
            "show calling syntax and comment header for the routine");
-    printf(magic_format, indent, magic_width, ":help [verbose]", 
-           "show this help message; 'verbose' option shows longer version");
+    printf(magic_format, indent, magic_width, ":help [cmd]", 
+           "show this help message; show help on 'cmd', if present");
     printf(magic_format, indent, magic_width, ":history [n] [nonum]", 
            "show last n commands (defaults to 10); 'nonum' option hides command numbers");
     printf(magic_format, indent, magic_width, ":histedit n filename", 
@@ -72,6 +90,7 @@ void ridl_magic_help(char *line, int firstcharIndex) {
   }
   
   free(argument);
+  return(plain_help);
 }
 
 
