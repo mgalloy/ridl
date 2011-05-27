@@ -1,0 +1,45 @@
+% no indent, but a bit of space between paragraphs
+\usepackage{parskip}
+
+% widen the page
+\usepackage[text={6.5in,8in},twoside]{geometry}
+
+% set up links
+\usepackage[unicode,colorlinks=true,linkcolor=black,urlcolor=black,citecolor=black]{hyperref}
+\urlstyle{same}
+
+% use Courier for tt font, scaled a bit to match the body font
+\usepackage[scaled=0.88]{couriers}
+
+\usepackage[runin]{abstract}
+
+\usepackage[labelfont=bf,justification=raggedright,labelsep=endash,singlelinecheck=false]{caption}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+
+\renewcommand{\headrulewidth}{0pt}
+
+\fancyhead[LE,RO]{\small \thepage} 
+\fancyhead[C]{}
+\fancyhead[LO,RE]{\small \em \rightmark}
+\fancyfoot[C]{}
+\fancyfoot[RE,LO]{} 
+
+
+% fix up the headings
+
+\RequirePackage[calcwidth]{titlesec}
+
+\titleformat{\section}[hang]{}
+{\large\thesection}{0pt}{\Large\raggedright}[]
+
+\titleformat{\subsection}[hang]{}
+{\normalsize\thesubsection}{0pt}{\it\normalsize\raggedright}[]
+
+\titlespacing{\section}{0pt}{*5}{*1}
+\titlespacing{\subsection}{0pt}{*3}{*0.75}
+
+
