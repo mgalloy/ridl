@@ -40,7 +40,7 @@ add_custom_command(
   DEPENDS "${IDL_DIR}/help/online_help/IDL/Content/Reference Material"
  )
    
-add_custom_target(help DEPENDS online_help)
+add_custom_target(onlinehelp DEPENDS online_help)
 
 add_custom_command(
   OUTPUT api-docs/index.html
