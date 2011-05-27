@@ -35,6 +35,14 @@ endif ()
 configure_file("ridl.sh.in" "ridl.sh")
 
 add_custom_command(
+  OUTPUT online_help
+  COMMAND idlhelp2txt.py "${IDL_DIR}/help/online_help/IDL/Content/Reference Material" online_help
+  DEPENDS "${IDL_DIR}/help/online_help/IDL/Content/Reference Material"
+ )
+   
+add_custom_target(help DEPENDS online_help)
+
+add_custom_command(
   OUTPUT api-docs/index.html
   COMMAND idl ridl_build_docs
   DEPENDS src/*.pro
@@ -61,3 +69,6 @@ add_custom_target(docs DEPENDS docs/manual.pdf)
 install(PROGRAMS ridl.sh DESTINATION bin)
 install(FILES docs/manual.pdf DESTINATION docs OPTIONAL)
 install(FILES docs/ridl.1 DESTINATION man/man1 OPTIONAL)
+install(DIRECTORY online_help/
+        DESTINATION online_help 
+        OPTIONAL)
