@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 PREFER_32=0
-OS=`uname -s | tr [A-Z] [a-z]`
+OS=`uname -s | tr [A-Z] [a-z] | tr '[A-Z]' '[a-z]'`
 
 for arg
 do
