@@ -57,6 +57,9 @@ char *idl_classes[75];
 /// IDL array of local variable names
 IDL_VPTR local_variables;
 
+/// IDL array of currently defined routine names
+IDL_VPTR routine_names;
+
 /// IDL array of structure field names
 IDL_VPTR structure_fields;
 
@@ -130,6 +133,16 @@ void ridl_remove_localvariables_list(void) {
 }
 
 
+void ridl_get_routinenames_list(void) {
+  int status = IDL_ExecuteStr("_ridl_routinenames = ridl_getroutines()");
+  routine_names = IDL_FindNamedVariable("_ridl_routinenames", 0);
+}
+
+
+void ridl_remove_routinenames_list(void) {
+  int status = IDL_ExecuteStr("delvar, _ridl_routinenames");
+}
+
 /**
    mallocs return value, caller should free; used in Readline completion
    callback
@@ -141,9 +154,10 @@ void ridl_remove_localvariables_list(void) {
                     for subsequent calls
 */
 char *ridl_generator(const char *text, int state) {
-  static int list_index, len, nlocals;
+  static int list_index, len, nlocals, nrnames;
   static IDL_STRING *locals;
-
+  static IDL_STRING *rnames;
+  
   static int processed_reservedwords;
   static int processed_systemvariables;
   static int processed_executivecmds;
@@ -151,6 +165,7 @@ char *ridl_generator(const char *text, int state) {
   static int processed_idlroutines;
   static int processed_idlclasses;
   static int processed_localvariables;
+  static int processed_routinenames;
   
   char *name;
   
@@ -166,6 +181,7 @@ char *ridl_generator(const char *text, int state) {
     processed_idlroutines = 0;
     processed_idlclasses = 0;
     processed_localvariables = 0;
+    processed_routinenames = 0;
   }
 
   if (!processed_reservedwords) {
@@ -280,6 +296,31 @@ char *ridl_generator(const char *text, int state) {
     //printf("processed local variables...\n");
     ridl_remove_localvariables_list();
     processed_localvariables = 1;
+    list_index = 0;
+  }
+
+  if (!processed_routinenames) {
+    ridl_get_routinenames_list();
+    nrnames = (int) (*routine_names->value.arr).n_elts;
+    rnames = (IDL_STRING *)routine_names->value.arr->data;      
+  }
+  
+
+  if (!processed_routinenames) {
+    while (list_index < nrnames) {
+      name = IDL_STRING_STR(&rnames[list_index]);
+
+      list_index++;
+      if (strncasecmp(name, text, len) == 0 && strcasecmp(name, "_ridl_routinenames") != 0) {
+        return(ridl_copystr(name));
+      }
+    }
+  }
+
+  if (!processed_routinenames) {
+    //printf("processed routine names...\n");
+    ridl_remove_routinenames_list();
+    processed_routinenames = 1;
     list_index = 0;
   }
     
