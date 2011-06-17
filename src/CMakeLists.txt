@@ -17,6 +17,7 @@ add_executable(ridl
                ridl_logging.c
                ridl_magic.c
                ridl_preferences.c
+               ridl_idlpreferences.c
                ridl_strings.c
                )
                

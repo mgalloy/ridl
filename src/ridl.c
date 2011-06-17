@@ -16,6 +16,7 @@
 #include "ridl_logging.h"
 #include "ridl_completion.h"
 #include "ridl_preferences.h"
+#include "ridl_idlpreferences.h"
 
 
 /// user information with fields: logname, homedir, pid, host, wd, date
@@ -809,6 +810,8 @@ int main(int argc, char *argv[]) {
   rl_readline_name = "rIDL";
   ridl_completion_init();
   rl_attempted_completion_function = ridl_completion;
+  
+  ridl_readpreferences();
   
   // load -pref filename if present on the command line
   if (preferences_file_set) {
