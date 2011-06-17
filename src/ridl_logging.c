@@ -6,6 +6,10 @@
 #include "ridl_config.h"
 #include "ridl_history.h"
 
+// 0 = HTML, 1 = rst
+static int ridl_logging_format = 0;
+
+int ridl_new_codeblock = 0;
 
 static int ridl_logging = 0;
 static int ridl_teeing = 0;
@@ -17,6 +21,9 @@ static FILE *log_fp;
 static char *notebook_filename;
 static FILE *notebook_fp;
 static int notebook_image_counter = 0;
+
+char *rst_indent = "   ";
+
 
 /**
    @file
@@ -35,7 +42,19 @@ int ridl_setnotebooking(int notebooking) {
 
 
 void ridl_notebookcmd(char *prompt, char *cmd) {
-  fprintf(notebook_fp, "    <p class=\"command\"><span class=\"prompt\">%s</span>%s</p>\n", prompt, cmd);  
+  switch(ridl_logging_format) {
+    case 0:
+      fprintf(notebook_fp, "    <p class=\"command\"><span class=\"prompt\">%s</span>%s</p>\n", prompt, cmd);
+      break;
+    case 1:
+      if (ridl_new_codeblock) {
+        fprintf(notebook_fp, "::\n\n");
+        ridl_new_codeblock = 0;
+      }
+      fprintf(notebook_fp, "%s%s%s\n", rst_indent, prompt, cmd);
+      break;
+  }
+
 }
 
 
@@ -49,7 +68,15 @@ void ridl_notebookgraphic(void) {
   free(savecmd);
 
   // put reference to .png file into notebook
-  fprintf(notebook_fp, "    <img src=\"%s-%d.png\"/>\n", notebook_filename, notebook_image_counter); 
+  switch(ridl_logging_format) {
+    case 0:
+      fprintf(notebook_fp, "    <img src=\"%s-%d.png\"/>\n", notebook_filename, notebook_image_counter); 
+      break;
+    case 1:
+      fprintf(notebook_fp, "\n.. image:: %s-%d.png\n\n", notebook_filename, notebook_image_counter);
+      ridl_new_codeblock = 1;
+      break;
+  }
   
   // increment image counter
   notebook_image_counter++; 
@@ -65,8 +92,16 @@ void ridl_notebookoutput(int flags, char *buf, int n) {
   if (flags & IDL_TOUT_F_NLPOST) printf("\n");
 
   //if (flags & IDL_TOUT_F_STDERR == 0) {
-    fprintf(notebook_fp, "    <pre class=\"output\">%s</pre>", output);
-    if (flags & IDL_TOUT_F_NLPOST) fprintf(notebook_fp, "\n");
+  switch(ridl_logging_format) {
+    case 0:
+      fprintf(notebook_fp, "    <pre class=\"output\">%s</pre>", output);
+      break;
+    case 1:
+      fprintf(notebook_fp, "%s%s", rst_indent, output);
+      break;  
+  }
+  
+  if (flags & IDL_TOUT_F_NLPOST) fprintf(notebook_fp, "\n");
   //}
   free(output);
 }
@@ -81,32 +116,55 @@ void ridl_initnotebook(char *filename) {
   notebook_fp = fopen(filename, "w");
   IDL_ToutPush(ridl_notebookoutput);
   
-  fprintf(notebook_fp, "<html>\n");
+  switch(ridl_logging_format) {
+    case 0:
+      fprintf(notebook_fp, "<html>\n");
   
-  fprintf(notebook_fp, "  <head>\n");
-  fprintf(notebook_fp, "    <title>Notebook from %s</title>\n", ts);
+      fprintf(notebook_fp, "  <head>\n");
+      fprintf(notebook_fp, "    <title>Notebook from %s</title>\n", ts);
   
-  // TODO: eventually this should be put into a stylesheet file and imported
-  fprintf(notebook_fp, "    <style type=\"text/css\" media=\"all\">\n");
-  fprintf(notebook_fp, "      p.command { whitespace: pre; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
-  fprintf(notebook_fp, "      span.prompt { color: #C65D09; }\n");
-  fprintf(notebook_fp, "      pre.output { color: #4A62A4; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
-  fprintf(notebook_fp, "      p.date { color: #666; font-size: 0.9em; }\n");
-  fprintf(notebook_fp, "    </style>\n");
-  fprintf(notebook_fp, "  </head>\n");  
+      // TODO: eventually this should be put into a stylesheet file and imported
+      fprintf(notebook_fp, "    <style type=\"text/css\" media=\"all\">\n");
+      fprintf(notebook_fp, "      p.command { whitespace: pre; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
+      fprintf(notebook_fp, "      span.prompt { color: #C65D09; }\n");
+      fprintf(notebook_fp, "      pre.output { color: #4A62A4; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
+      fprintf(notebook_fp, "      p.date { color: #666; font-size: 0.9em; }\n");
+      fprintf(notebook_fp, "    </style>\n");
+      fprintf(notebook_fp, "  </head>\n");  
 
-  fprintf(notebook_fp, "  <body>\n");
+      fprintf(notebook_fp, "  <body>\n");
+      break;
+    case 1:
+      fprintf(notebook_fp, "Notebook from %s\n\n", ts);
+      ridl_new_codeblock = 1;
+      break;
+  }
+  
+  free(ts);
 }
 
 
 void ridl_closenotebook(void) {
   char *ts = ridl_currenttimestamp();
-  fprintf(notebook_fp, "    <p class=\"date\">Notebook produced by rIDL %s with IDL %s on %s.</p>", 
-          RIDL_VERSION, IDL_STRING_STR(&IDL_SysvVersion.release), ts);
-  free(ts);
+  switch(ridl_logging_format) {
+    case 0:
+      fprintf(notebook_fp, "    <p class=\"date\">Notebook produced by rIDL %s with IDL %s on %s.</p>", 
+              RIDL_VERSION, IDL_STRING_STR(&IDL_SysvVersion.release), ts);
   
-  fprintf(notebook_fp, "  </body>\n");  
-  fprintf(notebook_fp, "</html>\n");
+      fprintf(notebook_fp, "  </body>\n");  
+      fprintf(notebook_fp, "</html>\n");
+      break;
+    case 1:
+      if (ridl_new_codeblock) {
+        ridl_new_codeblock = 0;
+      } else {
+        fprintf(notebook_fp, "\n");
+      }
+      fprintf(notebook_fp, "Notebook produced by rIDL %s with IDL %s on %s.\n",
+              RIDL_VERSION, IDL_STRING_STR(&IDL_SysvVersion.release), ts);
+      break;
+  }
+  free(ts);
   fclose(notebook_fp);
 }
 

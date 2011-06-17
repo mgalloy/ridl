@@ -8,6 +8,6 @@ $if rIDL
 "\e[15~": ridl-stepinto
 "\e[17~": ridl-stepover
 "\e[18~": ridl-stepreturn
-"\C-f": ridl-savegraphic
+"\C-g": ridl-savegraphic
 
 $endif
