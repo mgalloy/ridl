@@ -41,7 +41,7 @@ set_target_properties(ridl
 install(TARGETS ridl DESTINATION bin/${IDL_BIN_DIR})
 install(FILES idl_routines.txt idl_classes.txt inputrc
         DESTINATION share)
-install(FILES ridl_verbosehelp.txt DESTINATION share)
+install(FILES ridl_verbosehelp.txt example_prefs.ini DESTINATION share)
 
 install(DIRECTORY . 
         DESTINATION share/idl        

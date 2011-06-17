@@ -7,18 +7,20 @@
 ;    string
 ;-
 function ridl_preflocation
-  compile_opt strictarr
+  compile_opt strictarr, hidden
 
   readmeVersion = 1
   
-  _authorDescription = 'rIDL'
-  _appDescription = 'Really Interactive Data Language'
+  authorName = 'mgalloy'
+  authorDescription = 'michaelgalloy.com'
+  appName = 'rIDL'
+  appDescription = 'Really Interactive Data Language'
   
-  readmeText = ['This is the user configuration directory for ' + _appDescription, $
-                'by ' + _authorDescription + '.']
+  readmeText = ['This is the user configuration directory for ' + appName, $
+                'by ' + authorName + '.']
                   
-  configDir = app_user_dir(authorName, _authorDescription, $
-                           appName, _appDescription, $
+  configDir = app_user_dir(authorName, authorDescription, $
+                           appName, appDescription, $
                            readmeText, readmeVersion)
   
   pref_loc = filepath('prefs.ini', root=configDir)

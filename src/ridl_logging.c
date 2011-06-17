@@ -5,11 +5,12 @@
 
 #include "ridl_config.h"
 #include "ridl_history.h"
+#include "ridl_logging.h"
 
 // 0 = HTML, 1 = rst
 static int ridl_logging_format = 0;
 
-int ridl_new_codeblock = 0;
+static int ridl_new_codeblock = 0;
 
 static int ridl_logging = 0;
 static int ridl_teeing = 0;
@@ -22,7 +23,17 @@ static char *notebook_filename;
 static FILE *notebook_fp;
 static int notebook_image_counter = 0;
 
-char *rst_indent = "   ";
+static char *rst_indent = "   ";
+
+
+void ridl_setloggingformat(int format) {
+  ridl_logging_format = format;
+}
+
+
+int ridl_getloggingformat(void) {
+  return(ridl_logging_format);
+}
 
 
 /**
