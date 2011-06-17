@@ -19,9 +19,10 @@ static float ridl_event_delay = 0.1;
 
 // bindable routines
 
-int ridl_stepinto(void);
-int ridl_stepover(void);
-int ridl_stepreturn(void);
+int ridl_stepinto_cmd(void);
+int ridl_stepover_cmd(void);
+int ridl_stepreturn_cmd(void);
+int ridl_savegraphic_cmd(void);
 
 
 // public routines

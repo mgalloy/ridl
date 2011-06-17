@@ -1,12 +1,13 @@
 # add the contents of this file to or include this file from ~/.inputrc with
 # something like the following:
 # 
-#    $include /Users/mgalloy/projects/ridl/trunk/src/inputrc
+#    $include /Users/mgalloy/projects/ridl/install/share/inputrc
 
 $if rIDL
 
 "\e[15~": ridl-stepinto
 "\e[17~": ridl-stepover
 "\e[18~": ridl-stepreturn
+"\C-f": ridl-savegraphic
 
 $endif

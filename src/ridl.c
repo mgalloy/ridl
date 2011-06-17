@@ -46,12 +46,16 @@ static IDL_MSG_BLOCK msg_block;
 /// set to indicate that rIDL should just exit when asked
 int ridl_really_exit = 1;
 
-#define N_FUNMAP_FUNCTIONS 3
-char *funmap_function_names[] = { "ridl-stepinto", "ridl-stepover", "ridl-stepreturn" }; 
+#define N_FUNMAP_FUNCTIONS 4
+char *funmap_function_names[] = { "ridl-stepinto", 
+                                  "ridl-stepover", 
+                                  "ridl-stepreturn",
+                                  "ridl-savegraphic" }; 
 rl_command_func_t *funmap_functions[] = {
-  (rl_command_func_t *)ridl_stepinto,
-  (rl_command_func_t *)ridl_stepover,
-  (rl_command_func_t *)ridl_stepreturn
+  (rl_command_func_t *)ridl_stepinto_cmd,
+  (rl_command_func_t *)ridl_stepover_cmd,
+  (rl_command_func_t *)ridl_stepreturn_cmd,
+  (rl_command_func_t *)ridl_savegraphic_cmd
 };
 
   
@@ -155,7 +159,7 @@ void ridl_printsource(void) {
 }
 
 
-int ridl_stepinto(void) {
+int ridl_stepinto_cmd(void) {
   char *cmd = ".step";
   printf("%s\n", cmd);  
   int status = ridl_executestr(cmd, 1);
@@ -164,7 +168,7 @@ int ridl_stepinto(void) {
 }
 
 
-int ridl_stepover(void) {
+int ridl_stepover_cmd(void) {
   char *cmd = ".stepover";
   printf("%s\n", cmd);  
   int status = ridl_executestr(cmd, 1);
@@ -173,10 +177,19 @@ int ridl_stepover(void) {
 }
 
 
-int ridl_stepreturn(void) {
+int ridl_stepreturn_cmd(void) {
   char *cmd = ".return";
   printf("%s\n", cmd);   
   int status = ridl_executestr(cmd, 1);
+  ridl_printsource();  
+  printf("%s", ridl_expandedprompt);
+}
+
+
+int ridl_savegraphic_cmd(void) {
+  char *cmd = ":save_graphic";
+  printf("%s\n", cmd);   
+  int status = ridl_executeline(cmd, 1);
   ridl_printsource();  
   printf("%s", ridl_expandedprompt);
 }
