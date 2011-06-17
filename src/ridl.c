@@ -479,6 +479,17 @@ int ridl_executeline(char *line, int flags) {
           ridl_initnotebook(filename);
         }
         free(filename);
+      } else if (strcmp(cmd, ":pref") == 0) {
+        int search_length;
+        char *has_args = ridl_getnextword(line, firstcharIndex + 5, &search_length);
+
+        if (strlen(has_args) == 0) {
+          ridl_printpreferences();
+        } else {
+          char *pref_line = line + 6;
+          ridl_process_pref_line(pref_line);          
+        }
+        free(has_args);        
       } else if (strcmp(cmd, ":log") == 0) {
         if (ridl_islogging()) ridl_closelog();
 
@@ -529,7 +540,6 @@ int ridl_executeline(char *line, int flags) {
           ridl_warning("turn on notebooking to save graphics");
         }
       } else if (strcmp(cmd, ":time") == 0) {
-        int search_length;
         char *command = line + 6;
         ridl_magic_time(command);
       } else if (strcmp(cmd, ":help") == 0) {
@@ -811,7 +821,7 @@ int main(int argc, char *argv[]) {
   ridl_completion_init();
   rl_attempted_completion_function = ridl_completion;
   
-  ridl_readpreferences();
+  ridl_read_preferences();
   
   // load -pref filename if present on the command line
   if (preferences_file_set) {

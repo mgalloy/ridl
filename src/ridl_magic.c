@@ -77,6 +77,8 @@ int ridl_magic_help(char *line, int firstcharIndex) {
            "start sending all commands and output to an HTML notebook filename");
     printf(magic_format, indent, magic_width, ":unnotebook", 
            "stop logging commands and output to notebook");
+    printf(magic_format, indent, magic_width, ":pref [NAME=value]", 
+           "set rIDL preference (or list all rIDL preferences)");
     printf(magic_format, indent, magic_width, ":save_graphic", 
            "save current new graphic, iTool, or direct graphic window to notebook");           
     printf(magic_format, indent, magic_width, ":tee filename", 

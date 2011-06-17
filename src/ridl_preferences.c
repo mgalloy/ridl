@@ -7,13 +7,52 @@
 #include "ridl_logging.h"
 
 
-void ridl_readpreferences(void) {
-  IDL_VPTR pref_location;
-  int status, i, value_index;
-  FILE *fp;
-  char line[RIDL_MAX_LINE_LENGTH];
+void ridl_printpreferences(void) {
+  char *indent = "  ";
+  printf("rIDL preference values:\n");
+  printf("%sNOTEBOOK_FORMAT=%s\n", 
+         indent, 
+         ridl_getloggingformat() ? "rst" : "HTML");
+}
+
+
+void ridl_process_pref_line(char *pref_line) {
+  int i, value_index, len;
   char pref_name[RIDL_MAX_LINE_LENGTH] = "";
   char pref_value[RIDL_MAX_LINE_LENGTH] = "";
+  
+  // skip comment lines
+  if (pref_line[0] == '#') return;
+  
+  len = strlen(pref_line);
+  
+  i = 0;
+  while (i < len && (pref_name[i] = pref_line[i]) != '=') {
+    i++;
+  }
+  pref_name[i] = '\0';
+  value_index = ++i;
+
+  while (i < len && (pref_value[i - value_index] = pref_line[i]) != '\n') {
+    i++;
+  }
+  pref_value[i - value_index] = '\0';
+
+  if (strcmp(pref_name, "NOTEBOOK_FORMAT") == 0) {
+    if (strcmp(pref_value, "HTML") == 0) {
+      ridl_setloggingformat(0);
+    } else if (strcmp(pref_value, "rst") == 0) {
+      ridl_setloggingformat(1);
+    }
+  }  
+}
+
+
+void ridl_read_preferences(void) {
+  IDL_VPTR pref_location;
+  int status;
+  FILE *fp;
+  char line[RIDL_MAX_LINE_LENGTH];
   
   // find preferences file location
   status = IDL_ExecuteStr("_ridl_preflocation = ridl_preflocation()");
@@ -28,28 +67,7 @@ void ridl_readpreferences(void) {
   // read preferences line by line, setting preferences
   fp = fopen(IDL_VarGetString(pref_location), "r");
   while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
-    // skip comment lines
-    if (line[0] == '#') continue;
-    
-    i = 0;
-    while ((pref_name[i] = line[i]) != '=') {
-      i++;
-    }
-    pref_name[i] = '\0';
-    value_index = ++i;
-
-    while ((pref_value[i - value_index] = line[i]) != '\n') {
-      i++;
-    }
-    pref_value[i - value_index] = '\0';
-        
-    if (strcmp(pref_name, "NOTEBOOK_FORMAT") == 0) {
-      if (strcmp(pref_value, "HTML") == 0) {
-        ridl_setloggingformat(0);
-      } else if (strcmp(pref_value, "rst") == 0) {
-        ridl_setloggingformat(1);
-      }
-    }
+    ridl_process_pref_line(line);
   }
   fclose(fp);
     
