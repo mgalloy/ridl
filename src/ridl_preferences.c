@@ -62,6 +62,7 @@ void ridl_read_preferences(void) {
   if (!ridl_file_exists(IDL_VarGetString(pref_location))) {
     fp = fopen(IDL_VarGetString(pref_location), "w");
     fclose(fp);
+    ridl_warning("Created preferences file at %s", IDL_VarGetString(pref_location));
   }
     
   // read preferences line by line, setting preferences
