@@ -38,6 +38,8 @@ Magic command             Description
 ``:notebook filename``    start sending all commands and output to an HTML 
                           notebook filename
 ``:unnotebook``           stop logging commands and output to notebook
+``:pref [NAME=value]``    set rIDL preference (or list all rIDL preferences) 
+                          for the current session
 ``:save_graphic``         save current new graphic, iTool, or direct graphic 
                           window to notebook
 ``:tee filename``         start logging output to filename
@@ -82,6 +84,31 @@ rIDL uses the popular GNU Readline library to do command completion, so it
 supports the normal extensions and modifications of a Readline program. An
 example ``inputrc`` file is provided in the ``src`` directory which defines a
 few rIDL specific key bindings. It can be called from a ``.inputrc`` file.
+
+
+rIDL preferences
+----------------
+
+rIDL has a system for setting preferences specific to the rIDL command line, either for just the current session using the ``:pref`` magic command or permanently by editing the `prefs.ini` configuration file.
+
+The currently available options are shown in the table below.
+
+========================= ==================================================
+Preference                Description
+========================= ==================================================
+NOTEBOOK_FORMAT           format to use for notebook output; valid values
+                          are either "HTML" or "rst"               
+========================= ==================================================
+
+To set an preference for the current rIDL session, use ``:pref`` magic command::
+
+  rIDL> :pref NOTEBOOK_FORMAT=rst
+
+To change the value permanently, edit the `prefs.ini` configuration file in the app user directory `mgalloy/ridl`. The format is the same as the argument of the ``:pref`` magic command::
+
+   NOTEBOOK_FORMAT=rst
+   
+Lines of the configuration file can be commented out by starting the line with a ``#``.
 
 
 Other features
