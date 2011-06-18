@@ -10,6 +10,7 @@ For example, there is a field of the `!version` system variable that specifies t
   !dlm_path     !error_state  !map          !path         !values       !z
 
 Typing "ve" makes "version" unique::
+
   IDL> print, !ve
   
 So hitting tab again fills in "version". Adding the dot and hitting tab twice gives me the possible field names::
