@@ -1,21 +1,46 @@
-::
+One of the most useful features of rIDL is tab completion. rIDL can complete system variables, IDL library names, currently compile routine names, filenames, fields of a structure, executive commands, and magic commands.
+
+For example, there is a field of the `!version` system variable that specifies the type of operating system. Typing ``!`` and hitting tab twice shows all the system variables::
 
   IDL> print, !
   !c            !dpi          !except       !more         !pi           !version      
   !cpu          !dtor         !help_path    !mouse        !prompt       !warn         
   !d            !edit_input   !journal      !order        !quiet        !x            
   !dir          !err          !make_dll     !p            !radeg        !y            
-  !dlm_path     !error_state  !map          !path         !values       !z 
-  IDL> print, !ver
+  !dlm_path     !error_state  !map          !path         !values       !z
+
+Typing "ve" makes "version" unique::
+  IDL> print, !ve
+  
+So hitting tab again fills in "version". Adding the dot and hitting tab twice gives me the possible field names::
+
   IDL> print, !version.
   !version.arch              !version.memory_bits       !version.os_name
   !version.build_date        !version.os                !version.release
   !version.file_offset_bits  !version.os_family 
+
+Typing "o" gives me the "s", typing "_f" gives me the full field name::
+
   IDL> print, !version.o
   IDL> print, !version.os
-  IDL> print, !version.os_
+  IDL> print, !version.os
+  !version.os         !version.os_family  !version.os_name
+  IDL> print, !version.os_f
   IDL> print, !version.os_family
   unix
+
+Completion makes typing long filenames much less painful. For example, when specifying a path in a string::
+
   IDL> loc = '~/projects/idllib/trunk/src'
+  
+Or a file to compile or execute::
+
   IDL> .run ~/projects/idllib/trunk/src/hdf5/mg_h5.pro
-  IDL> f = '~'  ; will expand to /Users/mgalloy/
+  
+rIDL can also bind keystrokes to commonly executed commands like the step executive command useful when debugging or the save_graphic magic command for saving the current graphics window.
+
+To see a list of the current keybindings, use the help magic command::
+
+  IDL> :help
+
+Those escape codes represent F5, F6, F7, and control-g. For example, hitting control-g attempts to save a graphic (which of course is not valid now since I am not recording a notebook).
