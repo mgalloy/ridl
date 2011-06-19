@@ -30,6 +30,8 @@ Typing "o" gives me the "s", typing "_f" gives me the full field name::
   IDL> print, !version.os_family
   unix
 
+TODO: routine names
+
 Completion makes typing long filenames much less painful. For example, when specifying a path in a string::
 
   IDL> loc = '~/projects/idllib/trunk/src'
