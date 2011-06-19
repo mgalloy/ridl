@@ -5,6 +5,7 @@
 
 #include "ridl.h"
 #include "ridl_logging.h"
+#include "ridl_idlpreferences.h"
 
 
 void ridl_printpreferences(void) {
@@ -30,6 +31,10 @@ void ridl_process_pref_line(char *pref_line) {
   while (i < len && (pref_name[i] = pref_line[i]) != '=') {
     i++;
   }
+  if (i == len) {
+    ridl_warning("invalid preference syntax '%s'", pref_line);
+    return;
+  }
   pref_name[i] = '\0';
   value_index = ++i;
 
@@ -44,7 +49,11 @@ void ridl_process_pref_line(char *pref_line) {
     } else if (strcmp(pref_value, "rst") == 0) {
       ridl_setloggingformat(1);
     }
-  }  
+  } else if (strcmp(pref_name, "RIDL_PROMPT") == 0) {
+    ridl_setpreference("IDL_PROMPT", pref_value);
+  } else {
+    ridl_warning("unknown preference name '%s'", pref_name);
+  }
 }
 
 
