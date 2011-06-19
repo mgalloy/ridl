@@ -26,6 +26,12 @@ void ridl_process_pref_line(char *pref_line) {
   if (pref_line[0] == '#') return;
   
   len = strlen(pref_line);
+  if (len == 0) {
+    return;
+  }
+  if (pref_line[0] == ' ' || pref_line[0] == '\n') {
+    return;
+  }
   
   i = 0;
   while (i < len && (pref_name[i] = pref_line[i]) != '=') {
