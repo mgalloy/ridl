@@ -17,7 +17,7 @@ set(rIDL_VERSION_MAJOR 0)
 set(rIDL_VERSION_MINOR 1)
 set(rIDL_VERSION_PATCH 0)
 
-set(CMAKE_BUILD_TYPE "Release")
+#set(CMAKE_BUILD_TYPE "Release")
 
 include_directories("${PROJECT_SOURCE_DIR}/src" 
                     "${IDL_INCLUDE_DIR}"
