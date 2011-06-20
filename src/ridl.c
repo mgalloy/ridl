@@ -69,6 +69,11 @@ void ridl_inittextdone(void) {
 }
 
 
+char *ridl_ridlprompt(void) {
+  return(ridl_prompt);
+}
+
+
 void ridl_updateprompt(void) {
   char *tmp = (char *)malloc(RIDL_PROMPT_LENGTH);
   char *tmp2 = (char *)malloc(RIDL_PROMPT_LENGTH);

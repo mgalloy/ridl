@@ -27,6 +27,7 @@ int ridl_savegraphic_cmd(void);
 
 // public routines
 
+char *ridl_ridlprompt(void);
 void ridl_printversion(void);
 void ridl_warning(const char *format, ...);
 int ridl_file_exists(const char *filename);

@@ -14,6 +14,9 @@ void ridl_printpreferences(void) {
   printf("%sNOTEBOOK_FORMAT=%s\n", 
          indent, 
          ridl_getloggingformat() ? "rst" : "HTML");
+  printf("%sRIDL_PROMPT=%s\n", 
+         indent, 
+         ridl_ridlprompt());
 }
 
 
