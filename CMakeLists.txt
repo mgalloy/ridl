@@ -17,6 +17,8 @@ set(rIDL_VERSION_MAJOR 0)
 set(rIDL_VERSION_MINOR 1)
 set(rIDL_VERSION_PATCH 0)
 
+set(CMAKE_BUILD_TYPE "Release")
+
 include_directories("${PROJECT_SOURCE_DIR}/src" 
                     "${IDL_INCLUDE_DIR}"
                     "${Readline_INCLUDE_DIR}"
@@ -66,6 +68,7 @@ add_custom_command(
    
 add_custom_target(docs DEPENDS docs/manual.pdf)
 
+install(CODE "MESSAGE(STATUS \"Checking/updating configuration file\")")
 install(CODE "execute_process(COMMAND idl -quiet ridl_make_appdir)")
   
 install(PROGRAMS ridl.sh DESTINATION bin)
