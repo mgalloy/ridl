@@ -68,7 +68,7 @@ add_custom_command(
    
 add_custom_target(docs DEPENDS docs/manual.pdf)
 
-install(CODE "MESSAGE(STATUS \"Checking/updating configuration file\")")
+install(CODE "MESSAGE(STATUS \"Checking/updating rIDL preferences configuration file\")")
 install(CODE "execute_process(COMMAND idl -quiet ridl_make_appdir)")
   
 install(PROGRAMS ridl.sh DESTINATION bin)
