@@ -38,7 +38,7 @@ add_custom_command(
   OUTPUT online_help
   COMMAND idlhelp2txt.py "${IDL_DIR}/help/online_help/IDL/Content/Reference Material" online_help
   DEPENDS "${IDL_DIR}/help/online_help/IDL/Content/Reference Material"
- )
+  )
    
 add_custom_target(onlinehelp DEPENDS online_help)
 
@@ -46,7 +46,7 @@ add_custom_command(
   OUTPUT api-docs/index.html
   COMMAND idl ridl_build_docs
   DEPENDS src/*.pro
- )
+  )
    
 add_custom_target(apidocs DEPENDS api-docs/index.html)
 
@@ -54,7 +54,7 @@ add_custom_command(
   OUTPUT capi-docs/html/index.html
   COMMAND doxygen doxygen.config
   DEPENDS src/*.c
- )
+  )
    
 add_custom_target(capidocs DEPENDS capi-docs/html/index.html)
 
@@ -62,10 +62,12 @@ add_custom_command(
   OUTPUT docs/manual.pdf
   COMMAND make_docs.sh
   DEPENDS docs/manual.rst docs/ridl.rst
- )
+  )
    
 add_custom_target(docs DEPENDS docs/manual.pdf)
 
+install(CODE "execute_process(COMMAND idl -quiet ridl_make_appdir)")
+  
 install(PROGRAMS ridl.sh DESTINATION bin)
 install(FILES docs/manual.pdf DESTINATION docs OPTIONAL)
 install(FILES docs/ridl.1 DESTINATION man/man1 OPTIONAL)
