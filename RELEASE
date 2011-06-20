@@ -53,6 +53,11 @@ rIDL 0.1
   * Multi-line commands, when entered at the interactive command line, are 
     combined into a single line in the command history.
  
+  * Online-help can be accessed with :help magic command.
+  
+  * rIDL preferences can be set or viewed via :pref magic command or prefs.ini
+    preference configuration file in app user directory.
+
   
 IDL functionality not in rIDL
 -----------------------------
