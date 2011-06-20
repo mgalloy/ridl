@@ -14,10 +14,11 @@ find_package(IDL REQUIRED)
 find_package(Readline 6.0 REQUIRED)
 
 set(rIDL_VERSION_MAJOR 0)
-set(rIDL_VERSION_MINOR 1)
+set(rIDL_VERSION_MINOR 2)
 set(rIDL_VERSION_PATCH 0)
 
-#set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Distribution")
+set(CMAKE_C_FLAGS_DISTRIBUTION "-DNDEBUG")
 
 include_directories("${PROJECT_SOURCE_DIR}/src" 
                     "${IDL_INCLUDE_DIR}"
