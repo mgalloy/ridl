@@ -10,6 +10,14 @@ set(CMAKE_MODULE_PATH
     )
 include(${CMAKE_SOURCE_DIR}/CMake/GetDate.cmake)
 
+# 32- or 64-bit build (in bytes)
+if (NOT rIDL_SIZEOF_VOID_P) 
+  set(rIDL_SIZEOF_VOID_P 4)  
+endif ()
+math(EXPR rIDL_SIZEOF_VOID_P_BITS "8 * ${rIDL_SIZEOF_VOID_P}") 
+message(STATUS "Pointer size: ${rIDL_SIZEOF_VOID_P_BITS}-bit build")
+
+
 find_package(IDL REQUIRED)
 find_package(Readline 6.0 REQUIRED)
 
