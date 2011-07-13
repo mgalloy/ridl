@@ -1,21 +1,24 @@
 #!/usr/bin/env sh
 
-PREFER_32=0
-OS=`uname -s | tr [A-Z] [a-z] | tr '[A-Z]' '[a-z]'`
+#PREFER_32=0
+#OS=`uname -s | tr [A-Z] [a-z] | tr '[A-Z]' '[a-z]'`
 
-for arg
-do
-  if [ "$arg" = "-32" ]; then
-    PREFER_32=1
-  fi
-done
+#for arg
+#do
+#  if [ "$arg" = "-32" ]; then
+#    PREFER_32=1
+#  fi
+#done
 
 export IDL_DIR=${IDL_DIR}
 
-if [ $PREFER_32 = 1 ]; then 
-  export @rIDL_LIBRARY_PATH@=$IDL_DIR/bin/bin.$OS.i386:$@rIDL_LIBRARY_PATH@
-  @CMAKE_INSTALL_PREFIX@/bin/bin.$OS.i386/ridl $@
-else
-  export @rIDL_LIBRARY_PATH@=$IDL_DIR/bin/bin.$OS.x86_64:$@rIDL_LIBRARY_PATH@
-  @CMAKE_INSTALL_PREFIX@/bin/bin.$OS.x86_64/ridl $@
-fi
+#if [ $PREFER_32 = 1 ]; then 
+#  export @rIDL_LIBRARY_PATH@=$IDL_DIR/bin/bin.$OS.i386:$@rIDL_LIBRARY_PATH@
+#  @CMAKE_INSTALL_PREFIX@/bin/bin.$OS.i386/ridl $@
+#else
+#  export @rIDL_LIBRARY_PATH@=$IDL_DIR/bin/bin.$OS.x86_64:$@rIDL_LIBRARY_PATH@
+#  @CMAKE_INSTALL_PREFIX@/bin/bin.$OS.x86_64/ridl $@
+#fi
+
+export @rIDL_LIBRARY_PATH@=$IDL_DIR/bin/@IDL_BIN_DIR@:$@rIDL_LIBRARY_PATH@
+@CMAKE_INSTALL_PREFIX@/bin/@IDL_BIN_DIR@/ridl $@

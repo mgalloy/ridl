@@ -16,7 +16,7 @@ if (NOT rIDL_SIZEOF_VOID_P)
 endif ()
 math(EXPR rIDL_SIZEOF_VOID_P_BITS "8 * ${rIDL_SIZEOF_VOID_P}") 
 message(STATUS "Pointer size: ${rIDL_SIZEOF_VOID_P_BITS}-bit build")
-
+message(STATUS "Install location: ${CMAKE_INSTALL_PREFIX}")
 
 find_package(IDL REQUIRED "${rIDL_SIZEOF_VOID_P}")
 find_package(Readline 6.0 REQUIRED)
