@@ -7,7 +7,7 @@ cmake_policy(SET CMP0017 NEW)
 configure_file("ridl_config.h.in" "ridl_config.h")
 
 # if on a non-Apple UNIX platform, add -m64 if a 64-bit build is requested
-if (UNIX AND NOT APPLE (rIDL_SIZEOF_VOID_P EQUAL 8))
+if (UNIX AND NOT APPLE AND (rIDL_SIZEOF_VOID_P EQUAL 8))
   add_definitions(-m64)
 endif ()
 
