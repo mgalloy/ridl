@@ -1,3 +1,49 @@
+# Exports several useful variables:
+#
+#   IDL_BIN32_PATH
+#      relative path from the root of the IDL distribution to the directory 
+#      containing the 32-bit binaries, i.e.::
+#
+#        bin/bin.linux.x86
+#
+#   IDL_BIN64_PATH
+#      relative path from the root of the IDL distribution to the directory 
+#      containing the 64-bit binaries, i.e.::
+#
+#        bin/bin.linux.x86_64
+#
+#   IDL_BIN_PATH
+#      relative path from the root of the IDL distribution to the directory 
+#      containing the binaries to be used in the build, i.e.::
+#
+#        bin/bin.linux.x86_64
+#
+#   IDL_BIN_DIR
+#      relative path from the bin directory of the IDL distribution to the 
+#      directory containing the binaries to be used in the build, i.e.::
+#
+#        bin.linux.x86_64
+#
+#   IDL_LIBRARY
+#      full path to the IDL shared object file, i.e.::
+# 
+#        /usr/local/itt/idl/idl80/bin/bin.darwin.x86_64/libidl.dylib
+#
+#   IDL_LIBRARY_DIR
+#      full path to the directory containing the libidl.so file, i.e.::
+#
+#        /usr/local/itt/idl/idl80/bin/bin.darwin.x86_64
+#
+#   IDL_INCLUDE_DIR
+#      full path to the directory containing idl_export.h, i.e.::
+#
+#        /usr/local/itt/idl/idl80/external/include
+#
+#   IDL_DIR
+#      full path to the root of an IDL installation, i.e.::
+#
+#        /usr/local/itt/idl/idl80
+
 # convenience variable for IDL's default install directories
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set(_IDL_PROGRAM_FILES_DIR "C:/Program Files/ITT/IDL")
@@ -39,10 +85,17 @@ find_path(IDL_INCLUDE_DIR
   PATH_SUFFIXES external/include
   )
 
+set(IDL_BIN64_PATH /bin/bin${_IDL_OS}.x86_64)
+  if (APPLE)
+    set(IDL_BIN32_PATH /bin/bin${_IDL_OS}.i386)
+  else ()
+    set(IDL_BIN32_PATH /bin/bin${_IDL_OS}.x86)
+  endif ()
+  
 if (IDL_FIND_COMPONENTS EQUAL 8)
-  set(_IDL_BIN_SUFFIXES /bin/bin${_IDL_OS}.x86_64)
+  set(IDL_BIN_PATH ${IDL_BIN64_PATH})
 elseif (IDL_FIND_COMPONENTS EQUAL 4)
-  set(_IDL_BIN_SUFFIXES /bin/bin${_IDL_OS}.x86 /bin/bin${_IDL_OS}.i386)
+  set(IDL_BIN_PATH ${IDL_BIN32_PATH})
 else ()
   math(EXPR IDL_FIND_COMPONENTS_BITS "8 * ${IDL_FIND_COMPONENTS}") 
   message(FATAL_ERROR "${IDL_FIND_COMPONENTS_BITS}-bit build invalid")
@@ -52,7 +105,7 @@ find_library(IDL_LIBRARY
   NAMES idl
   PATHS ${_IDL_SEARCH_DIRS}
   HINTS ${IDL_ROOT}
-  PATH_SUFFIXES ${_IDL_BIN_SUFFIXES}
+  PATH_SUFFIXES ${IDL_BIN_PATH}
   )
 
 if (IDL_INCLUDE_DIR AND IDL_LIBRARY)
