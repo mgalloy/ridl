@@ -18,7 +18,7 @@ math(EXPR rIDL_SIZEOF_VOID_P_BITS "8 * ${rIDL_SIZEOF_VOID_P}")
 message(STATUS "Pointer size: ${rIDL_SIZEOF_VOID_P_BITS}-bit build")
 
 
-find_package(IDL REQUIRED)
+find_package(IDL REQUIRED "${rIDL_SIZEOF_VOID_P}")
 find_package(Readline 6.0 REQUIRED)
 
 set(rIDL_VERSION_MAJOR 0)
