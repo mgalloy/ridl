@@ -285,11 +285,25 @@ int ridl_firstchar(char *line) {
    @param[in] filename file to launch editor on
 */
 void ridl_launcheditor(char *filename) {
-  char *cmdFormat = "ridl_launcheditor, '%s'";
-  char *cmd = (char *)malloc(strlen(filename) + strlen(cmdFormat) + 1);
-  sprintf(cmd, cmdFormat, filename);
-  int result = IDL_ExecuteStr(cmd);
-  free(cmd);
+  int result;
+  IDL_VPTR ridl_editfile;
+  
+  char *launchCmdFormat = "_ridl_editfile = ridl_launcheditor('%s')";
+  char *launchCmd = (char *)malloc(strlen(filename) + strlen(launchCmdFormat) + 1);
+  sprintf(launchCmd, launchCmdFormat, filename);
+  
+  result = IDL_ExecuteStr(launchCmd);
+  free(launchCmd);
+
+  char *compileCmdFormat = ".compile %s";
+  char *compileCmd = (char *)malloc(strlen(filename) + strlen(compileCmdFormat) + 1);
+  ridl_editfile = IDL_FindNamedVariable("_ridl_editfile", 0);  
+  sprintf(compileCmd, compileCmdFormat, IDL_VarGetString(ridl_editfile));
+
+  result = IDL_ExecuteStr(compileCmd);
+  free(compileCmd);
+  
+  result = IDL_ExecuteStr("delvar, _ridl_editfile");
 }
 
 

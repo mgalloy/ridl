@@ -1,14 +1,18 @@
 ; docformat = 'rst'
 
 ;+
-; Finds `.pro` files in the `!path` or current directory.
+; Finds `.pro` files in the `!path` or current directory. Returns full path to
+; full path to file to edit.
+;
+; :Returns:
+;    string
 ;
 ; :Params:
 ;    basename : in, required, type=string
 ;       basename of `.pro` file to find in `!path` or current directory; may
 ;       already have `.pro` extension
 ;-
-pro ridl_launcheditor, basename
+function ridl_launcheditor, basename
   compile_opt strictarr, hidden
 
   ; add .pro extension if not already present
@@ -31,9 +35,11 @@ pro ridl_launcheditor, basename
   if (editor eq '') then begin
     message, 'No editor: set RIDL_EDITOR or EDITOR environment variable', $
              /informational, /noname
-    return
+    return, ''
   endif
   
   ; spawn the editor
   spawn, editor + ' ' + fullpath
+  
+  return, fullpath
 end
