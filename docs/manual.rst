@@ -98,6 +98,12 @@ Preference                Description
 ========================= ==================================================
 NOTEBOOK_FORMAT           format to use for notebook output; valid values
                           are either "HTML" or "rst"               
+RIDL_PROMPT               rIDL specific prompt where variables such as 
+                          ``%cmdnum`` and ``%wdir`` will be expanded; don't
+                          set to
+                          use the prompt specified via the IDL preference.             
+AUTO_COMPILE              set to "yes" or "no" to determine if ``.edit``'ed 
+                          files should be automatically compiled after editing    
 ========================= ==================================================
 
 To set an preference for the current rIDL session, use ``:pref`` magic command::

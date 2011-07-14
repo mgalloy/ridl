@@ -17,6 +17,9 @@ void ridl_printpreferences(void) {
   printf("%sRIDL_PROMPT=%s\n", 
          indent, 
          ridl_ridlprompt());
+  printf("%sAUTO_COMPILE=%s\n", 
+         indent, 
+         ridl_getautocompile() ? "yes" : "no");         
 }
 
 
@@ -60,6 +63,8 @@ void ridl_process_pref_line(char *pref_line) {
     }
   } else if (strcmp(pref_name, "RIDL_PROMPT") == 0) {
     ridl_setpreference("IDL_PROMPT", pref_value);
+  } else if (strcmp(pref_name, "AUTO_COMPILE") == 0) {
+    ridl_setautocompile(strcmp(pref_value, "yes") == 0 ? 1 : 0);
   } else {
     ridl_warning("unknown preference name '%s'", pref_name);
   }

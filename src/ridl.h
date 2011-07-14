@@ -27,6 +27,9 @@ int ridl_savegraphic_cmd(void);
 
 // public routines
 
+void ridl_setautocompile(int auto_compile);
+int ridl_getautocompile(void);
+
 char *ridl_ridlprompt(void);
 void ridl_printversion(void);
 void ridl_warning(const char *format, ...);

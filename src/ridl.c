@@ -37,6 +37,8 @@ static int preferences_file_set = 0;
 static char *preferences_filename;
 
 static int use_colors = 1;
+static int auto_compile = 1;
+
 
 static IDL_MSG_DEF msg_arr[] = {  
 #define M_RIDL_SIGNAL_REG       0
@@ -279,6 +281,14 @@ int ridl_firstchar(char *line) {
 }
 
 
+void ridl_setautocompile(int _auto_compile) {
+  auto_compile = _auto_compile;
+}
+
+int ridl_getautocompile() {
+  return auto_compile;
+}
+
 /**
    Launch editor in $EDITOR environment variable on the given filename.
    
@@ -287,21 +297,24 @@ int ridl_firstchar(char *line) {
 void ridl_launcheditor(char *filename) {
   int result;
   IDL_VPTR ridl_editfile;
+  char *launchCmdFormat, *launchCmd, *compileCmdFormat, *compileCmd;
   
-  char *launchCmdFormat = "_ridl_editfile = ridl_launcheditor('%s')";
-  char *launchCmd = (char *)malloc(strlen(filename) + strlen(launchCmdFormat) + 1);
+  launchCmdFormat = "_ridl_editfile = ridl_launcheditor('%s')";
+  launchCmd = (char *)malloc(strlen(filename) + strlen(launchCmdFormat) + 1);
   sprintf(launchCmd, launchCmdFormat, filename);
   
   result = IDL_ExecuteStr(launchCmd);
   free(launchCmd);
 
-  char *compileCmdFormat = ".compile %s";
-  char *compileCmd = (char *)malloc(strlen(filename) + strlen(compileCmdFormat) + 1);
-  ridl_editfile = IDL_FindNamedVariable("_ridl_editfile", 0);  
-  sprintf(compileCmd, compileCmdFormat, IDL_VarGetString(ridl_editfile));
+  if (auto_compile) {
+    compileCmdFormat = ".compile %s";
+    compileCmd = (char *)malloc(strlen(filename) + strlen(compileCmdFormat) + 1);
+    ridl_editfile = IDL_FindNamedVariable("_ridl_editfile", 0);  
+    sprintf(compileCmd, compileCmdFormat, IDL_VarGetString(ridl_editfile));
 
-  result = IDL_ExecuteStr(compileCmd);
-  free(compileCmd);
+    result = IDL_ExecuteStr(compileCmd);
+    free(compileCmd);
+  }
   
   result = IDL_ExecuteStr("delvar, _ridl_editfile");
 }
