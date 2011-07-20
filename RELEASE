@@ -71,3 +71,6 @@ IDL functionality not in rIDL
   * .step'ing into an OBJ_NEW or OBJ_DESTROY call will leave rIDL's command 
     line reading and into IDL's default mechanism until scope returns to the
     level of the original OBJ_NEW or OBJ_DESTROY.
+
+  * You can not use .compile or .run without a filename argument to enter
+    a program at the command line.
