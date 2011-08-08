@@ -436,6 +436,8 @@ char *ridl_readline(void) {
 void ridl_printfunmap(char *funmap_function_name, rl_command_func_t *funmap_function) {
   int binding;
   char **keyseqs = rl_invoking_keyseqs(funmap_function);
+  if (keyseqs == 0) return;
+  
   printf("  %s: ", funmap_function_name);
   for (binding = 0; keyseqs[binding] != 0; binding++) {
     printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
