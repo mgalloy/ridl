@@ -132,7 +132,7 @@ function ridl_getfields_object, var
 
   if (obj_hasmethod(var, 'GETPROPERTY')) then begin
     props = ridl_getfields_class(obj_class(var))
-    return, props[sort(props)]
+    return, obj_isa(var, 'IDL_OBJECT') ? props[sort(props)] : ['']
   endif else return, ['']
 end
 

@@ -5,8 +5,8 @@ rIDL 0.1
     variables to launch the specified editor.
     
   * Hitting tab will do completion on filenames, system variable names, local
-    variable names (including structure field names), reserved words, 
-    executive commands, and magic commands.
+    variable names (including structure field names and object properties),
+    reserved words, executive commands, and magic commands.
   
   * The :doc magic command displays header information about a routine.
   
