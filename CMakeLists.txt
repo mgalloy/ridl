@@ -70,9 +70,9 @@ add_custom_command(
 add_custom_target(capidocs DEPENDS capi-docs/html/index.html)
 
 add_custom_command(
-  OUTPUT docs/manual.pdf
+  OUTPUT docs/ridl_manual.pdf
   COMMAND make_docs.sh
-  DEPENDS docs/manual.rst docs/ridl.rst
+  DEPENDS docs/ridl_manual.rst docs/ridl.rst
   )
    
 add_custom_target(docs DEPENDS docs/manual.pdf)
@@ -81,7 +81,7 @@ install(CODE "MESSAGE(STATUS \"Checking/updating rIDL preferences configuration 
 install(CODE "execute_process(COMMAND idl -quiet ridl_make_appdir)")
   
 install(PROGRAMS ridl.sh DESTINATION bin)
-install(FILES docs/manual.pdf DESTINATION docs OPTIONAL)
+install(FILES docs/ridl_manual.pdf DESTINATION docs OPTIONAL)
 install(FILES docs/ridl.1 DESTINATION man/man1 OPTIONAL)
 install(DIRECTORY online_help/
         DESTINATION online_help 
