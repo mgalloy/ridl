@@ -117,7 +117,7 @@ end
 ;    string array
 ; 
 ; :Bugs:
-;    This routine will check for keywords to the ::getProperty methods of 
+;    This routine will check for keywords to the `::getProperty` methods of 
 ;    superclasses of the object and assume they are properties of the object.
 ;    This is not correct in all cases, though is quite common. A class does
 ;    not necessarily query its superclass for properties and a class may query
