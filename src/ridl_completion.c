@@ -66,6 +66,12 @@ IDL_VPTR structure_fields;
 /// name of current structure to check field names of
 char *current_struct;
 
+/// IDL array of method names
+IDL_VPTR method_names;
+
+/// name of current object to check method names of
+char *current_obj;
+
 
 /**
    Find field names of a structure.
@@ -94,7 +100,6 @@ void ridl_remove_structurefields_list(void) {
 char *ridl_structurefield_generator(const char *varname, int state) {
   static int list_index, len;  
   int nfields = (int) (*structure_fields->value.arr).n_elts;
-  int i;
   IDL_STRING *s = (IDL_STRING *)structure_fields->value.arr->data;
   char *name;
   
@@ -122,6 +127,60 @@ char *ridl_structurefield_generator(const char *varname, int state) {
 }
 
 
+/**
+   Find method names for an object.
+   
+   @param[in] varname name of object variable to find field names of
+*/
+void ridl_get_methodnames_list(char *varname) {
+  char cmd[1000];
+  int status;
+
+  // construct command to get field names
+  sprintf(cmd, "_ridl_methodnames = ridl_getmethods(%s)", varname);
+  status = IDL_ExecuteStr(cmd);
+  method_names = IDL_FindNamedVariable("_ridl_methodnames", 0);
+}
+
+
+/**
+   Free IDL array variable containing name of object method names.
+*/
+void ridl_remove_methodnames_list(void) {
+  int status = IDL_ExecuteStr("delvar, _ridl_methodnames");
+}
+
+
+char *ridl_methodname_generator(const char *varname, int state) {
+  static int list_index, len;  
+  int nnames = (int) (*method_names->value.arr).n_elts;
+  IDL_STRING *s = (IDL_STRING *)method_names->value.arr->data;
+  char *name;
+  
+  // state == 0 the first time this is called, non-zero on subsequent calls
+  if (!state) {
+    list_index = 0;
+    len = strlen(varname);
+  }
+
+  while (list_index < nnames) {
+    name = IDL_STRING_STR(&s[list_index]);
+
+    list_index++;
+    if (strncasecmp(name, varname, len) == 0) {
+      char *obj_and_method = (char *)malloc(strlen(current_obj) + strlen(name) + 2 + 1);
+      strcpy(obj_and_method, current_obj);
+      strcpy(obj_and_method + strlen(current_obj), "->");      
+      strcpy(obj_and_method + strlen(current_obj) + 2, name);
+      obj_and_method[strlen(current_obj) + strlen(name) + 2] = '\0';
+      return(obj_and_method);
+    }
+  }
+    
+  return((char *)NULL);
+}
+
+
 void ridl_get_localvariables_list(void) {
   int status = IDL_ExecuteStr("_ridl_localvars = strlowcase(scope_varname())");
   local_variables = IDL_FindNamedVariable("_ridl_localvars", 0);
@@ -142,6 +201,7 @@ void ridl_get_routinenames_list(void) {
 void ridl_remove_routinenames_list(void) {
   int status = IDL_ExecuteStr("delvar, _ridl_routinenames");
 }
+
 
 /**
    mallocs return value, caller should free; used in Readline completion
@@ -337,10 +397,13 @@ char *ridl_generator(const char *text, int state) {
 */
 char **ridl_completion(const char *text, int start, int end) {
   char **matches = (char **)NULL;
+  char *svarname, *ovarname;
+  int svarlen, ovarlen;
   int loc;
   
   //printf("\ntext = %s, start = %d, end = %d\n", text, start, end);
   //printf("\nline so far = '%s'\n", rl_line_buffer);
+  //printf("end of string = '%d'\n", text[end]);
   
   // if no text, quit
   if (strlen(text) == 0) return(matches);
@@ -357,18 +420,36 @@ char **ridl_completion(const char *text, int start, int end) {
   if (matches == (char **)NULL) {
     char *dotpos = strstr(text, ".");
     if (dotpos != (char *)NULL) {
-      int varlen = (int) (dotpos - text);
-      char *varname = (char *)malloc(varlen + 1);
-      strncpy(varname, text, varlen);
-      varname[varlen] = '\0';
-      current_struct = varname;
-      ridl_get_structurefields_list(varname);
+      svarlen = (int) (dotpos - text);
+      svarname = (char *)malloc(svarlen + 1);
+      strncpy(svarname, text, svarlen);
+      svarname[svarlen] = '\0';
+      current_struct = svarname;
+      ridl_get_structurefields_list(svarname);
       matches = rl_completion_matches(dotpos + 1, ridl_structurefield_generator);
       ridl_remove_structurefields_list();
-      free(varname);
+      current_struct = NULL;
+      free(svarname);
     }
   }
-  
+
+  // check for method names
+  if (matches == (char **)NULL) {
+    char *arrowpos = strstr(text, "->");
+    if (arrowpos != (char *)NULL) {
+      ovarlen = (int) (arrowpos - text);
+      ovarname = (char *)malloc(ovarlen + 1);
+      strncpy(ovarname, text, ovarlen);
+      ovarname[ovarlen] = '\0';
+      current_obj = ovarname;
+      ridl_get_methodnames_list(ovarname);
+      matches = rl_completion_matches(arrowpos + 2, ridl_methodname_generator);
+      ridl_remove_methodnames_list();
+      current_obj = NULL;
+      free(ovarname);
+    }
+  }
+    
   return(matches);
 }
 
@@ -422,5 +503,7 @@ void ridl_completion_init(void) {
     }
     r++;
   }
-  fclose(fp);  
+  fclose(fp);
+  
+  rl_basic_word_break_characters = " \t\n\"\\'`@$<=;|&{(";
 }
