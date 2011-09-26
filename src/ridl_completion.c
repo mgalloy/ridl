@@ -388,6 +388,25 @@ char *ridl_generator(const char *text, int state) {
 }
 
 
+int ridl_instring(int start) {
+  int in_single = 0, in_double = 0, i;
+  
+  for (i = 0; i < start; i++) {
+    if (rl_line_buffer[i] == '\'') {
+      // if not in double quotes, switch single quotes var
+      if (!in_double) in_single = 1 - in_single;
+    }
+    
+    if (rl_line_buffer[i] == '\"') {
+      // if not in single quotes, switch double quotes var
+      if (!in_single) in_double = 1 - in_double;
+    }
+  }
+  
+  return(in_single || in_double);
+}
+
+
 /**
    Readline attempted completion routine.
    
@@ -399,8 +418,9 @@ char **ridl_completion(const char *text, int start, int end) {
   char **matches = (char **)NULL;
   char *svarname, *ovarname;
   int svarlen, ovarlen;
-  int loc;
+  int loc, in_string;
   
+  //printf("\ntext = %s, start = %d, end = %d\n", rl_line_buffer, start, end);
   //printf("\ntext = %s, start = %d, end = %d\n", text, start, end);
   //printf("\nline so far = '%s'\n", rl_line_buffer);
   //printf("end of string = '%d'\n", text[end]);
@@ -408,6 +428,7 @@ char **ridl_completion(const char *text, int start, int end) {
   // if no text, quit
   if (strlen(text) == 0) return(matches);
   
+  in_string = ridl_instring(start);
   rl_completion_append_character = '\0';
 
   // check for reserved words, system variables, executive commands, IDL
@@ -417,7 +438,7 @@ char **ridl_completion(const char *text, int start, int end) {
   }
   
   // check for structure fields
-  if (matches == (char **)NULL) {
+  if (matches == (char **)NULL && !in_string) {
     char *dotpos = strstr(text, ".");
     if (dotpos != (char *)NULL) {
       svarlen = (int) (dotpos - text);
@@ -434,7 +455,7 @@ char **ridl_completion(const char *text, int start, int end) {
   }
 
   // check for method names
-  if (matches == (char **)NULL) {
+  if (matches == (char **)NULL && !in_string) {
     char *arrowpos = strstr(text, "->");
     if (arrowpos != (char *)NULL) {
       ovarlen = (int) (arrowpos - text);
