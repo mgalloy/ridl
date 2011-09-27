@@ -7,19 +7,53 @@ import os
 
 class IDLHelpParser(HTMLParser):
   
+  def handle_charref(self, name):
+    if (name == "160"):
+      self.current_text = self.current_text + " "
+      
   def handle_data(self, data):
-    self.current_text = self.current_text + data
+    # compress whitespace
+    stripped_data = " ".join(data.split())
+    
+    # exit if nothing left
+    if (len(stripped_data) == 0):
+      return
+      
+    # keep a single space at beginning or end if they were there to start with
+    if (data[0] != stripped_data[0]):
+      stripped_data = " " + stripped_data
+    if (data[-1] != stripped_data[-1]):
+      stripped_data = stripped_data + " "
+    
+    # append to current text
+    self.current_text = self.current_text + stripped_data
 
   def handle_starttag(self, tag, attrs):
     if (tag == "p"):
       self.current_text = ""
-      if (len(attrs) > 1 and (attrs[0][1] == 'class' or attrs[0][1] == 'MCWebHelpFramesetLink')):
-        self.type = "nav_para"
-      else:
-        if (len(attrs) > 1 and (attrs[1][1] == 'MadCap:conditions' or attrs[1][1] == 'Reference Material.Online_Help_Only')):
-          self.type = "nav_para"
-        else:
-          self.type = "plain_para"      
+      
+      # assume the paragraph is a normal paragraph
+      self.type = "plain_para"
+
+      # hide if it has specific attributes
+      if (len(attrs) > 1):
+        for a in attrs:
+          if (a[0] == "class" and a[1] == "Code"):
+            self.type = "code_para"
+          if (a[0] == "class" and a[1] == "MCWebHelpFramesetLink"):
+            self.type = "hide_para"
+          if (a[0] == "MadCap:conditions" and a[1] == "Reference Material.Online_Help_Only"):
+            self.type = "hide_para"
+          if (a[0] == "class" and a[1] == "HideSearchTerms"):
+            self.type = "hide_para"            
+        
+      #if (len(attrs) > 1 and (attrs[0][1] == 'class' or attrs[0][1] == 'MCWebHelpFramesetLink')):
+      #  self.type = "nav_para"
+      #else:
+      #  if (len(attrs) > 1 and (attrs[1][1] == 'MadCap:conditions' or attrs[1][1] == 'Reference Material.Online_Help_Only')):
+      #    self.type = "nav_para"
+      #  else:
+      #    self.type = "plain_para"      
       
     if (tag == "h1" or tag == "h2" or tag == "h3"):
       self.current_text = ""
@@ -35,8 +69,11 @@ class IDLHelpParser(HTMLParser):
   def handle_endtag(self, tag):
     if (tag == "p" and self.type == "plain_para"):
       if (len(self.current_text) > 0):
-        self.output = self.output + self.current_text.rstrip() + "\n\n"
-      
+        self.output = self.output + self.current_text + "\n\n"
+    if (tag == "p" and self.type == "code_para"):
+      if (len(self.current_text) > 0):
+        self.output = self.output + "  " + self.current_text + "\n"
+        
     if (tag == "h1" or tag == "h2" or tag == "h3"):
       if (tag == "h1"): char = "="
       if (tag == "h2"): char = "-"
