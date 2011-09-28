@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-PREFER_32=0
+PREFER_32=@rIDL_PREFER_32@
 OS=`uname -s | tr [A-Z] [a-z] | tr '[A-Z]' '[a-z]'`
 
 for arg

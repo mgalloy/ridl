@@ -18,6 +18,14 @@ math(EXPR rIDL_SIZEOF_VOID_P_BITS "8 * ${rIDL_SIZEOF_VOID_P}")
 message(STATUS "Pointer size: ${rIDL_SIZEOF_VOID_P_BITS}-bit build")
 message(STATUS "Install location: ${CMAKE_INSTALL_PREFIX}")
 
+# used in the launch script, if this is a 32-bit build then launch with -32
+# option
+if (rIDL_SIZEOF_VOID_P_BITS STREQUAL "32")
+  set(rIDL_PREFER_32 "1")
+else ()
+  set(rIDL_PREFER_32 "0")
+endif ()
+
 find_package(IDL REQUIRED "${rIDL_SIZEOF_VOID_P}")
 find_package(Readline 6.0 REQUIRED)
 
