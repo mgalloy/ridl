@@ -28,7 +28,7 @@ class IDLHelpParser(HTMLParser):
     # append to current text
     self.current_text = self.current_text + stripped_data
 
-  def handle_starttag(self, tag, attrs):
+  def handle_starttag(self, tag, attrs):    
     if (tag == "p"):
       self.current_text = ""
       
@@ -36,24 +36,17 @@ class IDLHelpParser(HTMLParser):
       self.type = "plain_para"
 
       # hide if it has specific attributes
-      if (len(attrs) > 1):
-        for a in attrs:
-          if (a[0] == "class" and a[1] == "Code"):
-            self.type = "code_para"
-          if (a[0] == "class" and a[1] == "MCWebHelpFramesetLink"):
-            self.type = "hide_para"
-          if (a[0] == "MadCap:conditions" and a[1] == "Reference Material.Online_Help_Only"):
-            self.type = "hide_para"
-          if (a[0] == "class" and a[1] == "HideSearchTerms"):
-            self.type = "hide_para"            
-        
-      #if (len(attrs) > 1 and (attrs[0][1] == 'class' or attrs[0][1] == 'MCWebHelpFramesetLink')):
-      #  self.type = "nav_para"
-      #else:
-      #  if (len(attrs) > 1 and (attrs[1][1] == 'MadCap:conditions' or attrs[1][1] == 'Reference Material.Online_Help_Only')):
-      #    self.type = "nav_para"
-      #  else:
-      #    self.type = "plain_para"      
+      for a in attrs:
+        if (a[0] == "class" and a[1] == "Code"):
+          self.type = "code_para"
+          self.last_was_code_para = True
+          
+        if (a[0] == "class" and a[1] == "MCWebHelpFramesetLink"):
+          self.type = "hide_para"
+        if (a[0] == "MadCap:conditions" and a[1] == "Reference Material.Online_Help_Only"):
+          self.type = "hide_para"
+        if (a[0] == "class" and a[1] == "HideSearchTerms"):
+          self.type = "hide_para"                 
       
     if (tag == "h1" or tag == "h2" or tag == "h3"):
       self.current_text = ""
@@ -67,34 +60,47 @@ class IDLHelpParser(HTMLParser):
       self.current_text = self.current_text + "\n"
       
   def handle_endtag(self, tag):
+    if self.last_was_code_para:
+      extra_line = "\n"
+    else:
+      extra_line = ""
+      
+    if (tag in self.para_tags):
+      self.last_was_code_para = False
+              
     if (tag == "p" and self.type == "plain_para"):
-      if (len(self.current_text) > 0):
-        self.output = self.output + self.current_text + "\n\n"
+      if (len(self.current_text) > 0):        
+        self.output = self.output + extra_line + self.current_text + "\n\n"
+                
     if (tag == "p" and self.type == "code_para"):
       if (len(self.current_text) > 0):
         self.output = self.output + "  " + self.current_text + "\n"
+        self.last_was_code_para = True
         
     if (tag == "h1" or tag == "h2" or tag == "h3"):
       if (tag == "h1"): char = "="
       if (tag == "h2"): char = "-"
       if (tag == "h3"): char = "~"
       if (tag == "h1"):
-        self.output = self.output + "".join([char for x in range(len(self.current_text))]) + "\n"
-
-      self.output = self.output + self.current_text + "\n"
+        self.output = self.output + extra_line + "".join([char for x in range(len(self.current_text))]) + "\n"
+        extra_line = ""
+      
+      self.output = self.output + extra_line + self.current_text + "\n"
       self.output = self.output + "".join([char for x in range(len(self.current_text))]) + "\n"
     
     if (tag == "img"):
-      self.output = self.output + self.current_text + "\n\n"
+      self.output = self.output + extra_line + self.current_text + "\n\n"
   
   def reset(self):
     HTMLParser.reset(self)
     self.current_text = ""
     self.type = ""
     self.output = ""
-
+    self.last_was_code_para = False
+    
   def __init__(self):
     HTMLParser.__init__(self)
+    self.para_tags = ["p", "img", "h1", "h2", "h3"]
     self.reset()
 
 
