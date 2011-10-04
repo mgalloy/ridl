@@ -647,7 +647,7 @@ int ridl_executeline(char *line, int flags) {
 }
 
 
-int ridl_readline_callback(int cont, int  widevint_allowed) {
+int ridl_readline_callback(int cont, int widevint_allowed) {
   char *line;
   //printf("Before: %d, %d\n", cont, widevint_allowed);
   line = ridl_readline();
