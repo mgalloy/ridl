@@ -388,16 +388,16 @@ char *ridl_generator(const char *text, int state) {
 }
 
 
-int ridl_instring(int start) {
+int ridl_instring(char *line, int start) {
   int in_single = 0, in_double = 0, i;
   
   for (i = 0; i < start; i++) {
-    if (rl_line_buffer[i] == '\'') {
+    if (line[i] == '\'') {
       // if not in double quotes, switch single quotes var
       if (!in_double) in_single = 1 - in_single;
     }
     
-    if (rl_line_buffer[i] == '\"') {
+    if (line[i] == '\"') {
       // if not in single quotes, switch double quotes var
       if (!in_single) in_double = 1 - in_double;
     }
@@ -428,7 +428,7 @@ char **ridl_completion(const char *text, int start, int end) {
   // if no text, quit
   if (strlen(text) == 0) return(matches);
   
-  in_string = ridl_instring(start);
+  in_string = ridl_instring(rl_line_buffer, start);
   rl_completion_append_character = '\0';
 
   // check for reserved words, system variables, executive commands, IDL

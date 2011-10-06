@@ -282,7 +282,11 @@ int ridl_firstchar(char *line) {
 
 
 /*
-   Return the index of the last non-space character on the line.
+   Return the index of the last non-space character on the line. Returns -1
+   if there is no last character, i.e., in an empty line or in a line with an 
+   unmatched string delimiter like:
+   
+       IDL> s = 'Hello?
 */
 int ridl_lastchar(char *line) {
   // TODO: this should be more sophisticated -- it should return the index
@@ -291,9 +295,19 @@ int ridl_lastchar(char *line) {
   //
   //   s = 'Hello?
   //   a = 5 ; what is a?
+  //   s = '?;
   
-  int i;
-  for (i = strlen(line) - 1; i >= 0; i--) {
+  int i, pos, comment_pos = strlen(line) - 1;
+  if (strlen(line) == 0) return -1;
+  if (ridl_instring(line, strlen(line) - 1)) return -1;
+  
+  pos = strcspn(line, ";");
+  while (ridl_instring(line, pos) && pos < comment_pos) {
+    pos += strcspn(line + pos, ";");
+  }
+  if (ridl_instring(line, pos) && pos < comment_pos) comment_pos = pos;
+  
+  for (i = comment_pos; i >= 0; i--) {
     if (line[i] != ' ') return(i);
   }
 }
@@ -637,7 +651,8 @@ int ridl_executeline(char *line, int flags) {
         free(cmd);
       } else {
         int lastcharIndex = ridl_lastchar(line);
-        char lastchar = line[lastcharIndex];
+        printf("lastcharIndex = %d\n", lastcharIndex);        
+        char lastchar = lastcharIndex == -1 ? ' ' : line[lastcharIndex];
         if (lastchar == '?') {
           char cmd[1000];
           char varname[1000];
