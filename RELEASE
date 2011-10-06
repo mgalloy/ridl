@@ -1,6 +1,9 @@
 rIDL 0.1
 --------
 
+  * Append "?" to the end of an expression to retrieve metadata about the
+    expression.
+    
   * The .edit executive command uses RIDL_EDITOR or EDITOR environment 
     variables to launch the specified editor.
     

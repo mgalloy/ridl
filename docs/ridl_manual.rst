@@ -48,12 +48,23 @@ Magic command             Description
 ========================= ==================================================
 
 
+Introspection
+-------------
+
+Use a ``?`` after an expression to display help on the expression. For
+example::
+
+    IDL> a = 5
+    IDL> a?
+    VAR             INT       =        5
+
+
 Completion
 ----------
 
 Command line completion is a handy convenience to minimize typing when you
 have already typed enough to identify something uniquely. Even if you haven't
-typed enough to uniquely indentify something, the currently available options
+typed enough to uniquely identify something, the currently available options
 can be displayed.
 
 rIDL completes on:
@@ -61,7 +72,8 @@ rIDL completes on:
   1. IDL library routines
   2. IDL library classnames
   3. system variables
-  4. local variables (including fields of structures)
+  4. local variables (including fields of structures, properties/methods of 
+     objects)
   5. reserved words
   6. executive commands
   7. magic commands

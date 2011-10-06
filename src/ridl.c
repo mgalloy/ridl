@@ -281,6 +281,24 @@ int ridl_firstchar(char *line) {
 }
 
 
+/*
+   Return the index of the last non-space character on the line.
+*/
+int ridl_lastchar(char *line) {
+  // TODO: this should be more sophisticated -- it should return the index
+  // of the last non-comment, non-white space character that is not in a 
+  // string, i.e., not return the location of the ? for the following:
+  //
+  //   s = 'Hello?
+  //   a = 5 ; what is a?
+  
+  int i;
+  for (i = strlen(line) - 1; i >= 0; i--) {
+    if (line[i] != ' ') return(i);
+  }
+}
+
+
 void ridl_setautocompile(int _auto_compile) {
   auto_compile = _auto_compile;
 }
@@ -598,7 +616,7 @@ int ridl_executeline(char *line, int flags) {
       }
     }
   } else {
-    if (line && *line) {           
+    if (line && *line) {      
       // check for .edit
       if (firstchar == '.') {
         int search_length;
@@ -618,26 +636,37 @@ int ridl_executeline(char *line, int flags) {
         }
         free(cmd);
       } else {
-        // determine if line is continued
-        char *line_continued = ridl_linecontinued(line);
+        int lastcharIndex = ridl_lastchar(line);
+        char lastchar = line[lastcharIndex];
+        if (lastchar == '?') {
+          char cmd[1000];
+          char varname[1000];
+          strncpy(varname, line, strlen(line) - 1);
+          varname[strlen(line) - 1] = '\0';
+          sprintf(cmd, "ridl_varhelp, %s", varname);
+          int status = IDL_ExecuteStr(cmd);
+        } else {        
+          // determine if line is continued
+          char *line_continued = ridl_linecontinued(line);
 
-        if (continued) {
-          if (line_continued) {
-            strcat(ridl_continuedline, line);
+          if (continued) {
+            if (line_continued) {
+              strcat(ridl_continuedline, line);
+            } else {
+              // execute IDL commands that were continued on several lines
+              continued = 0;
+              strcat(ridl_continuedline, line);
+              error = ridl_executestr(ridl_continuedline, 1);
+            }
           } else {
-            // execute IDL commands that were continued on several lines
-            continued = 0;
-            strcat(ridl_continuedline, line);
-            error = ridl_executestr(ridl_continuedline, 1);
+            if (line_continued) {
+              continued = 1;
+              strcpy(ridl_continuedline, line);
+            } else {
+              // execute normal IDL commands
+              error = ridl_executestr(line, 1);
+            }  
           }
-        } else {
-          if (line_continued) {
-            continued = 1;
-            strcpy(ridl_continuedline, line);
-          } else {
-            // execute normal IDL commands
-            error = ridl_executestr(line, 1);
-          }  
         }
       }
     }

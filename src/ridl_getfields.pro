@@ -16,7 +16,7 @@
 ;      second list of property names
 ;-
 function ridl_getfields_class_addprops, props1, props2
-  compile_opt strictarr
+  compile_opt strictarr, hidden
 
   if (props1[0] eq '') then begin
     if (props2[0] eq '') then begin
@@ -55,7 +55,7 @@ end
 ;       about the `getProperty` method of the class was found
 ;-
 function ridl_getfields_class_check, classname, found=found
-  compile_opt strictarr
+  compile_opt strictarr, hidden
 
   catch, error
   if (error ne 0L) then begin
@@ -86,7 +86,7 @@ end
 ;       classname to find the properties for
 ;-
 function ridl_getfields_class, classname
-  compile_opt strictarr
+  compile_opt strictarr, hidden
 
   param_info = ridl_getfields_class_check(classname, found=found)
   if (~found) then return, ['']
@@ -128,7 +128,7 @@ end
 ;       object to check for properties
 ;-
 function ridl_getfields_object, var
-  compile_opt strictarr
+  compile_opt strictarr, hidden
 
   if (obj_hasmethod(var, 'GETPROPERTY')) then begin
     props = ridl_getfields_class(obj_class(var))
