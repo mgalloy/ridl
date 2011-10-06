@@ -83,7 +83,7 @@ add_custom_command(
   DEPENDS docs/ridl_manual.rst docs/ridl.rst
   )
    
-add_custom_target(docs DEPENDS docs/manual.pdf)
+add_custom_target(docs DEPENDS docs/ridl_manual.pdf)
 
 install(CODE "MESSAGE(STATUS \"Checking/updating rIDL preferences configuration file\")")
 install(CODE "execute_process(COMMAND idl -quiet ridl_make_appdir)")
