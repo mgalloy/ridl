@@ -289,25 +289,21 @@ int ridl_firstchar(char *line) {
        IDL> s = 'Hello?
 */
 int ridl_lastchar(char *line) {
-  // TODO: this should be more sophisticated -- it should return the index
-  // of the last non-comment, non-white space character that is not in a 
-  // string, i.e., not return the location of the ? for the following:
-  //
-  //   s = 'Hello?
-  //   a = 5 ; what is a?
-  //   s = '?;
-  
   int i, pos, comment_pos = strlen(line) - 1;
+  
+  // return -1 if empty line
   if (strlen(line) == 0) return -1;
+  
+  // return -1 if the line ends with an unterminated string
   if (ridl_instring(line, strlen(line) - 1)) return -1;
   
   pos = strcspn(line, ";");
   while (ridl_instring(line, pos) && pos < comment_pos) {
     pos += strcspn(line + pos, ";");
   }
-  if (ridl_instring(line, pos) && pos < comment_pos) comment_pos = pos;
+  comment_pos = pos;
   
-  for (i = comment_pos; i >= 0; i--) {
+  for (i = comment_pos - 1; i >= 0; i--) {
     if (line[i] != ' ') return(i);
   }
 }
@@ -317,9 +313,11 @@ void ridl_setautocompile(int _auto_compile) {
   auto_compile = _auto_compile;
 }
 
+
 int ridl_getautocompile() {
   return auto_compile;
 }
+
 
 /**
    Launch editor in $EDITOR environment variable on the given filename.
@@ -651,13 +649,12 @@ int ridl_executeline(char *line, int flags) {
         free(cmd);
       } else {
         int lastcharIndex = ridl_lastchar(line);
-        printf("lastcharIndex = %d\n", lastcharIndex);        
         char lastchar = lastcharIndex == -1 ? ' ' : line[lastcharIndex];
         if (lastchar == '?') {
           char cmd[1000];
           char varname[1000];
-          strncpy(varname, line, strlen(line) - 1);
-          varname[strlen(line) - 1] = '\0';
+          strncpy(varname, line, lastcharIndex);
+          varname[lastcharIndex] = '\0';
           sprintf(cmd, "ridl_varhelp, %s", varname);
           int status = IDL_ExecuteStr(cmd);
         } else {        
