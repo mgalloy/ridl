@@ -88,7 +88,11 @@ int ridl_magic_help(char *line, int firstcharIndex) {
     printf(magic_format, indent, magic_width, ":time cmd", 
            "time the given command");
     printf(magic_format, indent, magic_width, ":version", 
-           "print version information");      
+           "print version information");
+           
+    printf("\nintrospection:\n");
+    printf("%splace a '?' after a variable or expression to show metadata\n", 
+           indent);
   }
   
   free(argument);
