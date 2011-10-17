@@ -118,6 +118,16 @@ void ridl_changeprompt(IDL_STRING *prompt) {
 
 
 /**
+   Registered to be called when the !prompt changes.
+   
+   @param[in] path string to change path to
+*/
+void ridl_changepath(IDL_STRING *path) {
+  ridl_get_userdefinedroutines_list(IDL_STRING_STR(path));
+}
+
+
+/**
    Registered to be called when the current working directory changes.
    
    @param[in] dir directory that working directory is changing to
@@ -872,6 +882,7 @@ int main(int argc, char *argv[]) {
   IDL_UicbRegExitDone(ridl_exit);
   IDL_UicbRegShowCompileErr(ridl_show_compile_error);
   IDL_UicbRegPromptChange(ridl_changeprompt);
+  IDL_UicbRegPathChange(ridl_changepath);  
   IDL_UicbRegWorkingDirChange(ridl_changewdir);
   IDL_UicbRegDeathHint(ridl_deathhint);
   

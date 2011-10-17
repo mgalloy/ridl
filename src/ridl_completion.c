@@ -60,6 +60,11 @@ IDL_VPTR local_variables;
 /// IDL array of currently defined routine names
 IDL_VPTR routine_names;
 
+/// IDL array of current routine names in path cache
+IDL_VPTR userdefined_routine_names;
+char **userdefined_routines;
+int nuserdefined_routines = 0;
+  
 /// IDL array of structure field names
 IDL_VPTR structure_fields;
 
@@ -71,6 +76,25 @@ IDL_VPTR method_names;
 
 /// name of current object to check method names of
 char *current_obj;
+
+
+void ridl_get_userdefinedroutines_list(char *path) {
+  char *cmd = "_ridl_userdefined_routine_names = ridl_getuserroutines()";
+  int status, r;
+
+  //status = IDL_ExecuteStr(cmd);
+  //userdefined_routine_names = IDL_FindNamedVariable("_ridl_userdefined_routine_names", 0);  
+
+  //userdefined_routines = (char **) malloc(sizeof(char *) * (nuserdefined_routines + 1));
+  
+  //nuserdefined_routines = (int) (*userdefined_routine_names->value.arr).n_elts;
+  //for (r = 0; r < nuserdefined_routines; nuserdefined_routines++) {
+  //  userdefined_routines[r] = ridl_copystr("mike");
+  //}
+  
+  // clear old variable
+  //status = IDL_ExecuteStr("delvar, _ridl_userdefined_routine_names");
+}
 
 
 /**
@@ -214,9 +238,9 @@ void ridl_remove_routinenames_list(void) {
                     for subsequent calls
 */
 char *ridl_generator(const char *text, int state) {
-  static int list_index, len, nlocals, nrnames;
+  static int list_index, len, nlocals, nrnames, nudrnames;
   static IDL_STRING *locals;
-  static IDL_STRING *rnames;
+  static IDL_STRING *rnames, *udrnames;
   
   static int processed_reservedwords;
   static int processed_systemvariables;
@@ -226,6 +250,7 @@ char *ridl_generator(const char *text, int state) {
   static int processed_idlclasses;
   static int processed_localvariables;
   static int processed_routinenames;
+  static int processed_userdefined_routinenames;
   
   char *name;
   
@@ -242,6 +267,7 @@ char *ridl_generator(const char *text, int state) {
     processed_idlclasses = 0;
     processed_localvariables = 0;
     processed_routinenames = 0;
+    processed_userdefined_routinenames = 0;
   }
 
   if (!processed_reservedwords) {
@@ -258,7 +284,8 @@ char *ridl_generator(const char *text, int state) {
     processed_reservedwords = 1;
     list_index = 0;
   }
-    
+
+
   if (!processed_systemvariables) {
     while (name = system_variables[list_index]) {
       list_index++;
@@ -273,6 +300,7 @@ char *ridl_generator(const char *text, int state) {
     processed_systemvariables = 1;
     list_index = 0;
   }
+  
   
   if (!processed_executivecmds) {
     while (name = executive_cmds[list_index]) {
@@ -289,6 +317,7 @@ char *ridl_generator(const char *text, int state) {
     list_index = 0;
   }
 
+
   if (!processed_magiccmds) {
     while (name = magic_cmds[list_index]) {
       list_index++;
@@ -303,6 +332,7 @@ char *ridl_generator(const char *text, int state) {
     processed_magiccmds = 1;
     list_index = 0;
   }
+  
   
   if (!processed_idlroutines) {
     while (name = idl_routines[list_index]) {
@@ -319,6 +349,7 @@ char *ridl_generator(const char *text, int state) {
     list_index = 0;
   }
 
+
   if (!processed_idlclasses) {
     while (name = idl_classes[list_index]) {
       list_index++;
@@ -334,13 +365,13 @@ char *ridl_generator(const char *text, int state) {
     list_index = 0;
   }
     
+    
   if (!processed_localvariables) {
     ridl_get_localvariables_list();  
     nlocals = (int) (*local_variables->value.arr).n_elts;
     locals = (IDL_STRING *)local_variables->value.arr->data;      
   }
   
-
   if (!processed_localvariables) {
     while (list_index < nlocals) {
       name = IDL_STRING_STR(&locals[list_index]);
@@ -359,13 +390,13 @@ char *ridl_generator(const char *text, int state) {
     list_index = 0;
   }
 
+
   if (!processed_routinenames) {
     ridl_get_routinenames_list();
     nrnames = (int) (*routine_names->value.arr).n_elts;
     rnames = (IDL_STRING *)routine_names->value.arr->data;      
   }
   
-
   if (!processed_routinenames) {
     while (list_index < nrnames) {
       name = IDL_STRING_STR(&rnames[list_index]);
@@ -383,7 +414,24 @@ char *ridl_generator(const char *text, int state) {
     processed_routinenames = 1;
     list_index = 0;
   }
-    
+
+
+  if (!processed_userdefined_routinenames) {
+    for (list_index = 0; list_index < nuserdefined_routines; list_index++) {
+      name = userdefined_routines[list_index];
+      if (strncmp(name, text, len) == 0) {
+        return(ridl_copystr(name));
+      }
+    }
+  }
+
+  if (!processed_userdefined_routinenames) {
+    //printf("processed user defined routines...\n");
+    processed_userdefined_routinenames = 1;
+    list_index = 0;
+  }
+      
+      
   return((char *)NULL);
 }
 
