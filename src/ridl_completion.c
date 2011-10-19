@@ -78,22 +78,30 @@ IDL_VPTR method_names;
 char *current_obj;
 
 
-void ridl_get_userdefinedroutines_list(char *path) {
+void ridl_get_userdefinedroutines_list() {
   char *cmd = "_ridl_userdefined_routine_names = ridl_getuserroutines()";
   int status, r;
-
-  //status = IDL_ExecuteStr(cmd);
-  //userdefined_routine_names = IDL_FindNamedVariable("_ridl_userdefined_routine_names", 0);  
-
-  //userdefined_routines = (char **) malloc(sizeof(char *) * (nuserdefined_routines + 1));
+  IDL_STRING *s;
   
-  //nuserdefined_routines = (int) (*userdefined_routine_names->value.arr).n_elts;
-  //for (r = 0; r < nuserdefined_routines; nuserdefined_routines++) {
-  //  userdefined_routines[r] = ridl_copystr("mike");
-  //}
+  status = IDL_ExecuteStr(cmd);
+  userdefined_routine_names = IDL_FindNamedVariable("_ridl_userdefined_routine_names", 0);  
+
+  if (userdefined_routines) {
+    // TODO: free individual strings
+    free(userdefined_routines);  
+  }
+
+  nuserdefined_routines = (int) (*userdefined_routine_names->value.arr).n_elts;
+  userdefined_routines = (char **) malloc(nuserdefined_routines * sizeof(char *));
+  s = (IDL_STRING *) userdefined_routine_names->value.arr->data;
   
-  // clear old variable
-  //status = IDL_ExecuteStr("delvar, _ridl_userdefined_routine_names");
+  for (r = 0; r < nuserdefined_routines; r++) {
+    userdefined_routines[r] = ridl_copystr((*s++).s);
+  }
+
+  
+  // clear IDL variable
+  status = IDL_ExecuteStr("delvar, _ridl_userdefined_routine_names");
 }
 
 
@@ -417,8 +425,10 @@ char *ridl_generator(const char *text, int state) {
 
 
   if (!processed_userdefined_routinenames) {
-    for (list_index = 0; list_index < nuserdefined_routines; list_index++) {
+    while (list_index < nuserdefined_routines) {
       name = userdefined_routines[list_index];
+      
+      list_index++;
       if (strncmp(name, text, len) == 0) {
         return(ridl_copystr(name));
       }

@@ -123,7 +123,7 @@ void ridl_changeprompt(IDL_STRING *prompt) {
    @param[in] path string to change path to
 */
 void ridl_changepath(IDL_STRING *path) {
-  ridl_get_userdefinedroutines_list(IDL_STRING_STR(path));
+  ridl_get_userdefinedroutines_list();
 }
 
 
@@ -882,7 +882,6 @@ int main(int argc, char *argv[]) {
   IDL_UicbRegExitDone(ridl_exit);
   IDL_UicbRegShowCompileErr(ridl_show_compile_error);
   IDL_UicbRegPromptChange(ridl_changeprompt);
-  IDL_UicbRegPathChange(ridl_changepath);  
   IDL_UicbRegWorkingDirChange(ridl_changewdir);
   IDL_UicbRegDeathHint(ridl_deathhint);
   
@@ -906,6 +905,8 @@ int main(int argc, char *argv[]) {
   rl_readline_name = "rIDL";
   ridl_completion_init();
   rl_attempted_completion_function = ridl_completion;
+  IDL_UicbRegPathChange(ridl_changepath);  
+  ridl_get_userdefinedroutines_list();
   
   ridl_read_preferences();
   
