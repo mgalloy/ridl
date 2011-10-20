@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Returns the names of the currently defined routines.
+; Returns the names of the currently compiled routines.
 ;
 ; :Returns:
 ;    strarr

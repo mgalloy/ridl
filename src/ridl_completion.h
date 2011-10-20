@@ -4,3 +4,4 @@ void ridl_completion_init(void);
 
 int ridl_instring(char *line, int start);
 void ridl_get_userdefinedroutines_list();
+void ridl_get_currentdir_userdefinedroutines_list();

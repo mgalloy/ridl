@@ -140,6 +140,10 @@ void ridl_changewdir(char *dir) {
     strcpy(ridl_current_wdir, dir);
   }
   ridl_updateprompt();
+  
+  // get .pro files in the current directory for use in tab completion
+  // TODO: put this back when fixed
+  //ridl_get_currentdir_userdefinedroutines_list(); 
 }
 
 
@@ -882,8 +886,8 @@ int main(int argc, char *argv[]) {
   IDL_UicbRegExitDone(ridl_exit);
   IDL_UicbRegShowCompileErr(ridl_show_compile_error);
   IDL_UicbRegPromptChange(ridl_changeprompt);
-  IDL_UicbRegWorkingDirChange(ridl_changewdir);
   IDL_UicbRegDeathHint(ridl_deathhint);
+  IDL_UicbRegWorkingDirChange(ridl_changewdir);
   
   // TODO: will need to use something like this to fix ticket #1, but this
   //       will crash now; this specifies a routine that will be called when
@@ -905,9 +909,9 @@ int main(int argc, char *argv[]) {
   rl_readline_name = "rIDL";
   ridl_completion_init();
   rl_attempted_completion_function = ridl_completion;
-  IDL_UicbRegPathChange(ridl_changepath);  
   ridl_get_userdefinedroutines_list();
-  
+  IDL_UicbRegPathChange(ridl_changepath); 
+    
   ridl_read_preferences();
   
   // load -pref filename if present on the command line

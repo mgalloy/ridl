@@ -60,11 +60,16 @@ IDL_VPTR local_variables;
 /// IDL array of currently defined routine names
 IDL_VPTR routine_names;
 
-/// IDL array of current routine names in path cache
+/// routine names in correctly named files in !path
 IDL_VPTR userdefined_routine_names;
 char **userdefined_routines;
 int nuserdefined_routines = 0;
-  
+
+/// routine names in correctly named files in current directory
+IDL_VPTR currentdir_userdefined_routine_names;
+char **currentdir_userdefined_routines;
+int ncurrentdir_userdefined_routines = 0;
+
 /// IDL array of structure field names
 IDL_VPTR structure_fields;
 
@@ -79,29 +84,66 @@ char *current_obj;
 
 
 void ridl_get_userdefinedroutines_list() {
-  char *cmd = "_ridl_userdefined_routine_names = ridl_getuserroutines()";
+  char *cmd = "_ridl_userdefined_routine_names = ridl_getuserroutines(n_routines=_ridl_nuserdefined_routine_names)";
   int status, r;
   IDL_STRING *s;
+  IDL_VPTR nuserdefined_routine_names;
   
   status = IDL_ExecuteStr(cmd);
   userdefined_routine_names = IDL_FindNamedVariable("_ridl_userdefined_routine_names", 0);  
+  nuserdefined_routine_names = IDL_FindNamedVariable("_ridl_nuserdefined_routine_names", 0);  
 
-  if (userdefined_routines) {
-    // TODO: free individual strings
+  if (nuserdefined_routines > 0) {
+    for (r = 0; r < nuserdefined_routines; r++) {
+      free(userdefined_routines[r]);
+    }
     free(userdefined_routines);  
   }
 
-  nuserdefined_routines = (int) (*userdefined_routine_names->value.arr).n_elts;
-  userdefined_routines = (char **) malloc(nuserdefined_routines * sizeof(char *));
-  s = (IDL_STRING *) userdefined_routine_names->value.arr->data;
+  nuserdefined_routines = (int) (nuserdefined_routine_names->value.l);
+  if (nuserdefined_routines) {
+    userdefined_routines = (char **) malloc(nuserdefined_routines * sizeof(char *));
+    s = (IDL_STRING *) userdefined_routine_names->value.arr->data;
   
-  for (r = 0; r < nuserdefined_routines; r++) {
-    userdefined_routines[r] = ridl_copystr((*s++).s);
+    for (r = 0; r < nuserdefined_routines; r++) {
+      userdefined_routines[r] = ridl_copystr((*s++).s);
+    }
   }
-
   
   // clear IDL variable
-  status = IDL_ExecuteStr("delvar, _ridl_userdefined_routine_names");
+  status = IDL_ExecuteStr("delvar, _ridl_userdefined_routine_names, _ridl_nuserdefined_routine_names");
+}
+
+
+void ridl_get_currentdir_userdefinedroutines_list() {
+  char *cmd = "_ridl_userdefined_routine_names = ridl_getuserroutines(/current_directory, n_routines=_ridl_nuserdefined_routine_names)";
+  int status, r;
+  IDL_STRING *s;
+  IDL_VPTR nuserdefined_routine_names;
+  
+  status = IDL_ExecuteStr(cmd);
+  currentdir_userdefined_routine_names = IDL_FindNamedVariable("_ridl_userdefined_routine_names", 0);  
+  nuserdefined_routine_names = IDL_FindNamedVariable("_ridl_nuserdefined_routine_names", 0);  
+
+  if (ncurrentdir_userdefined_routines > 0) {
+    for (r = 0; r < ncurrentdir_userdefined_routines; r++) {
+      free(currentdir_userdefined_routines[r]);
+    }
+    free(currentdir_userdefined_routines);  
+  }
+  
+  ncurrentdir_userdefined_routines = (int) (nuserdefined_routine_names->value.l);
+  if (ncurrentdir_userdefined_routines > 0) {
+    currentdir_userdefined_routines = (char **) malloc(ncurrentdir_userdefined_routines * sizeof(char *));
+    s = (IDL_STRING *) currentdir_userdefined_routine_names->value.arr->data;
+
+    for (r = 0; r < ncurrentdir_userdefined_routines; r++) {
+      currentdir_userdefined_routines[r] = ridl_copystr((*s++).s);
+    }
+  }
+  
+  // clear IDL variable
+  status = IDL_ExecuteStr("delvar, _ridl_userdefined_routine_names, _ridl_nuserdefined_routine_names");
 }
 
 
@@ -258,7 +300,8 @@ char *ridl_generator(const char *text, int state) {
   static int processed_idlclasses;
   static int processed_localvariables;
   static int processed_routinenames;
-  static int processed_userdefined_routinenames;
+  static int processed_currentdir_userdefined_routines;
+  static int processed_userdefined_routines;
   
   char *name;
   
@@ -275,7 +318,8 @@ char *ridl_generator(const char *text, int state) {
     processed_idlclasses = 0;
     processed_localvariables = 0;
     processed_routinenames = 0;
-    processed_userdefined_routinenames = 0;
+    processed_currentdir_userdefined_routines = 0;
+    processed_userdefined_routines = 0;
   }
 
   if (!processed_reservedwords) {
@@ -423,8 +467,25 @@ char *ridl_generator(const char *text, int state) {
     list_index = 0;
   }
 
+  if (!processed_currentdir_userdefined_routines) {
+    while (list_index < ncurrentdir_userdefined_routines) {
+      name = currentdir_userdefined_routines[list_index];
+      
+      list_index++;
+      if (strncmp(name, text, len) == 0) {
+        return(ridl_copystr(name));
+      }
+    }
+  }
 
-  if (!processed_userdefined_routinenames) {
+  if (!processed_currentdir_userdefined_routines) {
+    //printf("processed user defined routines...\n");
+    processed_currentdir_userdefined_routines = 1;
+    list_index = 0;
+  }
+  
+  
+  if (!processed_userdefined_routines) {
     while (list_index < nuserdefined_routines) {
       name = userdefined_routines[list_index];
       
@@ -435,13 +496,12 @@ char *ridl_generator(const char *text, int state) {
     }
   }
 
-  if (!processed_userdefined_routinenames) {
+  if (!processed_userdefined_routines) {
     //printf("processed user defined routines...\n");
-    processed_userdefined_routinenames = 1;
+    processed_userdefined_routines = 1;
     list_index = 0;
   }
-      
-      
+   
   return((char *)NULL);
 }
 
