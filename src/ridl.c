@@ -465,15 +465,19 @@ char *ridl_linecontinued(char *line) {
 }
 
 char *ridl_readline(void) {
+  char *line;
+  
   // print source code line if we are not at the main level
   ridl_printsource();
   
   // prompt changes depending on if this is a continuation line
   if (continued) {
-    char *line = readline(ridl_expandedprompt2); 
+    line = readline(ridl_expandedprompt2); 
   } else {
-    char *line = readline(ridl_expandedprompt);  
+    line = readline(ridl_expandedprompt);
   }
+  
+  return(line);
 }
 
 
@@ -492,7 +496,7 @@ void ridl_printfunmap(char *funmap_function_name, rl_command_func_t *funmap_func
 
 int ridl_executeline(char *line, int flags) {
   int error = 0;
-  
+
   // normal exit by hitting ^D
   if (line == NULL) { 
     printf("\n");
@@ -964,6 +968,7 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     char *line = ridl_readline();
+
     ridl_getevents();
     
     int error = ridl_executeline(line, 1);
