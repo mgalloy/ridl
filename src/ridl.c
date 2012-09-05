@@ -1,5 +1,5 @@
-#include <stdio.h>  
-#include <stdlib.h> 
+#include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <string.h>
 #include <stdarg.h>
@@ -40,9 +40,9 @@ static int use_colors = 1;
 static int auto_compile = 1;
 
 
-static IDL_MSG_DEF msg_arr[] = {  
+static IDL_MSG_DEF msg_arr[] = {
 #define M_RIDL_SIGNAL_REG       0
-  {  "M_RIDL_SIGNAL_REG",   "%NSignal registration problem." }, 
+  {  "M_RIDL_SIGNAL_REG",   "%NSignal registration problem." },
 };
 static IDL_MSG_BLOCK msg_block; 
 
@@ -50,8 +50,8 @@ static IDL_MSG_BLOCK msg_block;
 int ridl_really_exit = 1;
 
 #define N_FUNMAP_FUNCTIONS 4
-char *funmap_function_names[] = { "ridl-stepinto", 
-                                  "ridl-stepover", 
+char *funmap_function_names[] = { "ridl-stepinto",
+                                  "ridl-stepover",
                                   "ridl-stepreturn",
                                   "ridl-savegraphic" }; 
 rl_command_func_t *funmap_functions[] = {
@@ -83,9 +83,9 @@ void ridl_updateprompt(void) {
   char cmdnum[10];
   char *dots;
   int i;
-  
+
   sprintf(cmdnum, "%d", ridl_cmdnumber);
-  
+
   ridl_replacestr(tmp, ridl_prompt, "wdir", ridl_current_wdir);
   ridl_replacestr(ridl_expandedprompt, tmp, "cmdnum", cmdnum);
 
