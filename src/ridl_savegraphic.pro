@@ -47,23 +47,29 @@ pro ridl_savegraphic, filename, $
       end
     else: begin
         ; graphics type not set, try to guess
-        
-        windows = getWindows()
-        if (obj_valid(windows[0])) then begin
-          ridl_savegraphic, filename, /new_graphic
-          return
-        endif
-        
-        id = iGetCurrent(tool=tool)
-        if (obj_valid(tool)) then begin
-          ridl_savegraphic, filename, /itool
-          return
-        endif
-        
+
         if (!d.window ne -1L) then begin
           ridl_savegraphic, filename, /direct_graphic
           return
         endif
+
+        ; function graphics introduced in IDL 8.0
+        if (ridl_idlversion(require='8.0')) then begin
+          windows = getWindows()
+          if (obj_valid(windows[0])) then begin
+            ridl_savegraphic, filename, /new_graphic
+            return
+          endif
+        endif
+        
+        ; iTools introduced in IDL 7.0
+        if (ridl_idlversion(require='7.0')) then begin
+          id = iGetCurrent(tool=tool)
+          if (obj_valid(tool)) then begin
+            ridl_savegraphic, filename, /itool
+            return
+          endif
+        endif        
       end
   endcase
 end
