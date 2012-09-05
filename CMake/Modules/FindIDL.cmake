@@ -63,18 +63,17 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif ()
 
 
-# find idl based on version numbers, if you want a specific one, set
-# it prior to running configure
+# find IDL based on version numbers, if you want a specific one, set it prior 
+# to running configure
 if (NOT DEFINED IDL_FIND_VERSION)
-  set(_IDL_KNOWN_VERSIONS "82" "81" "80" "71" "706")
-# IDL 8.0 is in a different location than other versions on Windows (extra IDL directory in path)
+  set(_IDL_KNOWN_VERSIONS "82" "71" "706")
+  set(_IDL_KNOWN_VERSIONS_EXTRA_DIR "81" "80")
+  # IDL 8.0 and 8.1 is in a different location than other versions
   foreach (_IDL_COMPANY ${_IDL_KNOWN_COMPANIES})
-    list(APPEND 
-         _IDL_SEARCH_DIRS 
-         "${_IDL_PROGRAM_FILES_DIR}/${_IDL_COMPANY}/${_IDL_NAME}/${_IDL_NAME}80")
-    list(APPEND 
-         _IDL_SEARCH_DIRS 
-         "${_IDL_PROGRAM_FILES_DIR}/${_IDL_COMPANY}/${_IDL_NAME}/${_IDL_NAME}81")
+    foreach (_IDL_KNOWN_VERSION ${_IDL_KNOWN_VERSIONS_EXTRA_DIR})
+      list(APPEND _IDL_SEARCH_DIRS
+           "${_IDL_PROGRAM_FILES_DIR}/${_IDL_COMPANY}/${_IDL_NAME}/${_IDL_NAME}${_IDL_KNOWN_VERSION}")
+    endforeach (_IDL_KNOWN_VERSION ${_IDL_KNOWN_VERSIONS})
     foreach (_IDL_KNOWN_VERSION ${_IDL_KNOWN_VERSIONS})
       list(APPEND _IDL_SEARCH_DIRS
            "${_IDL_PROGRAM_FILES_DIR}/${_IDL_COMPANY}/${_IDL_NAME}${_IDL_KNOWN_VERSION}")
@@ -82,10 +81,10 @@ if (NOT DEFINED IDL_FIND_VERSION)
   endforeach (_IDL_COMPANY ${_IDL_KNOWN_COMPANIES})
 endif ()
 
+# override search path if IDL_DIR environment variable is set
 if (NOT "$ENV{IDL_DIR}" STREQUAL "")
   set(_IDL_SEARCH_DIRS "$ENV{IDL_DIR}")
 endif ()
-
 
 find_path(IDL_INCLUDE_DIR
   idl_export.h
@@ -93,7 +92,6 @@ find_path(IDL_INCLUDE_DIR
   HINTS ${IDL_ROOT}
   PATH_SUFFIXES external/include
 )
-
 
 set(IDL_BIN64_PATH /bin/bin${_IDL_OS}.x86_64)
   if (APPLE)
@@ -127,6 +125,7 @@ if (IDL_FOUND)
     message(STATUS "IDL library: ${IDL_LIBRARY}")
     message(STATUS "IDL include: ${IDL_INCLUDE_DIR}")
   endif ()
+
   set(HAVE_IDL 1 CACHE BOOL "Whether have IDL")
   get_filename_component(IDL_LIBRARY_DIR ${IDL_LIBRARY} PATH)
   get_filename_component(IDL_BIN_DIR ${IDL_LIBRARY_DIR} NAME)
