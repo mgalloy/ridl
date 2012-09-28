@@ -7,13 +7,14 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_SOURCE_DIR}/CMake/Modules 
     ${CMAKE_ROOT}/Modules 
     ${CMAKE_MODULE_PATH}
-    )
+)
 include(${CMAKE_SOURCE_DIR}/CMake/GetDate.cmake)
 
 # 32- or 64-bit build (in bytes)
 if (NOT rIDL_SIZEOF_VOID_P) 
   set(rIDL_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P})  
 endif ()
+
 math(EXPR rIDL_SIZEOF_VOID_P_BITS "8 * ${rIDL_SIZEOF_VOID_P}") 
 message(STATUS "Pointer size: ${rIDL_SIZEOF_VOID_P_BITS}-bit build")
 message(STATUS "Install location: ${CMAKE_INSTALL_PREFIX}")
@@ -39,7 +40,7 @@ set(CMAKE_C_FLAGS_DISTRIBUTION "-DNDEBUG")
 include_directories("${PROJECT_SOURCE_DIR}/src" 
                     "${IDL_INCLUDE_DIR}"
                     "${Readline_INCLUDE_DIR}"
-                     )
+)
 
 add_subdirectory(src)
 
@@ -57,32 +58,30 @@ add_custom_command(
   OUTPUT online_help
   COMMAND idlhelp2txt.py "${IDL_DIR}/help/online_help/IDL/Content/Reference Material" online_help
   DEPENDS "${IDL_DIR}/help/online_help/IDL/Content/Reference Material"
-  )
-   
+)
 add_custom_target(onlinehelp DEPENDS online_help)
 
 add_custom_command(
   OUTPUT api-docs/index.html
   COMMAND idl ridl_build_docs
   DEPENDS src/*.pro
-  )
-   
+)
 add_custom_target(apidocs DEPENDS api-docs/index.html)
 
 add_custom_command(
   OUTPUT capi-docs/html/index.html
   COMMAND doxygen doxygen.config
   DEPENDS src/*.c
-  )
-   
+)
 add_custom_target(capidocs DEPENDS capi-docs/html/index.html)
+
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "api-docs;capi-docs")
 
 add_custom_command(
   OUTPUT docs/ridl_manual.pdf
   COMMAND make_docs.sh
   DEPENDS docs/ridl_manual.rst docs/ridl.rst
-  )
-   
+)
 add_custom_target(docs DEPENDS docs/ridl_manual.pdf)
 
 install(CODE "MESSAGE(STATUS \"Checking/updating rIDL preferences configuration file\")")
