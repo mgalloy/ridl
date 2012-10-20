@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 2.8.4)
 
 project(rIDL)
 
-set(CMAKE_MODULE_PATH 
-    ${CMAKE_SOURCE_DIR}/CMake/Modules 
-    ${CMAKE_ROOT}/Modules 
-    ${CMAKE_MODULE_PATH}
+set(CMAKE_MODULE_PATH
+  ${CMAKE_SOURCE_DIR}/mgcmake/Modules
+  ${CMAKE_ROOT}/Modules
+  ${CMAKE_MODULE_PATH}
 )
-include(${CMAKE_SOURCE_DIR}/CMake/GetDate.cmake)
+include(${CMAKE_SOURCE_DIR}/mgcmake/GetDate.cmake)
 
 # 32- or 64-bit build (in bytes)
 if (NOT rIDL_SIZEOF_VOID_P) 
@@ -37,8 +37,8 @@ set(rIDL_VERSION_PATCH 0)
 set(CMAKE_BUILD_TYPE "Distribution")
 set(CMAKE_C_FLAGS_DISTRIBUTION "-DNDEBUG")
 
-include_directories("${PROJECT_SOURCE_DIR}/src" 
-                    "${IDL_INCLUDE_DIR}"
+include_directories("${PROJECT_SOURCE_DIR}/src"
+                    "${Idl_INCLUDE_DIR}"
                     "${Readline_INCLUDE_DIR}"
 )
 
@@ -56,14 +56,14 @@ configure_file("ridl.sh.in" "ridl.sh")
 
 add_custom_command(
   OUTPUT online_help
-  COMMAND idlhelp2txt.py "${IDL_DIR}/help/online_help/IDL/Content/Reference Material" online_help
-  DEPENDS "${IDL_DIR}/help/online_help/IDL/Content/Reference Material"
+  COMMAND idlhelp2txt.py "${Idl_ROOT}/help/online_help/IDL/Content/Reference Material" online_help
+  DEPENDS "${Idl_ROOT}/help/online_help/IDL/Content/Reference Material"
 )
 add_custom_target(onlinehelp DEPENDS online_help)
 
 add_custom_command(
   OUTPUT api-docs/index.html
-  COMMAND idl ridl_build_docs
+  COMMAND ${Idl_EXECUTABLE} ridl_build_docs
   DEPENDS src/*.pro
 )
 add_custom_target(apidocs DEPENDS api-docs/index.html)
@@ -91,5 +91,5 @@ install(PROGRAMS ridl.sh DESTINATION bin)
 install(FILES docs/ridl_manual.pdf DESTINATION docs OPTIONAL)
 install(FILES docs/ridl.1 DESTINATION man/man1 OPTIONAL)
 install(DIRECTORY online_help/
-        DESTINATION online_help 
+        DESTINATION online_help
         OPTIONAL)
