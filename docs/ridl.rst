@@ -6,7 +6,7 @@ rIDL
 enhanced command line interface to IDL
 --------------------------------------
 
-:Author: rIDL was written by Michael Galloy (mgalloy@idldev.com)
+:Author: rIDL was written by Michael Galloy (``mgalloy@idldev.com``)
 :Date:   2011-05-26
 :Copyright: BSD
 :Version: 0.1
@@ -23,7 +23,7 @@ ridl [options] [filename]
 DESCRIPTION
 -----------
 
-A filename, with or without the `.pro` extension, may be passed to ``ridl`` to
+A filename, with or without the *.pro* extension, may be passed to ``ridl`` to
 be executed as a batch file.
 
 The following options are available:
@@ -39,13 +39,13 @@ The following options are available:
 :-e *command*:
   executes command and exit
 :-em=\ *FILENAME*:
-  execute the given .sav file containing an embedded license
+  execute the given *.sav* file containing an embedded license
 :-h:
   display this help message
 :-IDL_PREF *value*:
   set the IDL_PREF preference for this session
 :-novm:
-  use 7-minute demo mode instead of virtual machine with --rt
+  use 7-minute demo mode instead of virtual machine with ``--rt``
 :-pref=\ *FILENAME*:
   load the given preference file
 :-queue:
@@ -53,7 +53,7 @@ The following options are available:
 :-quiet:
   suppress printing information about IDL on startup
 :-rt=\ *FILENAME*:
-  start with a runtime license on the given .sav file
+  start with a runtime license on the given *.sav* file
 :-student:
   start in student mode
 :-ulicense:
@@ -80,8 +80,8 @@ To execute a *.sav* file with the virtual machine::
 DIAGNOSTICS
 -----------
 
-rIDL returns 0 on normal completion or the exit status given by the ``EXIT``
-command in IDL.
+rIDL returns ``0`` on normal completion or the exit status given by the
+``EXIT`` command in IDL.
 
 
 ENVIRONMENT
@@ -95,5 +95,5 @@ The ``.edit`` executive command will use the editor specified by the
 BUGS
 ----
 
-See the rIDL site at ridl.idldev.com for current information about bugs in
-rIDL.
+See the rIDL GitHub site at ``github.com/mgalloy/ridl`` for current information
+about bugs in rIDL.
