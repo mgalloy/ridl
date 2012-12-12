@@ -1,4 +1,4 @@
-====        
+====
 rIDL
 ====
 
@@ -30,7 +30,7 @@ The following options are available:
 
 :-32:
   start in 32-bit mode
-:-arg *value*:                 
+:-arg *value*:
   saves a single command line argument
 :-args *value1* *value2* ...:
   saves multiple command line arguments; must be the last option on the line
@@ -41,7 +41,7 @@ The following options are available:
 :-em=\ *FILENAME*:
   execute the given .sav file containing an embedded license
 :-h:
-  display this help message 
+  display this help message
 :-IDL_PREF *value*:
   set the IDL_PREF preference for this session
 :-novm:
