@@ -250,6 +250,19 @@ int ridl_executestr(char *cmd, int save) {
 }
 
 
+void ridl_execute_batch_file(char *batch_filename) {
+  int err, i = 0;
+  FILE *fp = fopen(batch_filename, "r");
+  char line[RIDL_MAX_LINE_LENGTH];
+
+  while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
+    if (i != 0 || line[0] != '#') {
+      err = IDL_ExecuteStr(line);
+    }
+  }
+  fclose(fp);
+}
+
 /**
    IDL callback registered to be called before a compiler error is shown.
 */
@@ -259,7 +272,7 @@ void ridl_show_compile_error(void) {
 
 
 /**
-   IDL callback registered to be called after IDL_Cleanup is called. 
+   IDL callback registered to be called after IDL_Cleanup is called.
 */
 void ridl_deathhint(void) {
 }
@@ -270,7 +283,7 @@ void ridl_deathhint(void) {
 */
 void ridl_exit(void) {
   int status = IDL_Cleanup(IDL_FALSE);
-  exit(status);  
+  exit(status);
 }
 
 
@@ -279,7 +292,7 @@ void ridl_exit(void) {
 */
 void ridl_exit_handler(void) {
   if (ridl_isnotebooking()) ridl_closenotebook();
-  if (ridl_islogging()) ridl_closelog(); 
+  if (ridl_islogging()) ridl_closelog();
   if (ridl_isteeing()) ridl_closelog();
 }
 
@@ -297,7 +310,7 @@ int ridl_firstchar(char *line) {
 
 /*
    Return the index of the last non-space character on the line. Returns -1
-   if there is no last character, i.e., in an empty line or in a line with an 
+   if there is no last character, i.e., in an empty line or in a line with an
    unmatched string delimiter like:
    
        IDL> s = 'Hello?
@@ -717,7 +730,7 @@ int ridl_readline_callback(int cont, int widevint_allowed) {
 
 
 void ridl_printridlversion(void) {
-  printf("rIDL %s: Really Interactive Data Language. [Build: %s]\n", 
+  printf("rIDL %s: Really Interactive Data Language. [Build: %s]\n",
          RIDL_VERSION, RIDL_BUILD_DATE);
 }
 
@@ -727,7 +740,7 @@ void ridl_printridlversion(void) {
 */
 void ridl_welcome(void) {
   if (!(ridl_options & IDL_INIT_QUIET)) {
-    ridl_printridlversion(); 
+    ridl_printridlversion();
   }
 }
 
@@ -737,7 +750,7 @@ void ridl_welcome(void) {
 */
 void ridl_printversion(void) {  
   ridl_printridlversion();
-  printf("IDL Version %s, %s (%s %s m%d). [Build: %s]\n", 
+  printf("IDL Version %s, %s (%s %s m%d). [Build: %s]\n",
          IDL_STRING_STR(&IDL_SysvVersion.release),
          IDL_STRING_STR(&IDL_SysvVersion.os_name),
          IDL_STRING_STR(&IDL_SysvVersion.os),
@@ -946,12 +959,7 @@ int main(int argc, char *argv[]) {
   
   // execute batch file if present on the command line
   if (execute_batch_file) {
-    char *batch_cmd = (char *)malloc(strlen(batch_file) + 2);
-    sprintf(batch_cmd, "@%s", batch_file);
-    // TODO: should actually loop through the lines of the file and send each 
-    // one to "ridl_executeline(line, 0)"
-    int error = IDL_ExecuteStr(batch_cmd);
-    free(batch_cmd);
+    ridl_execute_batch_file(batch_file);
   }
   
   ridl_updateprompt();
