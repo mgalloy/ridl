@@ -12,35 +12,36 @@
 
 /// list of system variables
 char *system_variables[] = { 
-  "!c", "!color", "!cpu", "!d", "!dir", "!dlm_path", "!dpi", "!dtor",  "!edit_input", 
+  "!c", "!color", "!const", "!cpu", "!d", "!dir", "!dlm_path", "!dpi", "!dtor",
+  "!edit_input",
   "!err", "!error_state", "!except", "!help_path", "!journal", "!make_dll",
-  "!map", "!more", "!mouse", "!null", "!order", "!p", "!path", "!pi", "!prompt", 
+  "!map", "!more", "!mouse", "!null", "!order", "!p", "!path", "!pi", "!prompt",
   "!quiet", "!radeg", "!values", "!version", "!warn", "!x", "!y", "!z",
   (char *)NULL
 };
 
 /// list of reserved words for IDL language
 char *reserved_words[] = { 
-  "begin", "break", "case", "common", "compile_opt", "continue", "do", "else", 
-  "end", "endcase", "endelse", "endif", "endfor", "endforeach", "endrep", 
-  "endswitch", "endwhile", 
-  "for", "foreach", "forward_function", "function", "goto", "inherits", 
-  "of", "on_ierror", "pro", "repeat", "return", "switch", "then", "while", 
-  "and", "eq", "ge", "gt", "lt", "le",  "mod", "ne", "not",  "or", "xor", 
+  "begin", "break", "case", "common", "compile_opt", "continue", "do", "else",
+  "end", "endcase", "endelse", "endif", "endfor", "endforeach", "endrep",
+  "endswitch", "endwhile",
+  "for", "foreach", "forward_function", "function", "goto", "inherits",
+  "of", "on_ierror", "pro", "repeat", "return", "switch", "then", "while",
+  "and", "eq", "ge", "gt", "lt", "le",  "mod", "ne", "not",  "or", "xor",
   (char *)NULL
 };
 
 /// list of executive commands
 char *executive_cmds[] = {
   ".compile", ".continue", ".edit", ".full_reset_session", ".go", ".out",
-  ".reset_session", ".return", ".rnew", ".run", ".skip", ".step", ".stepover", 
-  ".trace", 
+  ".reset_session", ".return", ".rnew", ".run", ".skip", ".step", ".stepover",
+  ".trace",
   (char *)NULL
 };
 
 /// list of magic commands
 char *magic_cmds[] = {
-  ":colors", ":doc", ":help", ":history", ":histedit", ":log", ":unlog", 
+  ":colors", ":doc", ":help", ":history", ":histedit", ":log", ":unlog",
   ":notebook", ":unnotebook", ":save_graphic", ":tee", ":untee", ":time",
   ":version",
   (char *)NULL
@@ -97,7 +98,7 @@ void ridl_get_userdefinedroutines_list() {
     for (r = 0; r < nuserdefined_routines; r++) {
       free(userdefined_routines[r]);
     }
-    free(userdefined_routines);  
+    free(userdefined_routines);
   }
 
   nuserdefined_routines = (int) (nuserdefined_routine_names->value.l);
@@ -129,7 +130,7 @@ void ridl_get_currentdir_userdefinedroutines_list() {
     for (r = 0; r < ncurrentdir_userdefined_routines; r++) {
       free(currentdir_userdefined_routines[r]);
     }
-    free(currentdir_userdefined_routines);  
+    free(currentdir_userdefined_routines);
   }
   
   ncurrentdir_userdefined_routines = (int) (nuserdefined_routine_names->value.l);
@@ -172,7 +173,7 @@ void ridl_remove_structurefields_list(void) {
 
 
 char *ridl_structurefield_generator(const char *varname, int state) {
-  static int list_index, len;  
+  static int list_index, len;
   int nfields = (int) (*structure_fields->value.arr).n_elts;
   IDL_STRING *s = (IDL_STRING *)structure_fields->value.arr->data;
   char *name;
@@ -190,7 +191,7 @@ char *ridl_structurefield_generator(const char *varname, int state) {
     if (strncasecmp(name, varname, len) == 0) {
       char *struct_and_field = (char *)malloc(strlen(current_struct) + strlen(name) + 1 + 1);
       strcpy(struct_and_field, current_struct);
-      strcpy(struct_and_field + strlen(current_struct), ".");      
+      strcpy(struct_and_field + strlen(current_struct), ".");
       strcpy(struct_and_field + strlen(current_struct) + 1, name);
       struct_and_field[strlen(current_struct) + strlen(name) + 1] = '\0';
       return(struct_and_field);
@@ -226,7 +227,7 @@ void ridl_remove_methodnames_list(void) {
 
 
 char *ridl_methodname_generator(const char *varname, int state) {
-  static int list_index, len;  
+  static int list_index, len;
   int nnames = (int) (*method_names->value.arr).n_elts;
   IDL_STRING *s = (IDL_STRING *)method_names->value.arr->data;
   char *name;
@@ -244,7 +245,7 @@ char *ridl_methodname_generator(const char *varname, int state) {
     if (strncasecmp(name, varname, len) == 0) {
       char *obj_and_method = (char *)malloc(strlen(current_obj) + strlen(name) + 2 + 1);
       strcpy(obj_and_method, current_obj);
-      strcpy(obj_and_method + strlen(current_obj), "->");      
+      strcpy(obj_and_method + strlen(current_obj), "->");
       strcpy(obj_and_method + strlen(current_obj) + 2, name);
       obj_and_method[strlen(current_obj) + strlen(name) + 2] = '\0';
       return(obj_and_method);
@@ -332,7 +333,7 @@ char *ridl_generator(const char *text, int state) {
   }
 
   if (!processed_reservedwords) {
-    //printf("processed reserved words...\n");    
+    //printf("processed reserved words...\n");
     processed_reservedwords = 1;
     list_index = 0;
   }
@@ -348,7 +349,7 @@ char *ridl_generator(const char *text, int state) {
   }
   
   if (!processed_systemvariables) {
-    //printf("processed system variables...\n");    
+    //printf("processed system variables...\n");
     processed_systemvariables = 1;
     list_index = 0;
   }
@@ -364,7 +365,7 @@ char *ridl_generator(const char *text, int state) {
   }
 
   if (!processed_executivecmds) {
-    //printf("processed executive commands...\n");    
+    //printf("processed executive commands...\n");
     processed_executivecmds = 1;
     list_index = 0;
   }
@@ -380,7 +381,7 @@ char *ridl_generator(const char *text, int state) {
   }
     
   if (!processed_magiccmds) {
-    //printf("processed magic commands...\n");    
+    //printf("processed magic commands...\n");
     processed_magiccmds = 1;
     list_index = 0;
   }
@@ -419,9 +420,9 @@ char *ridl_generator(const char *text, int state) {
     
     
   if (!processed_localvariables) {
-    ridl_get_localvariables_list();  
+    ridl_get_localvariables_list();
     nlocals = (int) (*local_variables->value.arr).n_elts;
-    locals = (IDL_STRING *)local_variables->value.arr->data;      
+    locals = (IDL_STRING *)local_variables->value.arr->data;
   }
   
   if (!processed_localvariables) {
@@ -446,7 +447,7 @@ char *ridl_generator(const char *text, int state) {
   if (!processed_routinenames) {
     ridl_get_routinenames_list();
     nrnames = (int) (*routine_names->value.arr).n_elts;
-    rnames = (IDL_STRING *)routine_names->value.arr->data;      
+    rnames = (IDL_STRING *)routine_names->value.arr->data;
   }
   
   if (!processed_routinenames) {
@@ -599,15 +600,15 @@ char **ridl_completion(const char *text, int start, int end) {
 */
 void ridl_completion_init(void) {
   char line[RIDL_MAX_LINE_LENGTH];
-  char idl_routines_filename[RIDL_MAX_LINE_LENGTH];   
-  char idl_classes_filename[RIDL_MAX_LINE_LENGTH];   
+  char idl_routines_filename[RIDL_MAX_LINE_LENGTH];
+  char idl_classes_filename[RIDL_MAX_LINE_LENGTH];
   FILE *fp;
   int r, i;
   
-  sprintf(idl_routines_filename, "%s/share/idl_routines.txt", RIDL_DIR); 
+  sprintf(idl_routines_filename, "%s/share/idl_routines.txt", RIDL_DIR);
   if (!ridl_file_exists(idl_routines_filename)) {
     ridl_warning("catalog of IDL library routines not found, completion on routine names not available");
-    idl_routines_available = 0; 
+    idl_routines_available = 0;
     return;
   }
 
@@ -624,10 +625,10 @@ void ridl_completion_init(void) {
   }
   fclose(fp);
   
-  sprintf(idl_classes_filename, "%s/share/idl_classes.txt", RIDL_DIR); 
+  sprintf(idl_classes_filename, "%s/share/idl_classes.txt", RIDL_DIR);
   if (!ridl_file_exists(idl_classes_filename)) {
     ridl_warning("catalog of IDL library classes not found, completion on class names not available");
-    idl_classes_available = 0; 
+    idl_classes_available = 0;
     return;
   }
 
