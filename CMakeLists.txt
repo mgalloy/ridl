@@ -33,6 +33,17 @@ find_package(Readline 6.0 REQUIRED)
 set(rIDL_VERSION_MAJOR 0)
 set(rIDL_VERSION_MINOR 2)
 set(rIDL_VERSION_PATCH 0)
+set(VERSION "${rIDL_VERSION_MAJOR}.${rIDL_VERSION_MINOR}.${rIDL_VERSION_PATCH}")
+
+find_package(Git)
+if (GIT_FOUND)
+  execute_process(
+    COMMAND ${GIT_EXECUTABLE} log -1 --pretty=format:%h
+    OUTPUT_VARIABLE REVISION
+  )
+else ()
+  set(REVISION "")
+endif ()
 
 set(CMAKE_BUILD_TYPE "Distribution")
 set(CMAKE_C_FLAGS_DISTRIBUTION "-DNDEBUG")
@@ -84,6 +95,27 @@ add_custom_command(
 )
 add_custom_target(docs DEPENDS docs/ridl_manual.pdf)
 
+
+# setup installer
+
+if (WIN32)
+  set(CPACK_GENERATOR ZIP)
+else ()
+  set(CPACK_GENERATOR TGZ)
+endif ()
+
+string(TOLOWER "${CMAKE_SYSTEM_NAME}" rIDL_SYSTEM_NAME)
+string(TOLOWER "${CMAKE_PROJECT_NAME}" rIDL_PACKAGE_NAME)
+set(rIDL_PACKAGE_VERSION "${VERSION}.${REVISION}")
+set(CPACK_PACKAGE_FILE_NAME "${rIDL_PACKAGE_NAME}-${rIDL_PACKAGE_VERSION}-${rIDL_SYSTEM_NAME}")
+
+include(CPack)
+
+install(FILES
+          COPYING.rst
+          README.rst
+          RELEASE.rst
+        DESTINATION .)
 install(CODE "MESSAGE(STATUS \"Checking/updating rIDL preferences configuration file\")")
 install(CODE "execute_process(COMMAND idl -quiet ridl_make_appdir)")
   
@@ -93,3 +125,4 @@ install(FILES docs/ridl.1 DESTINATION share/man/man1 OPTIONAL)
 install(DIRECTORY online_help/
         DESTINATION online_help
         OPTIONAL)
+
