@@ -10,7 +10,7 @@ do
   fi
 done
 
-export IDL_DIR=${Idl_ROOT}
+export IDL_DIR=@IDL_ROOT_DIR@
 
 if [ $PREFER_32 = 1 ]; then 
   export @rIDL_LIBRARY_PATH@=@IDL_LIBRARY_PATH@:$@rIDL_LIBRARY_PATH@
