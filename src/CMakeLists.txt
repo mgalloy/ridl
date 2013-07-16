@@ -24,12 +24,12 @@ add_executable(ridl
                
 target_link_libraries(ridl
                       "${Readline_LIBRARY}"
-                      "${Idl_LIBRARY}"
+                      "${IDL_LIBRARY}"
                       )  
 
 # Freetype library not included in Mac OS X distribution of IDL
 if (UNIX AND APPLE)
-  set(rIDL_LD_FLAGS "-L${Idl_LIBRARY_PATH} -lXm -L/usr/X11/lib -lfreetype -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2")
+  set(rIDL_LD_FLAGS "-L${IDL_LIBRARY_PATH} -lXm -L/usr/X11/lib -lfreetype -lMesaGL6_2 -lMesaGLU6_2 -lOSMesa6_2")
 else ()
   set(rIDL_LD_FLAGS "")
 endif ()

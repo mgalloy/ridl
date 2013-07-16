@@ -8,3 +8,4 @@ install
 CPackConfig.cmake
 CPackSourceConfig.cmake
 _CPack_Packages/
+TestIDLVersion.c

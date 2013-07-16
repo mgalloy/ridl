@@ -49,7 +49,7 @@ set(CMAKE_BUILD_TYPE "Distribution")
 set(CMAKE_C_FLAGS_DISTRIBUTION "-DNDEBUG")
 
 include_directories("${PROJECT_SOURCE_DIR}/src"
-                    "${Idl_INCLUDE_DIR}"
+                    "${IDL_INCLUDE_DIR}"
                     "${Readline_INCLUDE_DIR}"
 )
 
@@ -68,7 +68,7 @@ configure_file("ridl.sh.in" "ridl.sh")
 add_custom_command(
   OUTPUT online_help
   COMMAND idlhelp2txt.py "${Idl_ROOT}/help/online_help/IDL/Content/Reference Material" online_help
-  DEPENDS "${Idl_ROOT}/help/online_help/IDL/Content/Reference Material"
+  DEPENDS "${IDL_ROOT_DIR}/help/online_help/IDL/Content/Reference Material"
 )
 add_custom_target(onlinehelp DEPENDS online_help)
 
