@@ -3,8 +3,10 @@
 #include <signal.h>
 #include <string.h>
 #include <stdarg.h>
+#include <unistd.h>
 
 #include "idl_export.h" 
+#include "idl_undocumented.h"
 #include "readline/readline.h"
 #include "readline/history.h"
 
@@ -44,7 +46,7 @@ static IDL_MSG_DEF msg_arr[] = {
 #define M_RIDL_SIGNAL_REG       0
   {  "M_RIDL_SIGNAL_REG",   "%NSignal registration problem." },
 };
-static IDL_MSG_BLOCK msg_block; 
+static IDL_MSG_BLOCK msg_block;
 
 /// set to indicate that rIDL should just exit when asked
 int ridl_really_exit = 1;
@@ -53,7 +55,7 @@ int ridl_really_exit = 1;
 char *funmap_function_names[] = { "ridl-stepinto",
                                   "ridl-stepover",
                                   "ridl-stepreturn",
-                                  "ridl-savegraphic" }; 
+                                  "ridl-savegraphic" };
 rl_command_func_t *funmap_functions[] = {
   (rl_command_func_t *)ridl_stepinto_cmd,
   (rl_command_func_t *)ridl_stepover_cmd,
@@ -64,7 +66,7 @@ rl_command_func_t *funmap_functions[] = {
   
 
 /**
-   IDL callback called when the initial IDL startup text has finished 
+   IDL callback called when the initial IDL startup text has finished
    printing.
 */
 void ridl_inittextdone(void) {
@@ -143,7 +145,7 @@ void ridl_changewdir(char *dir) {
   
   // get .pro files in the current directory for use in tab completion
   // TODO: put this back when fixed
-  //ridl_get_currentdir_userdefinedroutines_list(); 
+  //ridl_get_currentdir_userdefinedroutines_list();
 }
 
 
@@ -162,240 +164,10 @@ void ridl_warning(const char *format, ...) {
 
 int ridl_file_exists(const char *filename) {
   FILE *file;
-  if (file = fopen(filename, "r")) {
+  if ((file = fopen(filename, "r"))) {
     fclose(file);
     return(1);
   }
-  return(0);
-}
-
-
-/**
-   Print the current line of source code that execution is stopped at (if it
-   is stopped somewhere).
-*/
-void ridl_printsource(void) {
-  if (IDL_DebugGetStackDepth() > 1) {
-    int result = IDL_ExecuteStr("ridl_printsource");
-  }
-}
-
-
-int ridl_stepinto_cmd(void) {
-  char *cmd = ".step";
-  printf("%s\n", cmd);  
-  int status = ridl_executestr(cmd, 1);
-  ridl_printsource();  
-  printf("%s", ridl_expandedprompt);
-}
-
-
-int ridl_stepover_cmd(void) {
-  char *cmd = ".stepover";
-  printf("%s\n", cmd);  
-  int status = ridl_executestr(cmd, 1);
-  ridl_printsource();  
-  printf("%s", ridl_expandedprompt);
-}
-
-
-int ridl_stepreturn_cmd(void) {
-  char *cmd = ".return";
-  printf("%s\n", cmd);   
-  int status = ridl_executestr(cmd, 1);
-  ridl_printsource();  
-  printf("%s", ridl_expandedprompt);
-}
-
-
-int ridl_savegraphic_cmd(void) {
-  char *cmd = ":save_graphic";
-  printf("%s\n", cmd);   
-  int status = ridl_executeline(cmd, 1);
-  ridl_printsource();  
-  printf("%s", ridl_expandedprompt);
-}
-
-
-/**
-   Execute an IDL command.
-   
-   @return integer representing success
-   
-   @param[in] cmd IDL command to execute
-   @param[in] save flag to indicate if the command should be saved in the 
-              history and hence if command number should be incremented
-*/
-int ridl_executestr(char *cmd, int save) {
-  int result;
-  
-  if (ridl_islogging()) ridl_logcmd(ridl_expandedprompt, cmd);
-  if (ridl_isnotebooking()) ridl_notebookcmd(ridl_expandedprompt, cmd);
-  
-  result = IDL_ExecuteStr(cmd);
-  
-  // add line to both Readline's history and IDL's history file
-  if (save) {
-    ridl_addhistoryline(cmd);
-    ridl_cmdnumber++;
-  }
-
-  // update prompt
-  ridl_updateprompt();
-
-  // reset colors if there was a compile error
-  if (use_colors) fprintf(stderr, "\e[0m");
-  
-  return(result);
-}
-
-
-void ridl_execute_batch_file(char *batch_filename) {
-  int err, i = 0;
-  FILE *fp = fopen(batch_filename, "r");
-  char line[RIDL_MAX_LINE_LENGTH];
-
-  while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
-    if (i != 0 || line[0] != '#') {
-      err = IDL_ExecuteStr(line);
-    }
-  }
-  fclose(fp);
-}
-
-/**
-   IDL callback registered to be called before a compiler error is shown.
-*/
-void ridl_show_compile_error(void) {
-  if (use_colors) fprintf(stderr, "\e[31m");  // show compiler errors in red
-}
-
-
-/**
-   IDL callback registered to be called after IDL_Cleanup is called.
-*/
-void ridl_deathhint(void) {
-}
-
-
-/**
-   IDL callback registered to be called when EXIT routine is encountered.
-*/
-void ridl_exit(void) {
-  int status = IDL_Cleanup(IDL_FALSE);
-  exit(status);
-}
-
-
-/**
-   IDL callback registered to be called when IDL is done.
-*/
-void ridl_exit_handler(void) {
-  if (ridl_isnotebooking()) ridl_closenotebook();
-  if (ridl_islogging()) ridl_closelog();
-  if (ridl_isteeing()) ridl_closelog();
-}
-
-
-/*
-   Return the index of the first non-space character on the line.
-*/
-int ridl_firstchar(char *line) {
-  int i;
-  for (i = 0; i < strlen(line); i++) {
-    if (line[i] != ' ') return(i);
-  }
-}
-
-
-/*
-   Return the index of the last non-space character on the line. Returns -1
-   if there is no last character, i.e., in an empty line or in a line with an
-   unmatched string delimiter like:
-   
-       IDL> s = 'Hello?
-*/
-int ridl_lastchar(char *line) {
-  int i, pos, comment_pos = strlen(line) - 1;
-  
-  // return -1 if empty line
-  if (strlen(line) == 0) return -1;
-  
-  // return -1 if the line ends with an unterminated string
-  if (ridl_instring(line, strlen(line) - 1)) return -1;
-  
-  pos = strcspn(line, ";");
-  while (ridl_instring(line, pos) && pos < comment_pos) {
-    pos += strcspn(line + pos, ";");
-  }
-  comment_pos = pos;
-  
-  for (i = comment_pos - 1; i >= 0; i--) {
-    if (line[i] != ' ') return(i);
-  }
-}
-
-
-void ridl_setautocompile(int _auto_compile) {
-  auto_compile = _auto_compile;
-}
-
-
-int ridl_getautocompile() {
-  return auto_compile;
-}
-
-
-/**
-   Launch editor in $EDITOR environment variable on the given filename.
-   
-   @param[in] filename file to launch editor on
-*/
-void ridl_launcheditor(char *filename) {
-  int result;
-  IDL_VPTR ridl_editfile;
-  char *launchCmdFormat, *launchCmd, *compileCmdFormat, *compileCmd;
-  
-  launchCmdFormat = "_ridl_editfile = ridl_launcheditor('%s')";
-  launchCmd = (char *)malloc(strlen(filename) + strlen(launchCmdFormat) + 1);
-  sprintf(launchCmd, launchCmdFormat, filename);
-  
-  result = IDL_ExecuteStr(launchCmd);
-  free(launchCmd);
-
-  if (auto_compile) {
-    compileCmdFormat = ".compile %s";
-    compileCmd = (char *)malloc(strlen(filename) + strlen(compileCmdFormat) + 1);
-    ridl_editfile = IDL_FindNamedVariable("_ridl_editfile", 0);  
-    sprintf(compileCmd, compileCmdFormat, IDL_VarGetString(ridl_editfile));
-
-    result = IDL_ExecuteStr(compileCmd);
-    free(compileCmd);
-  }
-  
-  result = IDL_ExecuteStr("delvar, _ridl_editfile");
-}
-
-
-/**
-   Calls IDL routine IDL_GETEVENTS to check for widget events. 
-   
-   This is required to allow widget programs to receive events while the 
-   command line is active.
-*/
-void ridl_getevents() {
-  char *cmd = "ridl_getevents";
-  int result = IDL_ExecuteStr(cmd);
-}
-
-
-/**
-   This is the Readline event hook callback; called by Readline when waiting
-   for input, but no more than 10 times per second.
-*/
-static int ridl_event_hook () {
-  ridl_getevents();
-  sleep(ridl_event_delay);
   return(0);
 }
 
@@ -440,8 +212,8 @@ int ridl_findcontinuationpos(char *line) {
         }
         break;
         
-      case '$':      
-        // quoted        
+      case '$':
+        // quoted
         if (inside_single_quotes || inside_double_quotes) break;
         
         // spawn to OS
@@ -457,14 +229,56 @@ int ridl_findcontinuationpos(char *line) {
         after_char = 0;
         
         if (after_char && (line[i] >= '0' && line[i] <= '9')) after_char = 1;
-        if ((line[i] == '_') 
-              || (line[i] >= 'a' && line[i] <= 'z') 
+        if ((line[i] == '_')
+              || (line[i] >= 'a' && line[i] <= 'z')
               || (line[i] >= 'A' && line[i] <= 'Z')) after_char = 1;
     }
   }
   
   return(-1);
 }
+
+
+/*
+   Return the index of the first non-space character on the line.
+*/
+int ridl_firstchar(char *line) {
+  int i;
+  for (i = 0; i < strlen(line); i++) {
+    if (line[i] != ' ') return(i);
+  }
+  return(-1);
+}
+
+
+/*
+   Return the index of the last non-space character on the line. Returns -1
+   if there is no last character, i.e., in an empty line or in a line with an
+   unmatched string delimiter like:
+   
+       IDL> s = 'Hello?
+*/
+int ridl_lastchar(char *line) {
+  int i, pos, comment_pos = strlen(line) - 1;
+  
+  // return -1 if empty line
+  if (strlen(line) == 0) return -1;
+  
+  // return -1 if the line ends with an unterminated string
+  if (ridl_instring(line, strlen(line) - 1)) return -1;
+  
+  pos = strcspn(line, ";");
+  while (ridl_instring(line, pos) && pos < comment_pos) {
+    pos += strcspn(line + pos, ";");
+  }
+  comment_pos = pos;
+  
+  for (i = comment_pos - 1; i >= 0; i--) {
+    if (line[i] != ' ') return(i);
+  }
+  return(-1);
+}
+
 
 char *ridl_linecontinued(char *line) {
   int continuationPos = ridl_findcontinuationpos(line);
@@ -477,20 +291,15 @@ char *ridl_linecontinued(char *line) {
   }
 }
 
-char *ridl_readline(void) {
-  char *line;
-  
-  // print source code line if we are not at the main level
-  ridl_printsource();
-  
-  // prompt changes depending on if this is a continuation line
-  if (continued) {
-    line = readline(ridl_expandedprompt2); 
-  } else {
-    line = readline(ridl_expandedprompt);
+
+/**
+   Print the current line of source code that execution is stopped at (if it
+   is stopped somewhere).
+*/
+void ridl_printsource(void) {
+  if (IDL_DebugGetStackDepth() > 1) {
+    int result = IDL_ExecuteStr("ridl_printsource");
   }
-  
-  return(line);
 }
 
 
@@ -503,7 +312,40 @@ void ridl_printfunmap(char *funmap_function_name, rl_command_func_t *funmap_func
   for (binding = 0; keyseqs[binding] != 0; binding++) {
     printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
   }
-  printf("\n");  
+  printf("\n");
+}
+
+
+/**
+   Execute an IDL command.
+   
+   @return integer representing success
+   
+   @param[in] cmd IDL command to execute
+   @param[in] save flag to indicate if the command should be saved in the
+              history and hence if command number should be incremented
+*/
+int ridl_executestr(char *cmd, int save) {
+  int result;
+  
+  if (ridl_islogging()) ridl_logcmd(ridl_expandedprompt, cmd);
+  if (ridl_isnotebooking()) ridl_notebookcmd(ridl_expandedprompt, cmd);
+  
+  result = IDL_ExecuteStr(cmd);
+  
+  // add line to both Readline's history and IDL's history file
+  if (save) {
+    ridl_addhistoryline(cmd);
+    ridl_cmdnumber++;
+  }
+
+  // update prompt
+  ridl_updateprompt();
+
+  // reset colors if there was a compile error
+  if (use_colors) fprintf(stderr, "\e[0m");
+  
+  return(result);
 }
 
 
@@ -511,16 +353,16 @@ int ridl_executeline(char *line, int flags) {
   int error = 0;
 
   // normal exit by hitting ^D
-  if (line == NULL) { 
+  if (line == NULL) {
     printf("\n");
-    return(IDL_Cleanup(IDL_FALSE)); 
+    return(IDL_Cleanup(IDL_FALSE));
   };
   
   // magic lines start with :, anything else is passed to IDL
   int firstcharIndex = ridl_firstchar(line);
   char firstchar = line[firstcharIndex];
   if (firstchar == ':') {
-    if ((firstcharIndex + 1 < strlen(line)) 
+    if ((firstcharIndex + 1 < strlen(line))
           && (line[firstcharIndex + 1] == '!' || line[firstcharIndex + 1] == '^')) {
       // TODO: eventually this shouldn't be a magic command, but should be
       //       activated when a space is entered
@@ -530,22 +372,22 @@ int ridl_executeline(char *line, int flags) {
       strcpy(expansion_line, line + firstcharIndex + 1);
       expansion_result = history_expand(expansion_line, &expansion);
       switch (expansion_result) {
-        case -1: 
+        case -1:
           ridl_warning("error in expansion");
           break;
-        case 2: 
+        case 2:
           printf("%s\n", expansion);
           break;
-        case 0: 
-        case 1: 
+        case 0:
+        case 1:
           ridl_executestr(expansion, 1);
           break;
       }
       
       free(expansion_line);
       free(expansion);
-    } else {   
-      int search_length;                       
+    } else {
+      int search_length;
       char *cmd = ridl_getnextword(line, firstcharIndex, &search_length);
       if (strcmp(cmd, ":colors") == 0) {
         use_colors = use_colors ? 0 : 1;
@@ -582,9 +424,9 @@ int ridl_executeline(char *line, int flags) {
           ridl_printpreferences();
         } else {
           char *pref_line = line + 6;
-          ridl_process_pref_line(pref_line);          
+          ridl_process_pref_line(pref_line);
         }
-        free(has_args);        
+        free(has_args);
       } else if (strcmp(cmd, ":log") == 0) {
         if (ridl_islogging()) ridl_closelog();
 
@@ -594,7 +436,7 @@ int ridl_executeline(char *line, int flags) {
           ridl_warning("must specify filename of log");
         } else {
           ridl_setlogging(1);
-          ridl_initlog(filename);          
+          ridl_initlog(filename);
         }
 
         free(filename);
@@ -642,7 +484,7 @@ int ridl_executeline(char *line, int flags) {
         int display_keybindings = ridl_magic_help(line, firstcharIndex);
 
         if (display_keybindings) {
-          printf("\nrIDL keybindings:\n");          
+          printf("\nrIDL keybindings:\n");
           for(f = 0; f < N_FUNMAP_FUNCTIONS; f++) {
             ridl_printfunmap(funmap_function_names[f], funmap_functions[f]);
           }
@@ -659,15 +501,15 @@ int ridl_executeline(char *line, int flags) {
       }
     }
   } else {
-    if (line && *line) {      
+    if (line && *line) {
       // check for .edit
       if (firstchar == '.') {
         int search_length;
         char *cmd = ridl_getnextword(line, firstcharIndex, &search_length);
-        if (strcmp(cmd, ".edit") == 0 || strcmp(cmd, ".edi") == 0 
+        if (strcmp(cmd, ".edit") == 0 || strcmp(cmd, ".edi") == 0
               || strcmp(cmd, ".ed") == 0 || strcmp(cmd, ".e") == 0) {
           char *file = ridl_getnextword(line, firstcharIndex + strlen(cmd) + 1, &search_length);
-          ridl_launcheditor(file);              
+          ridl_launcheditor(file);
           free(file);
           
           add_history(line);
@@ -688,7 +530,7 @@ int ridl_executeline(char *line, int flags) {
           varname[lastcharIndex] = '\0';
           sprintf(cmd, "ridl_varhelp, %s", varname);
           int status = IDL_ExecuteStr(cmd);
-        } else {        
+        } else {
           // determine if line is continued
           char *line_continued = ridl_linecontinued(line);
 
@@ -716,6 +558,175 @@ int ridl_executeline(char *line, int flags) {
   }
   
   return(error);
+}
+
+
+void ridl_execute_batch_file(char *batch_filename) {
+  int err, i = 0;
+  FILE *fp = fopen(batch_filename, "r");
+  char line[RIDL_MAX_LINE_LENGTH];
+
+  while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
+    if (i != 0 || line[0] != '#') {
+      err = IDL_ExecuteStr(line);
+    }
+  }
+  fclose(fp);
+}
+
+
+int ridl_stepinto_cmd(void) {
+  char *cmd = ".step";
+  printf("%s\n", cmd);
+  int status = ridl_executestr(cmd, 1);
+  ridl_printsource();
+  printf("%s", ridl_expandedprompt);
+  return status;
+}
+
+
+int ridl_stepover_cmd(void) {
+  char *cmd = ".stepover";
+  printf("%s\n", cmd);
+  int status = ridl_executestr(cmd, 1);
+  ridl_printsource();
+  printf("%s", ridl_expandedprompt);
+  return status;
+}
+
+
+int ridl_stepreturn_cmd(void) {
+  char *cmd = ".return";
+  printf("%s\n", cmd);
+  int status = ridl_executestr(cmd, 1);
+  ridl_printsource();
+  printf("%s", ridl_expandedprompt);
+  return status;
+}
+
+
+int ridl_savegraphic_cmd(void) {
+  char *cmd = ":save_graphic";
+  printf("%s\n", cmd);
+  int status = ridl_executeline(cmd, 1);
+  ridl_printsource();
+  printf("%s", ridl_expandedprompt);
+  return status;
+}
+
+
+/**
+   IDL callback registered to be called before a compiler error is shown.
+*/
+void ridl_show_compile_error(void) {
+  if (use_colors) fprintf(stderr, "\e[31m");  // show compiler errors in red
+}
+
+
+/**
+   IDL callback registered to be called after IDL_Cleanup is called.
+*/
+void ridl_deathhint(void) {
+}
+
+
+/**
+   IDL callback registered to be called when EXIT routine is encountered.
+*/
+void ridl_exit(void) {
+  int status = IDL_Cleanup(IDL_FALSE);
+  exit(status);
+}
+
+
+/**
+   IDL callback registered to be called when IDL is done.
+*/
+void ridl_exit_handler(void) {
+  if (ridl_isnotebooking()) ridl_closenotebook();
+  if (ridl_islogging()) ridl_closelog();
+  if (ridl_isteeing()) ridl_closelog();
+}
+
+
+void ridl_setautocompile(int _auto_compile) {
+  auto_compile = _auto_compile;
+}
+
+
+int ridl_getautocompile() {
+  return auto_compile;
+}
+
+
+/**
+   Launch editor in $EDITOR environment variable on the given filename.
+   
+   @param[in] filename file to launch editor on
+*/
+void ridl_launcheditor(char *filename) {
+  int result;
+  IDL_VPTR ridl_editfile;
+  char *launchCmdFormat, *launchCmd, *compileCmdFormat, *compileCmd;
+  
+  launchCmdFormat = "_ridl_editfile = ridl_launcheditor('%s')";
+  launchCmd = (char *)malloc(strlen(filename) + strlen(launchCmdFormat) + 1);
+  sprintf(launchCmd, launchCmdFormat, filename);
+  
+  result = IDL_ExecuteStr(launchCmd);
+  free(launchCmd);
+
+  if (auto_compile) {
+    compileCmdFormat = ".compile %s";
+    compileCmd = (char *)malloc(strlen(filename) + strlen(compileCmdFormat) + 1);
+    ridl_editfile = IDL_FindNamedVariable("_ridl_editfile", 0);
+    sprintf(compileCmd, compileCmdFormat, IDL_VarGetString(ridl_editfile));
+
+    result = IDL_ExecuteStr(compileCmd);
+    free(compileCmd);
+  }
+  
+  result = IDL_ExecuteStr("delvar, _ridl_editfile");
+}
+
+
+/**
+   Calls IDL routine IDL_GETEVENTS to check for widget events.
+   
+   This is required to allow widget programs to receive events while the
+   command line is active.
+*/
+void ridl_getevents() {
+  char *cmd = "ridl_getevents";
+  int result = IDL_ExecuteStr(cmd);
+}
+
+
+/**
+   This is the Readline event hook callback; called by Readline when waiting
+   for input, but no more than 10 times per second.
+*/
+static int ridl_event_hook () {
+  ridl_getevents();
+  sleep(ridl_event_delay);
+  return(0);
+}
+
+
+char *ridl_readline(void) {
+  char *line;
+  
+  // print source code line if we are not at the main level
+  ridl_printsource();
+  
+  // prompt changes depending on if this is a continuation line
+  if (continued) {
+    line = readline(ridl_expandedprompt2);
+  } else {
+    line = readline(ridl_expandedprompt);
+  }
+  
+  return(line);
 }
 
 
@@ -748,7 +759,7 @@ void ridl_welcome(void) {
 /**
    Prints version information about rIDL and IDL to stdout.
 */
-void ridl_printversion(void) {  
+void ridl_printversion(void) {
   ridl_printridlversion();
   printf("IDL Version %s, %s (%s %s m%d). [Build: %s]\n",
          IDL_STRING_STR(&IDL_SysvVersion.release),
@@ -773,39 +784,39 @@ void ridl_printhelp(void) {
   printf("\nusage: ridl [options] [batch_filename]\n\n");
 
   printf("options:\n");
-  printf(switch_format, indent, switch_width, "-32", 
+  printf(switch_format, indent, switch_width, "-32",
          "start in 32-bit mode");
-  printf(switch_format, indent, switch_width, "-arg value", 
+  printf(switch_format, indent, switch_width, "-arg value",
          "saves a single command line argument");
-  printf(switch_format, indent, switch_width, "-args value1 value2 ...", 
+  printf(switch_format, indent, switch_width, "-args value1 value2 ...",
          "saves multiple command line arguments");
-  printf(switch_format, indent, switch_width, "-demo", 
+  printf(switch_format, indent, switch_width, "-demo",
          "start in 7-minute demo mode");
-  printf(switch_format, indent, switch_width, "-e command", 
+  printf(switch_format, indent, switch_width, "-e command",
          "executes command and exit");
-  printf(switch_format, indent, switch_width, "-em=FILENAME", 
+  printf(switch_format, indent, switch_width, "-em=FILENAME",
          "execute the given .sav file containing an embedded license");
-  printf(switch_format, indent, switch_width, "-h", 
+  printf(switch_format, indent, switch_width, "-h",
          "display this help message");
-  printf(switch_format, indent, switch_width, "-IDL_PREF value", 
-         "set the IDL_PREF preference for this session");         
-  printf(switch_format, indent, switch_width, "-novm", 
+  printf(switch_format, indent, switch_width, "-IDL_PREF value",
+         "set the IDL_PREF preference for this session");
+  printf(switch_format, indent, switch_width, "-novm",
          "use 7-minute demo mode instead of virtual machine with -rt");
-  printf(switch_format, indent, switch_width, "-pref=FILENAME", 
+  printf(switch_format, indent, switch_width, "-pref=FILENAME",
          "load the given preference file");
-  printf(switch_format, indent, switch_width, "-queue", 
+  printf(switch_format, indent, switch_width, "-queue",
          "wait for a license when none are available");
-  printf(switch_format, indent, switch_width, "-quiet", 
+  printf(switch_format, indent, switch_width, "-quiet",
          "suppress printing information about IDL on startup");
-  printf(switch_format, indent, switch_width, "-rt=FILENAME", 
+  printf(switch_format, indent, switch_width, "-rt=FILENAME",
          "start with a runtime license on the given .sav file");
-  printf(switch_format, indent, switch_width, "-student", 
+  printf(switch_format, indent, switch_width, "-student",
          "start in student mode");
-  printf(switch_format, indent, switch_width, "-ulicense", 
+  printf(switch_format, indent, switch_width, "-ulicense",
          "start IDL with a unique license");
-  printf(switch_format, indent, switch_width, "-v", 
+  printf(switch_format, indent, switch_width, "-v",
          "display version information");
-  printf(switch_format, indent, switch_width, "-vm=FILENAME", 
+  printf(switch_format, indent, switch_width, "-vm=FILENAME",
          "start the virtual machine with the given .sav file");
 }
 
@@ -854,13 +865,13 @@ void ridl_handleswitches(int argc, char *argv[], int before) {
       ridl_options |= IDL_INIT_STUDENT;
     } else if (strcmp(argv[a], "-ulicense") == 0) {
       ridl_options |= IDL_INIT_NOLICALIAS;
-    } else if (strcmp(argv[a], "-v") == 0) { 
+    } else if (strcmp(argv[a], "-v") == 0) {
       ridl_printversion();
       exit(EXIT_SUCCESS);
     } else if (strncmp(argv[a], "-vm", 3) == 0) {
       ridl_options |= IDL_INIT_VM;
       runtime_exec = 1;
-      runtime_filename = argv[a] + 4;      
+      runtime_filename = argv[a] + 4;
     } else if (strcmp(argv[a], "-32") == 0) {
       // need to accept -32, but don't need to do anything since this must be
       // handled by the launch script (if we have gotten here it is too late)
@@ -915,8 +926,8 @@ int main(int argc, char *argv[]) {
 
   ridl_cmdnumber = ridl_initialize_history() + 1;
   
-  if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK", 
-                                           IDL_CARRAY_ELTS(msg_arr),  
+  if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK",
+                                           IDL_CARRAY_ELTS(msg_arr),
                                            msg_arr))) return(1);
   
   IDL_GetUserInfo(&user_info);
@@ -927,14 +938,14 @@ int main(int argc, char *argv[]) {
   ridl_completion_init();
   rl_attempted_completion_function = ridl_completion;
   ridl_get_userdefinedroutines_list();
-  IDL_UicbRegPathChange(ridl_changepath); 
+  IDL_UicbRegPathChange(ridl_changepath);
     
   ridl_read_preferences();
   
   // load -pref filename if present on the command line
   if (preferences_file_set) {
     // TODO: make this work (doing a PREF_SET will not change the preferences
-    // values unless COMMIT is set, but doing so will change the user's 
+    // values unless COMMIT is set, but doing so will change the user's
     // preferences file permanently); how to change preferences just for this
     // session of IDL?
     
@@ -966,7 +977,7 @@ int main(int argc, char *argv[]) {
   
   rl_event_hook = ridl_event_hook;
   
-  // bind these commands to keys in an Readline configuration file, i.e., 
+  // bind these commands to keys in an Readline configuration file, i.e.,
   // like ~/.inputrc (an example inputrc is given in the src/ directory of the
   // distribution)
   int f;

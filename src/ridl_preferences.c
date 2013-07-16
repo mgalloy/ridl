@@ -11,15 +11,15 @@
 void ridl_printpreferences(void) {
   char *indent = "  ";
   printf("rIDL preference values:\n");
-  printf("%sNOTEBOOK_FORMAT=%s\n", 
-         indent, 
+  printf("%sNOTEBOOK_FORMAT=%s\n",
+         indent,
          ridl_getloggingformat() ? "rst" : "HTML");
-  printf("%sRIDL_PROMPT=%s\n", 
-         indent, 
+  printf("%sRIDL_PROMPT=%s\n",
+         indent,
          ridl_ridlprompt());
-  printf("%sAUTO_COMPILE=%s\n", 
-         indent, 
-         ridl_getautocompile() ? "yes" : "no");         
+  printf("%sAUTO_COMPILE=%s\n",
+         indent,
+         ridl_getautocompile() ? "yes" : "no");
 }
 
 

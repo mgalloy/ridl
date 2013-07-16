@@ -5,6 +5,7 @@
 #include <ctype.h>
 
 #include "readline/history.h"
+#include "idl_export.h"
 
 #include "ridl.h"
 #include "ridl_strings.h"

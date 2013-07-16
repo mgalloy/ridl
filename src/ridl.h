@@ -35,4 +35,4 @@ void ridl_printversion(void);
 void ridl_warning(const char *format, ...);
 int ridl_file_exists(const char *filename);
 void ridl_launcheditor(char *filename);
-
+int ridl_executestr(char *cmd, int save);

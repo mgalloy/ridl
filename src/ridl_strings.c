@@ -17,7 +17,7 @@
    @param[in] s string to copy
 */
 char *ridl_copystr(char *s) {
-  char *r = (char *)malloc(strlen(s) + 1); 
+  char *r = (char *)malloc(strlen(s) + 1);
   strcpy(r, s);
   return(r);
 }
@@ -68,9 +68,9 @@ int ridl_replacestr(char *result, char *text, char *name, char *value) {
 
       if (matches) {
         matched = 1;
-        while (*result++ = *value++) 
+        while ((*result++ = *value++))
           ;
-        *result--;   // remove the null
+        result--;   // remove the null
         value = original_value;
       } else {
         *result++ = *pos;
@@ -88,7 +88,7 @@ int ridl_replacestr(char *result, char *text, char *name, char *value) {
 
 
 /**
-   Return the word starting from index start on line. The result is 
+   Return the word starting from index start on line. The result is
    dynamically allocated, so should be freed by the calling routine.
    
    @return char * of next word; caller is responsible for freeing

@@ -38,7 +38,7 @@ int ridl_getloggingformat(void) {
 
 /**
    @file
-   This file contains helper routines dealing with the logging/teeing 
+   This file contains helper routines dealing with the logging/teeing
    and notebooking commands.
 */
 
@@ -47,7 +47,7 @@ int ridl_isnotebooking(void) {
 }
 
 
-int ridl_setnotebooking(int notebooking) {
+void ridl_setnotebooking(int notebooking) {
   ridl_notebooking = notebooking;
 }
 
@@ -75,7 +75,7 @@ void ridl_notebookgraphic(void) {
   int cmd_length = strlen(notebook_filename) + strlen(savecmd_format) - 4 + 1 + 1;
   char *savecmd = (char *)malloc(cmd_length);
   sprintf(savecmd, savecmd_format, notebook_filename, notebook_image_counter);
-  int result = IDL_ExecuteStr(savecmd);  
+  int result = IDL_ExecuteStr(savecmd);
   free(savecmd);
 
   // put reference to .png file into notebook
@@ -90,7 +90,7 @@ void ridl_notebookgraphic(void) {
   }
   
   // increment image counter
-  notebook_image_counter++; 
+  notebook_image_counter++;
 }
 
 
@@ -109,7 +109,7 @@ void ridl_notebookoutput(int flags, char *buf, int n) {
       break;
     case 1:
       fprintf(notebook_fp, "%s%s", rst_indent, output);
-      break;  
+      break;
   }
   
   if (flags & IDL_TOUT_F_NLPOST) fprintf(notebook_fp, "\n");
@@ -141,7 +141,7 @@ void ridl_initnotebook(char *filename) {
       fprintf(notebook_fp, "      pre.output { color: #4A62A4; font-family: Monaco; margin-top: 0em; margin-bottom: 0em; }\n");
       fprintf(notebook_fp, "      p.date { color: #666; font-size: 0.9em; }\n");
       fprintf(notebook_fp, "    </style>\n");
-      fprintf(notebook_fp, "  </head>\n");  
+      fprintf(notebook_fp, "  </head>\n");
 
       fprintf(notebook_fp, "  <body>\n");
       break;

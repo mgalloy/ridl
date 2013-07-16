@@ -11,7 +11,7 @@
 
 
 /// list of system variables
-char *system_variables[] = { 
+char *system_variables[] = {
   "!c", "!color", "!const", "!cpu", "!d", "!dir", "!dlm_path", "!dpi", "!dtor",
   "!edit_input",
   "!err", "!error_state", "!except", "!help_path", "!journal", "!make_dll",
@@ -21,7 +21,7 @@ char *system_variables[] = {
 };
 
 /// list of reserved words for IDL language
-char *reserved_words[] = { 
+char *reserved_words[] = {
   "begin", "break", "case", "common", "compile_opt", "continue", "do", "else",
   "end", "endcase", "endelse", "endif", "endfor", "endforeach", "endrep",
   "endswitch", "endwhile",
@@ -91,8 +91,8 @@ void ridl_get_userdefinedroutines_list() {
   IDL_VPTR nuserdefined_routine_names;
   
   status = IDL_ExecuteStr(cmd);
-  userdefined_routine_names = IDL_FindNamedVariable("_ridl_userdefined_routine_names", 0);  
-  nuserdefined_routine_names = IDL_FindNamedVariable("_ridl_nuserdefined_routine_names", 0);  
+  userdefined_routine_names = IDL_FindNamedVariable("_ridl_userdefined_routine_names", 0);
+  nuserdefined_routine_names = IDL_FindNamedVariable("_ridl_nuserdefined_routine_names", 0);
 
   if (nuserdefined_routines > 0) {
     for (r = 0; r < nuserdefined_routines; r++) {
@@ -124,7 +124,7 @@ void ridl_get_currentdir_userdefinedroutines_list() {
   
   status = IDL_ExecuteStr(cmd);
   currentdir_userdefined_routine_names = IDL_FindNamedVariable("_ridl_userdefined_routine_names", 0);  
-  nuserdefined_routine_names = IDL_FindNamedVariable("_ridl_nuserdefined_routine_names", 0);  
+  nuserdefined_routine_names = IDL_FindNamedVariable("_ridl_nuserdefined_routine_names", 0);
 
   if (ncurrentdir_userdefined_routines > 0) {
     for (r = 0; r < ncurrentdir_userdefined_routines; r++) {
@@ -231,7 +231,7 @@ char *ridl_methodname_generator(const char *varname, int state) {
   int nnames = (int) (*method_names->value.arr).n_elts;
   IDL_STRING *s = (IDL_STRING *)method_names->value.arr->data;
   char *name;
-  
+
   // state == 0 the first time this is called, non-zero on subsequent calls
   if (!state) {
     list_index = 0;
@@ -251,7 +251,7 @@ char *ridl_methodname_generator(const char *varname, int state) {
       return(obj_and_method);
     }
   }
-    
+
   return((char *)NULL);
 }
 
@@ -324,7 +324,7 @@ char *ridl_generator(const char *text, int state) {
   }
 
   if (!processed_reservedwords) {
-    while (name = reserved_words[list_index]) {
+    while ((name = reserved_words[list_index])) {
       list_index++;
       if (strncmp(name, text, len) == 0) {
         return(ridl_copystr(name));
@@ -340,23 +340,23 @@ char *ridl_generator(const char *text, int state) {
 
 
   if (!processed_systemvariables) {
-    while (name = system_variables[list_index]) {
+    while ((name = system_variables[list_index])) {
       list_index++;
       if (strncmp(name, text, len) == 0) {
         return(ridl_copystr(name));
       }
     }
   }
-  
+
   if (!processed_systemvariables) {
     //printf("processed system variables...\n");
     processed_systemvariables = 1;
     list_index = 0;
   }
-  
-  
+
+
   if (!processed_executivecmds) {
-    while (name = executive_cmds[list_index]) {
+    while ((name = executive_cmds[list_index])) {
       list_index++;
       if (strncmp(name, text, len) == 0) {
         return(ridl_copystr(name));
@@ -372,14 +372,14 @@ char *ridl_generator(const char *text, int state) {
 
 
   if (!processed_magiccmds) {
-    while (name = magic_cmds[list_index]) {
+    while ((name = magic_cmds[list_index])) {
       list_index++;
       if (strncmp(name, text, len) == 0) {
         return(ridl_copystr(name));
       }
     }
   }
-    
+
   if (!processed_magiccmds) {
     //printf("processed magic commands...\n");
     processed_magiccmds = 1;
@@ -388,7 +388,7 @@ char *ridl_generator(const char *text, int state) {
   
   
   if (!processed_idlroutines) {
-    while (name = idl_routines[list_index]) {
+    while ((name = idl_routines[list_index])) {
       list_index++;
       if (strncmp(name, text, len) == 0) {
         return(ridl_copystr(name));
@@ -404,7 +404,7 @@ char *ridl_generator(const char *text, int state) {
 
 
   if (!processed_idlclasses) {
-    while (name = idl_classes[list_index]) {
+    while ((name = idl_classes[list_index])) {
       list_index++;
       if (strncasecmp(name, text, len) == 0) {
         return(ridl_copystr(name));
@@ -417,8 +417,8 @@ char *ridl_generator(const char *text, int state) {
     processed_idlclasses = 1;
     list_index = 0;
   }
-    
-    
+
+
   if (!processed_localvariables) {
     ridl_get_localvariables_list();
     nlocals = (int) (*local_variables->value.arr).n_elts;
@@ -589,7 +589,7 @@ char **ridl_completion(const char *text, int start, int end) {
       free(ovarname);
     }
   }
-    
+
   return(matches);
 }
 
@@ -613,7 +613,7 @@ void ridl_completion_init(void) {
   }
 
   fp = fopen(idl_routines_filename, "r");
-  
+
   r = 0;
   while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
     idl_routines[r] = (char *)calloc(strlen(line), 1);
@@ -624,7 +624,7 @@ void ridl_completion_init(void) {
     r++;
   }
   fclose(fp);
-  
+
   sprintf(idl_classes_filename, "%s/share/idl_classes.txt", RIDL_DIR);
   if (!ridl_file_exists(idl_classes_filename)) {
     ridl_warning("catalog of IDL library classes not found, completion on class names not available");
@@ -633,7 +633,7 @@ void ridl_completion_init(void) {
   }
 
   fp = fopen(idl_classes_filename, "r");
-  
+
   r = 0;
   while (fgets(line, RIDL_MAX_LINE_LENGTH, fp) != NULL) {
     idl_classes[r] = (char *)calloc(strlen(line), 1);
@@ -644,6 +644,6 @@ void ridl_completion_init(void) {
     r++;
   }
   fclose(fp);
-  
+
   rl_basic_word_break_characters = " \t\n\"\\'`@$<=;|&{(";
 }
