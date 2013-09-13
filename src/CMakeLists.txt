@@ -25,7 +25,7 @@ add_executable(ridl
 target_link_libraries(ridl
                       "${Readline_LIBRARY}"
                       "${IDL_LIBRARY}"
-                      )  
+                      )
 
 # Freetype library not included in Mac OS X distribution of IDL
 if (UNIX AND APPLE)
@@ -37,7 +37,7 @@ endif ()
 set_target_properties(ridl
                       PROPERTIES 
                         LINK_FLAGS "${rIDL_LD_FLAGS}"
-)                                   
+)
 
 install(TARGETS ridl DESTINATION bin/${IDL_BIN_DIR})
 install(FILES idl_routines.txt idl_classes.txt inputrc
