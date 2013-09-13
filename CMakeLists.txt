@@ -11,11 +11,11 @@ set(CMAKE_MODULE_PATH
 include(${CMAKE_SOURCE_DIR}/mgcmake/GetDate.cmake)
 
 # 32- or 64-bit build (in bytes)
-if (NOT rIDL_SIZEOF_VOID_P) 
-  set(rIDL_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P})  
+if (NOT rIDL_SIZEOF_VOID_P)
+  set(rIDL_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P})
 endif ()
 
-math(EXPR rIDL_SIZEOF_VOID_P_BITS "8 * ${rIDL_SIZEOF_VOID_P}") 
+math(EXPR rIDL_SIZEOF_VOID_P_BITS "8 * ${rIDL_SIZEOF_VOID_P}")
 message(STATUS "Pointer size: ${rIDL_SIZEOF_VOID_P_BITS}-bit build")
 message(STATUS "Install location: ${CMAKE_INSTALL_PREFIX}")
 
@@ -59,7 +59,7 @@ if (UNIX)
   if (APPLE)
     set(rIDL_LIBRARY_PATH "DYLD_LIBRARY_PATH")
   else ()
-    set(rIDL_LIBRARY_PATH "LD_LIBRARY_PATH")    
+    set(rIDL_LIBRARY_PATH "LD_LIBRARY_PATH")
   endif ()
 endif ()
 
