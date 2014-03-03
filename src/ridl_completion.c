@@ -1,8 +1,17 @@
-#include <stdio.h>  
-#include <stdlib.h> 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "idl_export.h" 
+#ifdef strlcpy
+#undef strlcpy
+#endif
+
+#ifdef strlcat
+#undef strlcat
+#endif
+
+#include "idl_export.h"
+
 #include "readline/readline.h"
 
 #include "ridl.h"

@@ -5,7 +5,15 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-#include "idl_export.h" 
+#ifdef strlcpy
+#undef strlcpy
+#endif
+
+#ifdef strlcat
+#undef strlcat
+#endif
+
+#include "idl_export.h"
 #include "idl_undocumented.h"
 #include "readline/readline.h"
 #include "readline/history.h"
