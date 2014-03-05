@@ -28,6 +28,9 @@
 #include "ridl_preferences.h"
 #include "ridl_idlpreferences.h"
 
+#define ANSI_COLOR_YELLOW  "\e[33m"
+#define ANSI_COLOR_RED     "\e[31m"
+#define ANSI_COLOR_RESET   "\e[0m"
 
 /// user information with fields: logname, homedir, pid, host, wd, date
 static IDL_USER_INFO user_info;
@@ -338,9 +341,9 @@ int ridl_executestr(char *cmd, int save) {
   
   if (ridl_islogging()) ridl_logcmd(ridl_expandedprompt, cmd);
   if (ridl_isnotebooking()) ridl_notebookcmd(ridl_expandedprompt, cmd);
-  
+
   result = IDL_ExecuteStr(cmd);
-  
+
   // add line to both Readline's history and IDL's history file
   if (save) {
     ridl_addhistoryline(cmd);
@@ -351,7 +354,10 @@ int ridl_executestr(char *cmd, int save) {
   ridl_updateprompt();
 
   // reset colors if there was a compile error
-  if (use_colors) fprintf(stderr, "\e[0m");
+  if (use_colors) {
+    fprintf(stderr, ANSI_COLOR_RESET);
+    fflush(stderr);
+  }
   
   return(result);
 }
@@ -627,7 +633,10 @@ int ridl_savegraphic_cmd(void) {
    IDL callback registered to be called before a compiler error is shown.
 */
 void ridl_show_compile_error(void) {
-  if (use_colors) fprintf(stderr, "\e[31m");  // show compiler errors in red
+  if (use_colors) {
+    fprintf(stderr, ANSI_COLOR_RED);  // show compiler errors in red
+    fflush(stderr);
+  }
 }
 
 
