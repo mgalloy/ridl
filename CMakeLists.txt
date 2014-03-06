@@ -117,9 +117,9 @@ install(FILES
           RELEASE.rst
         DESTINATION .)
 install(CODE "MESSAGE(STATUS \"Checking/updating rIDL preferences configuration file\")")
-install(CODE "execute_process(COMMAND idl -quiet ridl_make_appdir)")
+install(CODE "execute_process(COMMAND idl -IDL_PATH \"${CMAKE_SOURCE_DIR}:<IDL_DEFAULT>\" -IDL_STARTUP \"\" -quiet ridl_make_appdir)")
   
-install(PROGRAMS ridl.sh DESTINATION bin)
+install(PROGRAMS ${CMAKE_BINARY_DIR}/ridl.sh DESTINATION bin)
 install(FILES docs/ridl_manual.pdf DESTINATION docs OPTIONAL)
 install(FILES docs/ridl.1 DESTINATION share/man/man1 OPTIONAL)
 install(DIRECTORY online_help/
