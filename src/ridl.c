@@ -564,13 +564,13 @@ int ridl_executeline(char *line, int flags) {
             } else {
               // execute normal IDL commands
               error = ridl_executestr(line, 1);
-            }  
+            }
           }
         }
       }
     }
   }
-  
+
   return(error);
 }
 
@@ -917,16 +917,16 @@ int main(int argc, char *argv[]) {
   init_data.options = ridl_options;
   init_data.clargs.argc = argc;
   init_data.clargs.argv = argv;
-  
+
   ridl_welcome();
-  
+
   IDL_UicbRegInitTextDone(ridl_inittextdone);
                                                
   if (!IDL_Initialize(&init_data)) {
     ridl_warning("failed to initialize Callable IDL session.\n");
     return(EXIT_FAILURE);
   }
-      
+
   IDL_ExitRegister(ridl_exit_handler);
   IDL_UicbRegExitDone(ridl_exit);
   IDL_UicbRegShowCompileErr(ridl_show_compile_error);
@@ -942,11 +942,11 @@ int main(int argc, char *argv[]) {
   ridl_handleswitches(argc, argv, 0);
 
   ridl_cmdnumber = ridl_initialize_history() + 1;
-  
+
   if (!(msg_block = IDL_MessageDefineBlock("RIDL_MSG_BLOCK",
                                            IDL_CARRAY_ELTS(msg_arr),
                                            msg_arr))) return(1);
-  
+
   IDL_GetUserInfo(&user_info);
   ridl_changewdir(user_info.wd);
   IDL_ExecuteStr("!prompt = !prompt");  // triggers prompt to be set
@@ -972,28 +972,28 @@ int main(int argc, char *argv[]) {
     //int error = IDL_ExecuteStr(pref_set_cmd);
     //free(pref_set_cmd);
   }
-  
+
   // handle -rt or -em options if one of them was present on the command line
   if (runtime_exec) {
     int error = IDL_RuntimeExec(runtime_filename);
     return(IDL_Cleanup(IDL_FALSE));
   }
-  
+
   // handle -e option if it was present on the command line
   if (execute_cmd) {
     int error = IDL_ExecuteStr(cmd);
     return(IDL_Cleanup(IDL_FALSE));
   }
-  
+
   // execute batch file if present on the command line
   if (execute_batch_file) {
     ridl_execute_batch_file(batch_file);
   }
-  
+
   ridl_updateprompt();
-  
+
   rl_event_hook = ridl_event_hook;
-  
+
   // bind these commands to keys in an Readline configuration file, i.e.,
   // like ~/.inputrc (an example inputrc is given in the src/ directory of the
   // distribution)
@@ -1006,11 +1006,11 @@ int main(int argc, char *argv[]) {
     char *line = ridl_readline();
 
     ridl_getevents();
-    
+
     int error = ridl_executeline(line, 1);
-        
+
     free(line);
-  }    
-  
+  }
+
   return(EXIT_FAILURE);
 }
