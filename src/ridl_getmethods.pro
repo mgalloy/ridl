@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Add two list of property names with 1-element array containing an empty 
+; Add two list of property names with 1-element array containing an empty
 ; string representing an empty list of names.
 ;
 ; :Private:
@@ -39,7 +39,7 @@ end
 
 
 ;+
-; Returns the method names of the given class, and its superclasses. Returns a 
+; Returns the method names of the given class, and its superclasses. Returns a
 ; 1-element array with an empty string if no methods are found.
 ;
 ; :Private:
@@ -73,7 +73,7 @@ end
 
 
 ;+
-; Get the method names of an object. 
+; Get the method names of an object.
 ;
 ; :Returns:
 ;    string array

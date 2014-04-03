@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Add two list of property names with 1-element array containing an empty 
+; Add two list of property names with 1-element array containing an empty
 ; string representing an empty list of names.
 ;
 ; :Private:
@@ -37,7 +37,7 @@ end
 
 
 ;+
-; Find parameter information about the `getProperty` method of the given 
+; Find parameter information about the `getProperty` method of the given
 ; class.
 ;
 ; :Returns:
@@ -51,7 +51,7 @@ end
 ;
 ; :Keywords:
 ;    found : out, optional, type=boolean
-;       set to a named variable to return whether the parameter information 
+;       set to a named variable to return whether the parameter information
 ;       about the `getProperty` method of the class was found
 ;-
 function ridl_getfields_class_check, classname, found=found
@@ -73,7 +73,7 @@ end
 
 
 ;+
-; Returns the properties of the given class, and its superclasses. Returns a 
+; Returns the properties of the given class, and its superclasses. Returns a
 ; 1-element array with an empty string if no properties found.
 ;
 ; :Private:
@@ -108,16 +108,16 @@ end
 
 
 ;+
-; Returns the properties of an object, in alphabetical order. Returns a 
+; Returns the properties of an object, in alphabetical order. Returns a
 ; 1-element array with an empty string if no properties found.
-; 
+;
 ; :Private:
 ;
 ; :Returns:
 ;    string array
-; 
+;
 ; :Bugs:
-;    This routine will check for keywords to the `::getProperty` methods of 
+;    This routine will check for keywords to the `::getProperty` methods of
 ;    superclasses of the object and assume they are properties of the object.
 ;    This is not correct in all cases, though is quite common. A class does
 ;    not necessarily query its superclass for properties and a class may query
@@ -138,7 +138,7 @@ end
 
 
 ;+
-; Get the field names of a structure. 
+; Get the field names of a structure.
 ;
 ; :Returns:
 ;    string array
@@ -149,7 +149,7 @@ end
 ;-
 function ridl_getfields, var
   compile_opt strictarr, hidden
-  
+
   catch, error
   if (error ne 0) then begin
     catch, /cancel

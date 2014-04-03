@@ -1,11 +1,10 @@
 ; docformat = 'rst'
 
 ;+
-; Compares two version numbers for the more updated number. Returns `0` for 
-; equal versions, `1` if `version1` is later than `version2`, and -1 if 
-; `version1` is earlier than `version2`. Strings such as 'alpha' and 'beta' 
+; Compares two version numbers for the more updated number. Returns `0` for
+; equal versions, `1` if `version1` is later than `version2`, and -1 if
+; `version1` is earlier than `version2`. Strings such as 'alpha' and 'beta'
 ; may be tacked on to the end of a version, but are compared alphabetically.
-;     
 ;
 ; :Examples:
 ;    For example, 1.2 is later than 1.1.2::
@@ -20,7 +19,7 @@
 ;
 ;    And 1.2 is equivalent to itself::
 ;
-;       IDL> print, ridl_cmp_version('1.2', '1.2')  
+;       IDL> print, ridl_cmp_version('1.2', '1.2')
 ;              0
 ;
 ;    Also, try the main-level example program at the end of this file::
@@ -33,15 +32,15 @@
 ;         1.1alpha >         -1        -1        -1         0        -1
 ;          1.1beta >         -1        -1        -1         1         0
 ;
-; :Returns: 
+; :Returns:
 ;    -1, 0, or 1
 ;
-; :Params:    
+; :Params:
 ;    version1 : in, required, type=string
 ;       first version number
 ;    version2 : in, required, type=string
 ;       second version number
-;- 
+;-
 function ridl_cmp_version, version1, version2
   compile_opt strictarr
   
@@ -66,7 +65,7 @@ function ridl_cmp_version, version1, version2
 
       if (nondigitpos1 eq -1L && nondigitpos2 eq -1L) then return, 0
       if (nondigitpos1 eq -1L) then return, 1
-      if (nondigitpos2 eq -1L) then return, -1    
+      if (nondigitpos2 eq -1L) then return, -1
       
       case 1 of
         v1parts[i] lt v2parts[i]: return, -1

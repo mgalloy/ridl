@@ -1,7 +1,7 @@
 ; docformat = 'rst'
 
 ;+
-; Retrieve events; needs to be called periodically when command line is 
+; Retrieve events; needs to be called periodically when command line is
 ; waiting for a new command.
 ;-
 pro ridl_getevents

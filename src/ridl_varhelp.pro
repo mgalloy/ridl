@@ -46,7 +46,7 @@ pro ridl_varhelp, var
   
   case size(var, /type) of
     11: begin
-        if (obj_isa(var, 'idl_object')) then print, var->_overloadHelp(varname) 
+        if (obj_isa(var, 'idl_object')) then print, var->_overloadHelp(varname)
         print, 'Class hierarchy:'
         ridl_class_hierarchy, var, hierarchy=hierarchy, /no_print
         ridl_class_hierarchy_print, hierarchy, indent='  '
