@@ -122,7 +122,7 @@ install(CODE "execute_process(COMMAND idl -IDL_PATH \"${CMAKE_SOURCE_DIR}:<IDL_D
 install(PROGRAMS ${CMAKE_BINARY_DIR}/ridl.sh DESTINATION bin)
 install(FILES docs/ridl_manual.pdf DESTINATION docs OPTIONAL)
 install(FILES docs/ridl.1 DESTINATION share/man/man1 OPTIONAL)
-install(DIRECTORY online_help/
+install(DIRECTORY ${CMAKE_BINARY_DIR}/online_help/
         DESTINATION online_help
         OPTIONAL)
 
