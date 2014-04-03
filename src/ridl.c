@@ -951,6 +951,9 @@ int main(int argc, char *argv[]) {
   ridl_changewdir(user_info.wd);
   IDL_ExecuteStr("!prompt = !prompt");  // triggers prompt to be set
 
+  // handle functions called by rIDL (instead of compile_opt strictarr)
+  IDL_ExecuteStr("forward_function ridl_class_hierarchy_helper, ridl_cmp_version, ridl_getfields, ridl_getmethods, ridl_getroutines, ridl_getuserroutines, ridl_launcheditor, ridl_preflocation");
+
   rl_readline_name = "rIDL";
   ridl_completion_init();
   rl_attempted_completion_function = ridl_completion;
