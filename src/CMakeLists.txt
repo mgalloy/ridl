@@ -5,6 +5,8 @@ cmake_policy(SET CMP0017 NEW)
 
 # configure a header file to pass some CMake settings to the source code
 configure_file("ridl_config.h.in" "ridl_config.h")
+message(STATUS "CONFIG file = ${CMAKE_CURRENT_BINARY_DIR}/ridl_config.h")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 # if on a non-Apple UNIX platform, add -m64 if a 64-bit build is requested
 if (UNIX AND NOT APPLE AND (rIDL_SIZEOF_VOID_P EQUAL 8))
@@ -35,7 +37,7 @@ else ()
 endif ()
 
 set_target_properties(ridl
-                      PROPERTIES 
+                      PROPERTIES
                         LINK_FLAGS "${rIDL_LD_FLAGS}"
 )
 
