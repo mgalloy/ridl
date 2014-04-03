@@ -67,7 +67,7 @@ configure_file("ridl.sh.in" "ridl.sh")
 
 add_custom_command(
   OUTPUT online_help
-  COMMAND idlhelp2txt.py "${Idl_ROOT}/help/online_help/IDL/Content/Reference Material" online_help
+  COMMAND "${CMAKE_SOURCE_DIR}/idlhelp2txt.py" "${IDL_ROOT_DIR}/help/online_help/IDL/Content/Reference Material" online_help
   DEPENDS "${IDL_ROOT_DIR}/help/online_help/IDL/Content/Reference Material"
 )
 add_custom_target(onlinehelp DEPENDS online_help)
