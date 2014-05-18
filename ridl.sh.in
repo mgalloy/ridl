@@ -11,6 +11,7 @@ do
 done
 
 export IDL_DIR=@IDL_ROOT_DIR@
+export RIDL_DIR=@CMAKE_INSTALL_PREFIX@
 
 if [ $PREFER_32 = 1 ]; then 
   export @rIDL_LIBRARY_PATH@=@IDL_LIBRARY_PATH@:$@rIDL_LIBRARY_PATH@

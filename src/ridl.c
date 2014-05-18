@@ -950,6 +950,7 @@ int main(int argc, char *argv[]) {
   IDL_GetUserInfo(&user_info);
   ridl_changewdir(user_info.wd);
   IDL_ExecuteStr("!prompt = !prompt");  // triggers prompt to be set
+  IDL_ExecuteStr("!path = filepath('', subdir=['share', 'idl'], root=getenv('RIDL_DIR')) + path_sep(/search_path) + !path");
 
   // handle functions called by rIDL (instead of compile_opt strictarr)
   IDL_ExecuteStr("forward_function ridl_class_hierarchy_helper, ridl_cmp_version, ridl_getfields, ridl_getmethods, ridl_getroutines, ridl_getuserroutines, ridl_launcheditor, ridl_preflocation");
