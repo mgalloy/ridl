@@ -103,8 +103,8 @@ int ridl_initialize_history(void) {
   IDL_USER_INFO user_info;
   IDL_GetUserInfo(&user_info);
 
-  sprintf(history_filename, "%s/.idl/itt/rbuf/history", user_info.homedir);
-  sprintf(historybackup_filename, "%s/.idl/itt/rbuf/#history", user_info.homedir);
+  sprintf(history_filename, "%s/.idl/idl/rbuf/history", user_info.homedir);
+  sprintf(historybackup_filename, "%s/.idl/idl/rbuf/#history", user_info.homedir);
   
   using_history();
   return(ridl_populatehistory());
