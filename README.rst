@@ -1,3 +1,13 @@
+Introductin
+===========
+
+The Really Interactive Data Language (rIDL) provides a command line interface
+for IDL with more interactive features. Completion on filenames, variables,
+routines, system variables, reserved words, and executive commands allows
+users to quickly explore possibilities. rIDL also provides a richer set of
+other features including output logging and advanced history handling.
+
+
 Building
 ========
 
