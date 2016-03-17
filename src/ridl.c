@@ -74,7 +74,7 @@ rl_command_func_t *funmap_functions[] = {
   (rl_command_func_t *)ridl_savegraphic_cmd
 };
 
-  
+
 
 /**
    IDL callback called when the initial IDL startup text has finished
@@ -107,11 +107,11 @@ void ridl_updateprompt(void) {
     dots[i] = '.';
   }
   dots[i] = '\0';
-  
+
   ridl_replacestr(tmp2, ridl_prompt2, "wdir", ridl_current_wdir);
   ridl_replacestr(tmp3, tmp2, "cmdnum", cmdnum);
   ridl_replacestr(ridl_expandedprompt2, tmp3, "p1dots", dots);
-  
+
   free(tmp);
   free(tmp2);
   free(tmp3);
@@ -121,7 +121,7 @@ void ridl_updateprompt(void) {
 
 /**
    Registered to be called when the !prompt changes.
-   
+
    @param[in] prompt string to change prompt to
 */
 void ridl_changeprompt(IDL_STRING *prompt) {
@@ -132,17 +132,18 @@ void ridl_changeprompt(IDL_STRING *prompt) {
 
 /**
    Registered to be called when the !prompt changes.
-   
+
    @param[in] path string to change path to
 */
 void ridl_changepath(IDL_STRING *path) {
-  ridl_get_userdefinedroutines_list();
+  // TODO: put this back when fixed
+  //ridl_get_userdefinedroutines_list();
 }
 
 
 /**
    Registered to be called when the current working directory changes.
-   
+
    @param[in] dir directory that working directory is changing to
 */
 void ridl_changewdir(char *dir) {
@@ -153,7 +154,7 @@ void ridl_changewdir(char *dir) {
     strcpy(ridl_current_wdir, dir);
   }
   ridl_updateprompt();
-  
+
   // get .pro files in the current directory for use in tab completion
   // TODO: put this back when fixed
   //ridl_get_currentdir_userdefinedroutines_list();
@@ -189,14 +190,14 @@ int ridl_findcontinuationpos(char *line) {
   int only_space = 1;
   int after_char = 0;
   int inside_single_quotes = 0, inside_double_quotes = 0, inside_comment = 0;
-  
+
   for (i = 0; i < strlen(line); i++) {
     switch (line[i]) {
       case '\t':
       case ' ':
         after_char = 0;
         break;
-        
+
       case ';':
         only_space = 0;
         after_char = 0;
@@ -212,7 +213,7 @@ int ridl_findcontinuationpos(char *line) {
           inside_single_quotes = 1;
         }
         break;
-        
+
       case '"':
         only_space = 0;
         after_char = 0;
@@ -222,30 +223,30 @@ int ridl_findcontinuationpos(char *line) {
           inside_double_quotes = 1;
         }
         break;
-        
+
       case '$':
         // quoted
         if (inside_single_quotes || inside_double_quotes) break;
-        
+
         // spawn to OS
         if (only_space && !continued) break;
-        
+
         // in a variable name
         if (after_char) break;
-        
+
         return(i);
 
       default:
         only_space = 0;
         after_char = 0;
-        
+
         if (after_char && (line[i] >= '0' && line[i] <= '9')) after_char = 1;
         if ((line[i] == '_')
               || (line[i] >= 'a' && line[i] <= 'z')
               || (line[i] >= 'A' && line[i] <= 'Z')) after_char = 1;
     }
   }
-  
+
   return(-1);
 }
 
@@ -266,24 +267,24 @@ int ridl_firstchar(char *line) {
    Return the index of the last non-space character on the line. Returns -1
    if there is no last character, i.e., in an empty line or in a line with an
    unmatched string delimiter like:
-   
+
        IDL> s = 'Hello?
 */
 int ridl_lastchar(char *line) {
   int i, pos, comment_pos = strlen(line) - 1;
-  
+
   // return -1 if empty line
   if (strlen(line) == 0) return -1;
-  
+
   // return -1 if the line ends with an unterminated string
   if (ridl_instring(line, strlen(line) - 1)) return -1;
-  
+
   pos = strcspn(line, ";");
   while (ridl_instring(line, pos) && pos < comment_pos) {
     pos += strcspn(line + pos, ";");
   }
   comment_pos = pos;
-  
+
   for (i = comment_pos - 1; i >= 0; i--) {
     if (line[i] != ' ') return(i);
   }
@@ -318,7 +319,7 @@ void ridl_printfunmap(char *funmap_function_name, rl_command_func_t *funmap_func
   int binding;
   char **keyseqs = rl_invoking_keyseqs(funmap_function);
   if (keyseqs == 0) return;
-  
+
   printf("  %s: ", funmap_function_name);
   for (binding = 0; keyseqs[binding] != 0; binding++) {
     printf("%s%s", binding == 0 ? "" : ", ", keyseqs[binding]);
@@ -329,16 +330,16 @@ void ridl_printfunmap(char *funmap_function_name, rl_command_func_t *funmap_func
 
 /**
    Execute an IDL command.
-   
+
    @return integer representing success
-   
+
    @param[in] cmd IDL command to execute
    @param[in] save flag to indicate if the command should be saved in the
               history and hence if command number should be incremented
 */
 int ridl_executestr(char *cmd, int save) {
   int result;
-  
+
   if (ridl_islogging()) ridl_logcmd(ridl_expandedprompt, cmd);
   if (ridl_isnotebooking()) ridl_notebookcmd(ridl_expandedprompt, cmd);
 
@@ -358,7 +359,7 @@ int ridl_executestr(char *cmd, int save) {
     fprintf(stderr, ANSI_COLOR_RESET);
     fflush(stderr);
   }
-  
+
   return(result);
 }
 
@@ -371,7 +372,7 @@ int ridl_executeline(char *line, int flags) {
     printf("\n");
     return(IDL_Cleanup(IDL_FALSE));
   };
-  
+
   // magic lines start with :, anything else is passed to IDL
   int firstcharIndex = ridl_firstchar(line);
   char firstchar = line[firstcharIndex];
@@ -397,7 +398,7 @@ int ridl_executeline(char *line, int flags) {
           ridl_executestr(expansion, 1);
           break;
       }
-      
+
       free(expansion_line);
       free(expansion);
     } else {
@@ -476,7 +477,7 @@ int ridl_executeline(char *line, int flags) {
           ridl_setteeing(1);
           ridl_initlog(filename);
         }
-        
+
         free(filename);
       } else if (strcmp(cmd, ":untee") == 0) {
         if (ridl_isteeing()) {
@@ -525,7 +526,7 @@ int ridl_executeline(char *line, int flags) {
           char *file = ridl_getnextword(line, firstcharIndex + strlen(cmd) + 1, &search_length);
           ridl_launcheditor(file);
           free(file);
-          
+
           add_history(line);
           ridl_cmdnumber++;
           ridl_updateprompt();
@@ -678,18 +679,18 @@ int ridl_getautocompile() {
 
 /**
    Launch editor in $EDITOR environment variable on the given filename.
-   
+
    @param[in] filename file to launch editor on
 */
 void ridl_launcheditor(char *filename) {
   int result;
   IDL_VPTR ridl_editfile;
   char *launchCmdFormat, *launchCmd, *compileCmdFormat, *compileCmd;
-  
+
   launchCmdFormat = "_ridl_editfile = ridl_launcheditor('%s')";
   launchCmd = (char *)malloc(strlen(filename) + strlen(launchCmdFormat) + 1);
   sprintf(launchCmd, launchCmdFormat, filename);
-  
+
   result = IDL_ExecuteStr(launchCmd);
   free(launchCmd);
 
@@ -702,14 +703,14 @@ void ridl_launcheditor(char *filename) {
     result = IDL_ExecuteStr(compileCmd);
     free(compileCmd);
   }
-  
+
   result = IDL_ExecuteStr("delvar, _ridl_editfile");
 }
 
 
 /**
    Calls IDL routine IDL_GETEVENTS to check for widget events.
-   
+
    This is required to allow widget programs to receive events while the
    command line is active.
 */
@@ -732,17 +733,17 @@ static int ridl_event_hook () {
 
 char *ridl_readline(void) {
   char *line;
-  
+
   // print source code line if we are not at the main level
   ridl_printsource();
-  
+
   // prompt changes depending on if this is a continuation line
   if (continued) {
     line = readline(ridl_expandedprompt2);
   } else {
     line = readline(ridl_expandedprompt);
   }
-  
+
   return(line);
 }
 
@@ -754,7 +755,7 @@ int ridl_readline_callback(int cont, int widevint_allowed) {
   //printf("After: %d, %d, %s\n", cont, widevint_allowed, line);
 
   return(line == 0 ? 0 : 1);
-} 
+}
 
 
 void ridl_printridlversion(void) {
@@ -772,7 +773,7 @@ void ridl_welcome(void) {
   }
 }
 
-            
+
 /**
    Prints version information about rIDL and IDL to stdout.
 */
@@ -795,9 +796,9 @@ void ridl_printhelp(void) {
   char *indent = "  ";    // prefix for each line of switch help
   char *switch_format = "%s%-*s %s\n";
   int switch_width = 25;  // width of switch column in spaces
-  
+
   ridl_printversion();
-  
+
   printf("\nusage: ridl [options] [batch_filename]\n\n");
 
   printf("options:\n");
@@ -841,7 +842,7 @@ void ridl_printhelp(void) {
 void ridl_handleswitches(int argc, char *argv[], int before) {
   int a;
   char tmpcmd[RIDL_MAX_LINE_LENGTH];
-  
+
   // first run through command line switches (some of them are needed when
   // initializing IDL)
   for (a = 1; a < argc; a++) {
@@ -903,7 +904,7 @@ void ridl_handleswitches(int argc, char *argv[], int before) {
       batch_file = argv[a];
     }
   }
-  
+
 }
 
 
@@ -912,7 +913,7 @@ void ridl_handleswitches(int argc, char *argv[], int before) {
 */
 int main(int argc, char *argv[]) {
   ridl_handleswitches(argc, argv, 1);
-  
+
   IDL_INIT_DATA init_data;
   init_data.options = ridl_options;
   init_data.clargs.argc = argc;
@@ -921,7 +922,7 @@ int main(int argc, char *argv[]) {
   ridl_welcome();
 
   IDL_UicbRegInitTextDone(ridl_inittextdone);
-                                               
+
   if (!IDL_Initialize(&init_data)) {
     ridl_warning("failed to initialize Callable IDL session.\n");
     return(EXIT_FAILURE);
@@ -933,7 +934,7 @@ int main(int argc, char *argv[]) {
   IDL_UicbRegPromptChange(ridl_changeprompt);
   IDL_UicbRegDeathHint(ridl_deathhint);
   IDL_UicbRegWorkingDirChange(ridl_changewdir);
-  
+
   // TODO: will need to use something like this to fix ticket #1, but this
   //       will crash now; this specifies a routine that will be called when
   //       IDL needs to do a readline (as in RIDL_STOPTEST)
@@ -960,16 +961,16 @@ int main(int argc, char *argv[]) {
   rl_attempted_completion_function = ridl_completion;
   ridl_get_userdefinedroutines_list();
   IDL_UicbRegPathChange(ridl_changepath);
-    
+
   ridl_read_preferences();
-  
+
   // load -pref filename if present on the command line
   if (preferences_file_set) {
     // TODO: make this work (doing a PREF_SET will not change the preferences
     // values unless COMMIT is set, but doing so will change the user's
     // preferences file permanently); how to change preferences just for this
     // session of IDL?
-    
+
     //char *pref_set_format = "pref_set, filename='%s'";
     //char *pref_set_cmd = (char *)malloc(strlen(pref_set_format) - 2 + strlen(preferences_filename) + 1);
     //sprintf(pref_set_cmd, pref_set_format, preferences_filename);
