@@ -18,6 +18,28 @@
 #include "readline/readline.h"
 #include "readline/history.h"
 
+// IDL 8.6 got rid of some startup options
+
+#ifndef IDL_INIT_DEMO
+#define IDL_INIT_DEMO 0
+#endif
+
+#ifndef IDL_INIT_EMBEDDED
+#define IDL_INIT_EMBEDDED 0
+#endif
+
+#ifndef IDL_INIT_LMQUEUE
+#define IDL_INIT_LMQUEUE 0
+#endif
+
+#ifndef IDL_INIT_STUDENT
+#define IDL_INIT_STUDENT 0
+#endif
+
+#ifndef IDL_INIT_NOLICALIAS
+#define IDL_INIT_NOLICALIAS 0
+#endif
+
 #include "ridl.h"
 #include "ridl_magic.h"
 #include "ridl_history.h"
